@@ -8,7 +8,7 @@ from homeassistant.components.media_player import (
     PLATFORM_SCHEMA,
     MediaPlayerEntity,
     MediaPlayerEntityFeature,
-    MediaPlayerState,
+    MediaPlayerState, MediaPlayerDeviceClass,
 )
 from homeassistant.const import CONF_HOST, CONF_NAME, CONF_PORT, CONF_TYPE
 from homeassistant.core import HomeAssistant
@@ -80,8 +80,10 @@ def setup_platform(
 
 class NAD(MediaPlayerEntity):
     """Representation of a NAD Receiver."""
-
-    _attr_icon = "mdi:speaker-multiple"
+    _attr_has_entity_name = True
+    _attr_name = None
+    _attr_device_class = MediaPlayerDeviceClass.RECEIVER
+    _attr_icon = "mdi:audio-video"
     _attr_supported_features = SUPPORT_NAD
 
     def __init__(self, config):
@@ -93,6 +95,9 @@ class NAD(MediaPlayerEntity):
         self._max_volume = config[CONF_MAX_VOLUME]
         self._source_dict = config[CONF_SOURCE_DICT]
         self._reverse_mapping = {value: key for key, value in self._source_dict.items()}
+
+        if self.config[CONF_TYPE] == "RS232":
+            self._attr_unique_id = f"{self.config[CONF_SERIAL_PORT]}-mediaplayer"
 
     def _instantiate_nad_receiver(self) -> NADReceiver:
         if self.config[CONF_TYPE] == "RS232":
@@ -188,7 +193,10 @@ class NAD(MediaPlayerEntity):
 
 class NADtcp(MediaPlayerEntity):
     """Representation of a NAD Digital amplifier."""
-
+    _attr_has_entity_name = True
+    _attr_name = None
+    _attr_device_class = MediaPlayerDeviceClass.RECEIVER
+    _attr_icon = "mdi:audio-video"
     _attr_supported_features = SUPPORT_NAD
 
     def __init__(self, config):

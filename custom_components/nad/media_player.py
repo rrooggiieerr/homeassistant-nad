@@ -1,17 +1,22 @@
 """Support for interfacing with NAD receivers through RS-232."""
 from __future__ import annotations
 
+import logging
+
 from nad_receiver import NADReceiver, NADReceiverTCP, NADReceiverTelnet
 import voluptuous as vol
 
+import homeassistant.helpers.config_validation as cv
 from homeassistant.components.media_player import (
     PLATFORM_SCHEMA,
     MediaPlayerEntity,
     MediaPlayerEntityFeature,
     MediaPlayerState, MediaPlayerDeviceClass,
 )
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_HOST, CONF_NAME, CONF_PORT, CONF_TYPE
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity import DeviceInfo
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
@@ -29,9 +34,11 @@ from .const import (
     CONF_SOURCE_DICT,
 )
 
-DEFAULT_TYPE = "RS232"
-DEFAULT_SERIAL_PORT = "/dev/ttyUSB0"
-DEFAULT_NAME = "NAD Receiver"
+CONF_DEFAULT_TYPE = "RS232"
+CONF_DEFAULT_SERIAL_PORT = "/dev/ttyUSB0"
+CONF_DEFAULT_NAME = "NAD Receiver"
+
+_LOGGER = logging.getLogger(__name__)
 
 SUPPORT_NAD = (
     MediaPlayerEntityFeature.VOLUME_SET
@@ -47,13 +54,13 @@ SOURCE_DICT_SCHEMA = vol.Schema({vol.Range(min=1, max=12): cv.string})
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
     {
-        vol.Optional(CONF_TYPE, default=DEFAULT_TYPE): vol.In(
+        vol.Optional(CONF_TYPE, default=CONF_DEFAULT_TYPE): vol.In(
             ["RS232", "Telnet", "TCP"]
         ),
-        vol.Optional(CONF_SERIAL_PORT, default=DEFAULT_SERIAL_PORT): cv.string,
+        vol.Optional(CONF_SERIAL_PORT, default=CONF_DEFAULT_SERIAL_PORT): cv.string,
         vol.Optional(CONF_HOST): cv.string,
         vol.Optional(CONF_PORT, default=CONF_DEFAULT_PORT): int,
-        vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
+        vol.Optional(CONF_NAME, default=CONF_DEFAULT_NAME): cv.string,
         vol.Optional(CONF_MIN_VOLUME, default=CONF_DEFAULT_MIN_VOLUME): int,
         vol.Optional(CONF_MAX_VOLUME, default=CONF_DEFAULT_MAX_VOLUME): int,
         vol.Optional(CONF_SOURCE_DICT, default={}): SOURCE_DICT_SCHEMA,
@@ -71,14 +78,28 @@ def setup_platform(
     """Set up the NAD platform."""
     if config.get(CONF_TYPE) in ("RS232", "Telnet"):
         add_entities(
-            [NAD(config)],
+            [NAD(None, config)],
             True,
         )
     else:
         add_entities(
-            [NADtcp(config)],
+            [NADtcp(None, config)],
             True,
         )
+
+
+async def async_setup_entry(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    async_add_entities: AddEntitiesCallback,
+) -> None:
+    """Set up the NAD Receiver media player."""
+    receiver: NADReceiver = hass.data[DOMAIN][config_entry.entry_id]
+    options = config_entry.options.copy()
+    if isinstance(receiver, NADReceiverTCP):
+        async_add_entities([NADtcp(receiver, options)])
+    elif isinstance(receiver, NADReceiverTelnet) or isinstance(receiver, NADReceiver):
+        async_add_entities([NAD(receiver, options)])
 
 
 class NAD(MediaPlayerEntity):
@@ -89,18 +110,35 @@ class NAD(MediaPlayerEntity):
     _attr_icon = "mdi:audio-video"
     _attr_supported_features = SUPPORT_NAD
 
-    def __init__(self, config):
+    def __init__(self, receiver, config):
         """Initialize the NAD Receiver device."""
         self.config = config
-        self._instantiate_nad_receiver()
-        self._attr_name = self.config[CONF_NAME]
+
+        if receiver:
+            self._nad_receiver = receiver
+        else:
+            self._instantiate_nad_receiver()
+            self._attr_name = self.config[CONF_NAME]
+
         self._min_volume = config[CONF_MIN_VOLUME]
         self._max_volume = config[CONF_MAX_VOLUME]
         self._source_dict = config[CONF_SOURCE_DICT]
         self._reverse_mapping = {value: key for key, value in self._source_dict.items()}
 
-        if self.config[CONF_TYPE] == "RS232":
-            self._attr_unique_id = f"{self.config[CONF_SERIAL_PORT]}-mediaplayer"
+        if isinstance(self._nad_receiver, NADReceiverTelnet):
+            pass
+        elif isinstance(self._nad_receiver, NADReceiver):
+            serial_port = self._nad_receiver.transport.ser.port
+            model = self._nad_receiver.main_model("?")
+
+            self._attr_device_info = DeviceInfo(
+                identifiers={(DOMAIN, serial_port)},
+                name=f"NAD {model}",
+                model=model,
+                manufacturer="NAD",
+            )
+
+            self._attr_unique_id = f"{serial_port}-mediaplayer"
 
     def _instantiate_nad_receiver(self) -> NADReceiver:
         if self.config[CONF_TYPE] == "RS232":
@@ -202,15 +240,25 @@ class NADtcp(MediaPlayerEntity):
     _attr_icon = "mdi:audio-video"
     _attr_supported_features = SUPPORT_NAD
 
-    def __init__(self, config):
+    def __init__(self, receiver, config):
         """Initialize the amplifier."""
-        self._attr_name = config[CONF_NAME]
-        self._nad_receiver = NADReceiverTCP(config.get(CONF_HOST))
+        if receiver:
+            self._nad_receiver = receiver
+        else:
+            self._attr_name = config[CONF_NAME]
+            self._nad_receiver = NADReceiverTCP(config.get(CONF_HOST))
         self._min_vol = (config[CONF_MIN_VOLUME] + 90) * 2  # from dB to nad vol (0-200)
         self._max_vol = (config[CONF_MAX_VOLUME] + 90) * 2  # from dB to nad vol (0-200)
         self._volume_step = config[CONF_VOLUME_STEP]
         self._nad_volume = None
         self._source_list = self._nad_receiver.available_sources()
+
+        self._attr_device_info = DeviceInfo(
+            identifiers={(DOMAIN)},
+            name=self.config[CONF_NAME],
+            model=self._nad_receiver.main_model("?"),
+            manufacturer="NAD",
+        )
 
     def turn_off(self) -> None:
         """Turn the media player off."""

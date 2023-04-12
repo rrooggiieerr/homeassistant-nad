@@ -2,6 +2,7 @@
   "domain": "nad",
   "name": "NAD",
   "codeowners": [],
+  "config_flow": true,
   "documentation": "https://www.home-assistant.io/integrations/nad",
   "integration_type": "device",
   "iot_class": "local_polling",

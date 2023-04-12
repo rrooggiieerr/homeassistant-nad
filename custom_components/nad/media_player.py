@@ -16,13 +16,22 @@ import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 
+from .const import (
+    DOMAIN,
+    CONF_SERIAL_PORT,
+    CONF_DEFAULT_PORT,
+    CONF_MIN_VOLUME,
+    CONF_MAX_VOLUME,
+    CONF_DEFAULT_MIN_VOLUME,
+    CONF_DEFAULT_MAX_VOLUME,
+    CONF_VOLUME_STEP,
+    CONF_DEFAULT_VOLUME_STEP,
+    CONF_SOURCE_DICT,
+)
+
 DEFAULT_TYPE = "RS232"
 DEFAULT_SERIAL_PORT = "/dev/ttyUSB0"
-DEFAULT_PORT = 53
 DEFAULT_NAME = "NAD Receiver"
-DEFAULT_MIN_VOLUME = -92
-DEFAULT_MAX_VOLUME = -20
-DEFAULT_VOLUME_STEP = 4
 
 SUPPORT_NAD = (
     MediaPlayerEntityFeature.VOLUME_SET
@@ -32,12 +41,6 @@ SUPPORT_NAD = (
     | MediaPlayerEntityFeature.VOLUME_STEP
     | MediaPlayerEntityFeature.SELECT_SOURCE
 )
-
-CONF_SERIAL_PORT = "serial_port"  # for NADReceiver
-CONF_MIN_VOLUME = "min_volume"
-CONF_MAX_VOLUME = "max_volume"
-CONF_VOLUME_STEP = "volume_step"  # for NADReceiverTCP
-CONF_SOURCE_DICT = "sources"  # for NADReceiver
 
 # Max value based on a C658 with an MDC HDM-2 card installed
 SOURCE_DICT_SCHEMA = vol.Schema({vol.Range(min=1, max=12): cv.string})
@@ -49,12 +52,12 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
         ),
         vol.Optional(CONF_SERIAL_PORT, default=DEFAULT_SERIAL_PORT): cv.string,
         vol.Optional(CONF_HOST): cv.string,
-        vol.Optional(CONF_PORT, default=DEFAULT_PORT): int,
+        vol.Optional(CONF_PORT, default=CONF_DEFAULT_PORT): int,
         vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
-        vol.Optional(CONF_MIN_VOLUME, default=DEFAULT_MIN_VOLUME): int,
-        vol.Optional(CONF_MAX_VOLUME, default=DEFAULT_MAX_VOLUME): int,
+        vol.Optional(CONF_MIN_VOLUME, default=CONF_DEFAULT_MIN_VOLUME): int,
+        vol.Optional(CONF_MAX_VOLUME, default=CONF_DEFAULT_MAX_VOLUME): int,
         vol.Optional(CONF_SOURCE_DICT, default={}): SOURCE_DICT_SCHEMA,
-        vol.Optional(CONF_VOLUME_STEP, default=DEFAULT_VOLUME_STEP): int,
+        vol.Optional(CONF_VOLUME_STEP, default=CONF_DEFAULT_VOLUME_STEP): int,
     }
 )
 

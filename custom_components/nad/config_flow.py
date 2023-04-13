@@ -191,7 +191,7 @@ class NADReceiverConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 return self.async_create_entry(title=title, data=data, options=options)
 
         return self.async_show_form(
-            step_id="setup_serial",
+            step_id="setup_telnet",
             data_schema=STEP_SETUP_TELNET_SCHEMA,
             errors=errors,
         )
@@ -251,7 +251,7 @@ class NADReceiverConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 return self.async_create_entry(title=title, data=data, options=options)
 
         return self.async_show_form(
-            step_id="setup_serial",
+            step_id="setup_tcp",
             data_schema=STEP_SETUP_TCP_SCHEMA,
             errors=errors,
         )

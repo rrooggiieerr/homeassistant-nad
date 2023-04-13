@@ -3,35 +3,34 @@ from __future__ import annotations
 
 import logging
 
-from nad_receiver import NADReceiver, NADReceiverTCP, NADReceiverTelnet
-import voluptuous as vol
-
 import homeassistant.helpers.config_validation as cv
+import voluptuous as vol
 from homeassistant.components.media_player import (
     PLATFORM_SCHEMA,
+    MediaPlayerDeviceClass,
     MediaPlayerEntity,
     MediaPlayerEntityFeature,
-    MediaPlayerState, MediaPlayerDeviceClass,
+    MediaPlayerState,
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_HOST, CONF_NAME, CONF_PORT, CONF_TYPE
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import DeviceInfo
-import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
+from nad_receiver import NADReceiver, NADReceiverTCP, NADReceiverTelnet
 
 from .const import (
-    DOMAIN,
-    CONF_SERIAL_PORT,
-    CONF_DEFAULT_PORT,
-    CONF_MIN_VOLUME,
-    CONF_MAX_VOLUME,
-    CONF_DEFAULT_MIN_VOLUME,
     CONF_DEFAULT_MAX_VOLUME,
-    CONF_VOLUME_STEP,
+    CONF_DEFAULT_MIN_VOLUME,
+    CONF_DEFAULT_PORT,
     CONF_DEFAULT_VOLUME_STEP,
+    CONF_MAX_VOLUME,
+    CONF_MIN_VOLUME,
+    CONF_SERIAL_PORT,
     CONF_SOURCE_DICT,
+    CONF_VOLUME_STEP,
+    DOMAIN,
 )
 
 CONF_DEFAULT_TYPE = "RS232"
@@ -104,6 +103,7 @@ async def async_setup_entry(
 
 class NAD(MediaPlayerEntity):
     """Representation of a NAD Receiver."""
+
     _attr_has_entity_name = True
     _attr_name = None
     _attr_device_class = MediaPlayerDeviceClass.RECEIVER
@@ -234,6 +234,7 @@ class NAD(MediaPlayerEntity):
 
 class NADtcp(MediaPlayerEntity):
     """Representation of a NAD Digital amplifier."""
+
     _attr_has_entity_name = True
     _attr_name = None
     _attr_device_class = MediaPlayerDeviceClass.RECEIVER

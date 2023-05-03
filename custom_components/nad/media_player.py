@@ -99,7 +99,7 @@ class NAD(CoordinatorEntity, MediaPlayerEntity):
         _LOGGER.debug("_handle_coordinator_update")
         power_state = self.coordinator.data.get(self.zone + ".Power")
         if power_state is None:
-            self._attr_state == None
+            self._attr_state = None
             self._attr_available = False
         elif power_state.lower() == "off":
             self._attr_state = MediaPlayerState.OFF

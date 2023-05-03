@@ -447,7 +447,7 @@ class NADReceiverNumber(CoordinatorEntity, NumberEntity):
             if self._attr_native_value == value:
                 return
 
-            if self._attr_native_step < 1:
+            if self.native_step < 1:
                 response = self.coordinator.exec_command(
                     self.entity_description.key, "=", value
                 )

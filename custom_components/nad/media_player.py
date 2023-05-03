@@ -3,19 +3,17 @@ from __future__ import annotations
 
 import logging
 
-import homeassistant.helpers.config_validation as cv
-import voluptuous as vol
+from aiodiscover.discovery import _LOGGER
 from homeassistant.components.media_player import (
-    PLATFORM_SCHEMA,
     MediaPlayerDeviceClass,
     MediaPlayerEntity,
     MediaPlayerEntityFeature,
     MediaPlayerState,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_HOST, CONF_NAME, CONF_PORT, CONF_TYPE
+from homeassistant.const import CONF_TYPE
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers.entity import DeviceInfo
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
@@ -25,68 +23,17 @@ from . import NADReceiverCoordinator
 from .const import (
     CONF_DEFAULT_MAX_VOLUME,
     CONF_DEFAULT_MIN_VOLUME,
-    CONF_DEFAULT_PORT,
     CONF_DEFAULT_VOLUME_STEP,
     CONF_MAX_VOLUME,
     CONF_MIN_VOLUME,
-    CONF_SERIAL_PORT,
     CONF_SOURCE_DICT,
+    CONF_TYPE_SERIAL,
+    CONF_TYPE_TELNET,
     CONF_VOLUME_STEP,
     DOMAIN,
 )
 
-CONF_DEFAULT_TYPE = "RS232"
-CONF_DEFAULT_SERIAL_PORT = "/dev/ttyUSB0"
-CONF_DEFAULT_NAME = "NAD Receiver"
-
 _LOGGER = logging.getLogger(__name__)
-
-SUPPORT_NAD = (
-    MediaPlayerEntityFeature.VOLUME_SET
-    | MediaPlayerEntityFeature.VOLUME_MUTE
-    | MediaPlayerEntityFeature.TURN_ON
-    | MediaPlayerEntityFeature.TURN_OFF
-    | MediaPlayerEntityFeature.VOLUME_STEP
-    | MediaPlayerEntityFeature.SELECT_SOURCE
-)
-
-# Max value based on a C658 with an MDC HDM-2 card installed
-SOURCE_DICT_SCHEMA = vol.Schema({vol.Range(min=1, max=12): cv.string})
-
-PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
-    {
-        vol.Optional(CONF_TYPE, default=CONF_DEFAULT_TYPE): vol.In(
-            ["RS232", "Telnet", "TCP"]
-        ),
-        vol.Optional(CONF_SERIAL_PORT, default=CONF_DEFAULT_SERIAL_PORT): cv.string,
-        vol.Optional(CONF_HOST): cv.string,
-        vol.Optional(CONF_PORT, default=CONF_DEFAULT_PORT): int,
-        vol.Optional(CONF_NAME, default=CONF_DEFAULT_NAME): cv.string,
-        vol.Optional(CONF_MIN_VOLUME, default=CONF_DEFAULT_MIN_VOLUME): int,
-        vol.Optional(CONF_MAX_VOLUME, default=CONF_DEFAULT_MAX_VOLUME): int,
-        vol.Optional(CONF_SOURCE_DICT, default={}): SOURCE_DICT_SCHEMA,
-        vol.Optional(CONF_VOLUME_STEP, default=CONF_DEFAULT_VOLUME_STEP): int,
-    }
-)
-
-
-def setup_platform(
-    hass: HomeAssistant,
-    config: ConfigType,
-    add_entities: AddEntitiesCallback,
-    discovery_info: DiscoveryInfoType | None = None,
-) -> None:
-    """Set up the NAD platform."""
-    if config.get(CONF_TYPE) in ("RS232", "Telnet"):
-        add_entities(
-            [NAD(None, config)],
-            True,
-        )
-    else:
-        add_entities(
-            [NADtcp(None, config)],
-            True,
-        )
 
 
 async def async_setup_entry(
@@ -105,7 +52,7 @@ async def async_setup_entry(
     elif isinstance(coordinator.receiver, NADReceiverTelnet) or isinstance(
         coordinator.receiver, NADReceiver
     ):
-        async_add_entities([NAD(coordinator)])
+        async_add_entities([NADMain(coordinator), NADZone2(coordinator)])
 
 
 class NAD(CoordinatorEntity, MediaPlayerEntity):
@@ -114,90 +61,154 @@ class NAD(CoordinatorEntity, MediaPlayerEntity):
     _attr_has_entity_name = True
     _attr_name = None
     _attr_device_class = MediaPlayerDeviceClass.RECEIVER
-    _attr_icon = "mdi:audio-video"
-    _attr_supported_features = SUPPORT_NAD
+
+    zone = "Main"
 
     def __init__(self, coordinator: NADReceiverCoordinator):
         """Initialize the NAD Receiver device."""
-        super().__init__(coordinator)
+        super().__init__(coordinator, self.zone + ".Power")
 
         self._attr_device_info = coordinator.device_info
-        self._attr_unique_id = f"{coordinator.unique_id}-mediaplayer"
+        self._attr_unique_id = (
+            f"{coordinator.unique_id}-mediaplayer-{self.zone.lower()}"
+        )
 
-        self._min_volume = coordinator.options[CONF_MIN_VOLUME]
-        self._max_volume = coordinator.options[CONF_MAX_VOLUME]
-        self._source_dict = coordinator.options[CONF_SOURCE_DICT]
+        self._min_volume = coordinator.options.get(
+            CONF_MIN_VOLUME, CONF_DEFAULT_MIN_VOLUME
+        )
+        self._max_volume = coordinator.options.get(
+            CONF_MAX_VOLUME, CONF_DEFAULT_MAX_VOLUME
+        )
+
+        self._source_dict = coordinator.sources
         self._reverse_mapping = {value: key for key, value in self._source_dict.items()}
+
+        coordinator.add_listener_command(self.zone + ".Mute")
+        coordinator.add_listener_command(self.zone + ".Volume")
+        coordinator.add_listener_command(self.zone + ".Source")
 
     async def async_added_to_hass(self) -> None:
         _LOGGER.debug("async_added_to_hass")
         await super().async_added_to_hass()
 
-        if self.coordinator.receiver:
-            self.async_write_ha_state()
-        else:
-            _LOGGER.debug("%s is not available", self.command)
+        self._handle_coordinator_update()
 
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle updated data from the coordinator."""
         _LOGGER.debug("_handle_coordinator_update")
-        self._attr_state = self.coordinator.power_state
-        if self._attr_state == None:
-            return
+        power_state = self.coordinator.data.get(self.zone + ".Power")
+        if power_state is None:
+            self._attr_state == None
+            self._attr_available = False
+        elif power_state.lower() == "off":
+            self._attr_state = MediaPlayerState.OFF
+            self._attr_available = True
+        elif power_state.lower() == "on":
+            self._attr_state = MediaPlayerState.ON
+            self._attr_available = True
 
-        if self._attr_state == MediaPlayerState.ON:
-            self._attr_is_volume_muted = self.coordinator.muted
-            volume = self.coordinator.volume
-            # Some receivers cannot report the volume, e.g. C 356BEE,
-            # instead they only support stepping the volume up or down
-            self._attr_volume_level = (
-                self.calc_volume(volume) if volume is not None else None
+            self._attr_is_volume_muted = (
+                self.coordinator.data.get(self.zone + ".Mute", "").lower() == "on"
             )
-            self._attr_source = self._source_dict.get(self.coordinator.source)
+
+            volume = self.coordinator.data.get(self.zone + ".Volume")
+            if volume.lstrip("-").isnumeric():
+                volume = float(volume)
+                self._attr_volume_level = self.calc_volume(volume)
+            else:
+                # Some receivers cannot report the volume, e.g. C 356BEE,
+                # instead they only support stepping the volume up or down
+                self._attr_volume_level = None
+
+            source = int(self.coordinator.data.get(self.zone + ".Source"))
+            self._attr_source = self._source_dict.get(source)
 
         self.async_write_ha_state()
 
     def turn_off(self) -> None:
         """Turn the media player off."""
-        self.coordinator.receiver.main_power("=", "Off")
+        response = self.coordinator.exec_command(self.zone + ".Power", "=", "Off")
+        if response.lower() == "off":
+            self._attr_state = MediaPlayerState.OFF
+            self.async_write_ha_state()
 
     def turn_on(self) -> None:
         """Turn the media player on."""
-        self.coordinator.receiver.main_power("=", "On")
+        response = self.coordinator.exec_command(self.zone + ".Power", "=", "On")
+        if response.lower() == "on":
+            self._attr_state = MediaPlayerState.ON
+            self.async_write_ha_state()
 
     def volume_up(self) -> None:
         """Volume up the media player."""
-        self.coordinator.receiver.main_volume("+")
+        response = self.coordinator.exec_command(self.zone + ".Volume", "+")
+        if response is not None and response.lstrip("-").isnumeric():
+            self._attr_volume_level = self.calc_volume(float(response))
+            self.async_write_ha_state()
 
     def volume_down(self) -> None:
         """Volume down the media player."""
-        self.coordinator.receiver.main_volume("-")
+        response = self.coordinator.exec_command(self.zone + ".Volume", "-")
+        if response is not None and response.lstrip("-").isnumeric():
+            self._attr_volume_level = self.calc_volume(float(response))
+            self.async_write_ha_state()
 
     def set_volume_level(self, volume: float) -> None:
         """Set volume level, range 0..1."""
-        self.coordinator.receiver.main_volume("=", self.calc_db(volume))
+        response = self.coordinator.exec_command(
+            self.zone + ".Volume", "=", int(self.calc_db(volume))
+        )
+        if response is not None and response.lstrip("-").isnumeric():
+            self._attr_volume_level = self.calc_volume(float(response))
+            self.async_write_ha_state()
 
     def mute_volume(self, mute: bool) -> None:
         """Mute (true) or unmute (false) media player."""
         if mute:
-            self.coordinator.receiver.main_mute("=", "On")
+            response = self.coordinator.exec_command(self.zone + ".Mute", "=", "On")
         else:
-            self.coordinator.receiver.main_mute("=", "Off")
+            response = self.coordinator.exec_command(self.zone + ".Mute", "=", "Off")
+
+        if mute and response.lower() != "on":
+            _LOGGER.error("Failed to mute volume")
+        elif not mute and response.lower() != "off":
+            _LOGGER.error("Failed to unmute volume")
+        else:
+            _LOGGER.debug("Volume %s", "muted" if mute else "unmuted")
+            self._attr_is_volume_muted = mute
+            self.async_write_ha_state()
 
     def select_source(self, source: str) -> None:
         """Select input source."""
-        self.coordinator.receiver.main_source("=", self._reverse_mapping.get(source))
+        _LOGGER.debug("select_source(%s)", source)
+
+        if source in self._reverse_mapping:
+            source_id = self._reverse_mapping[source]
+        elif source.isnumeric() and int(source) in self._source_dict:
+            source_id = source
+        else:
+            raise HomeAssistantError(f"Source {source} invalid")
+
+        _LOGGER.debug("Source ID: %s", source_id)
+
+        response = self.coordinator.exec_command(self.zone + ".Source", "=", source_id)
+        if response.isnumeric():
+            self._attr_source = self._source_dict.get(int(response))
+            self.async_write_ha_state()
 
     @property
     def source_list(self):
         """List of available input sources."""
-        return sorted(self._reverse_mapping)
+        return list(self._reverse_mapping)
 
     @property
     def available(self) -> bool:
-        """Return if device is available."""
-        return self.state is not None
+        """Return if entity is available."""
+        if not self._attr_available:
+            return self._attr_available
+
+        return self.coordinator.last_update_success
 
     def calc_volume(self, decibel):
         """Calculate the volume given the decibel.
@@ -218,107 +229,72 @@ class NAD(CoordinatorEntity, MediaPlayerEntity):
         )
 
 
-class NADtcp(CoordinatorEntity, MediaPlayerEntity):
-    """Representation of a NAD Digital amplifier."""
+class NADMain(NAD):
+    """Representation of a NAD Receiver - Zone 2."""
 
-    _attr_has_entity_name = True
-    _attr_name = None
-    _attr_device_class = MediaPlayerDeviceClass.RECEIVER
-    _attr_icon = "mdi:audio-video"
-    _attr_supported_features = SUPPORT_NAD
+    _attr_supported_features = (
+        MediaPlayerEntityFeature.VOLUME_SET
+        | MediaPlayerEntityFeature.VOLUME_MUTE
+        | MediaPlayerEntityFeature.TURN_ON
+        | MediaPlayerEntityFeature.TURN_OFF
+        | MediaPlayerEntityFeature.VOLUME_STEP
+        | MediaPlayerEntityFeature.SELECT_SOURCE
+        | MediaPlayerEntityFeature.SELECT_SOUND_MODE
+    )
+    _attr_sound_mode_list = [
+        "None",
+        "ProLogic",
+        "PLIIMovie",
+        "PLIIMusic",
+        "NEO6Cinema",
+        "NEO6Music",
+        "EARS",
+        "EnhancedStereo",
+        "AnalogBypass",
+        "StereoDownmix",
+        "SurroundEX",
+    ]
+
+    zone = "Main"
 
     def __init__(self, coordinator: NADReceiverCoordinator):
-        """Initialize the amplifier."""
+        """Initialize the NAD Receiver device."""
         super().__init__(coordinator)
 
-        self._min_vol = (
-            coordinator.options[CONF_MIN_VOLUME] + 90
-        ) * 2  # from dB to nad vol (0-200)
-        self._max_vol = (
-            coordinator.options[CONF_MAX_VOLUME] + 90
-        ) * 2  # from dB to nad vol (0-200)
-        self._volume_step = coordinator.options[CONF_VOLUME_STEP]
-        self._nad_volume = None
-        self._source_list = self.coordinator.receiver.available_sources()
+        coordinator.add_listener_command(self.zone + ".ListeningMode")
 
-        self._attr_device_info = coordinator.device_info
-        self._attr_unique_id = f"{coordinator.unique_id}-mediaplayer"
+    @callback
+    def _handle_coordinator_update(self) -> None:
+        """Handle updated data from the coordinator."""
+        super()._handle_coordinator_update()
 
-    def turn_off(self) -> None:
-        """Turn the media player off."""
-        self.coordinator.receiver.power_off()
+        response = self.coordinator.data.get(self.zone + ".ListeningMode")
+        if response is not None:
+            self._attr_sound_mode = response
+            self.async_write_ha_state()
 
-    def turn_on(self) -> None:
-        """Turn the media player on."""
-        self.coordinator.receiver.power_on()
-
-    def volume_up(self) -> None:
-        """Step volume up in the configured increments."""
-        self.coordinator.receiver.set_volume(self._nad_volume + 2 * self._volume_step)
-
-    def volume_down(self) -> None:
-        """Step volume down in the configured increments."""
-        self.coordinator.receiver.set_volume(self._nad_volume - 2 * self._volume_step)
-
-    def set_volume_level(self, volume: float) -> None:
-        """Set volume level, range 0..1."""
-        nad_volume_to_set = int(
-            round(volume * (self._max_vol - self._min_vol) + self._min_vol)
+    def select_sound_mode(self, sound_mode: str) -> None:
+        """Select sound mode."""
+        response = self.coordinator.exec_command(
+            self.zone + ".ListeningMode", "=", sound_mode
         )
-        self.coordinator.receiver.set_volume(nad_volume_to_set)
+        if response is not None:
+            self._attr_sound_mode = sound_mode
+            self.async_write_ha_state()
 
-    def mute_volume(self, mute: bool) -> None:
-        """Mute (true) or unmute (false) media player."""
-        if mute:
-            self.coordinator.receiver.mute()
-        else:
-            self.coordinator.receiver.unmute()
 
-    def select_source(self, source: str) -> None:
-        """Select input source."""
-        self.coordinator.receiver.select_source(source)
+class NADZone2(NAD):
+    """Representation of a NAD Receiver - Zone 2."""
 
-    @property
-    def source_list(self):
-        """List of available input sources."""
-        return self.coordinator.receiver.available_sources()
+    _attr_name = "Zone 2"
+    _attr_entity_registry_enabled_default = False
+    _attr_supported_features = (
+        MediaPlayerEntityFeature.VOLUME_SET
+        | MediaPlayerEntityFeature.VOLUME_MUTE
+        | MediaPlayerEntityFeature.TURN_ON
+        | MediaPlayerEntityFeature.TURN_OFF
+        | MediaPlayerEntityFeature.VOLUME_STEP
+        | MediaPlayerEntityFeature.SELECT_SOURCE
+    )
 
-    def update(self) -> None:
-        """Get the latest details from the device."""
-        try:
-            nad_status = self.coordinator.receiver.status()
-        except OSError:
-            return
-        if nad_status is None:
-            return
-
-        # Update on/off state
-        if nad_status["power"]:
-            self._attr_state = MediaPlayerState.ON
-        else:
-            self._attr_state = MediaPlayerState.OFF
-
-        # Update current volume
-        self._attr_volume_level = self.nad_vol_to_internal_vol(nad_status["volume"])
-        self._nad_volume = nad_status["volume"]
-
-        # Update muted state
-        self._attr_is_volume_muted = nad_status["muted"]
-
-        # Update current source
-        self._attr_source = nad_status["source"]
-
-    def nad_vol_to_internal_vol(self, nad_volume):
-        """Convert nad volume range (0-200) to internal volume range.
-
-        Takes into account configured min and max volume.
-        """
-        if nad_volume < self._min_vol:
-            volume_internal = 0.0
-        elif nad_volume > self._max_vol:
-            volume_internal = 1.0
-        else:
-            volume_internal = (nad_volume - self._min_vol) / (
-                self._max_vol - self._min_vol
-            )
-        return volume_internal
+    zone = "Zone2"

@@ -9,12 +9,15 @@ import homeassistant.helpers.config_validation as cv
 import serial
 import serial.tools.list_ports
 import voluptuous as vol
+from aiodiscover.discovery import _LOGGER
 from homeassistant import config_entries
 from homeassistant.const import CONF_HOST, CONF_PORT, CONF_TYPE
+from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.exceptions import HomeAssistantError
 from nad_receiver import NADReceiver, NADReceiverTCP, NADReceiverTelnet
 
+from . import NADReceiverCoordinator
 from .const import (
     CONF_DEFAULT_MAX_VOLUME,
     CONF_DEFAULT_MIN_VOLUME,
@@ -36,14 +39,14 @@ _LOGGER = logging.getLogger(__name__)
 
 STEP_SETUP_TELNET_SCHEMA = vol.Schema(
     {
-        vol.Optional(CONF_HOST): cv.string,
-        vol.Optional(CONF_PORT, default=CONF_DEFAULT_PORT): int,
+        vol.Required(CONF_HOST): cv.string,
+        vol.Required(CONF_PORT, default=CONF_DEFAULT_PORT): cv.port,
     }
 )
 
 STEP_SETUP_TCP_SCHEMA = vol.Schema(
     {
-        vol.Optional(CONF_HOST): cv.string,
+        vol.Required(CONF_HOST): cv.string,
     }
 )
 
@@ -104,7 +107,7 @@ class NADReceiverConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 title, data, options = await self.validate_input_setup_serial(
                     user_input, errors
                 )
-            except CannotConnect:
+            except CannotConnectError:
                 errors["base"] = "cannot_connect"
             except Exception as ex:
                 _LOGGER.exception("Unexpected exception: %s", ex)
@@ -153,10 +156,11 @@ class NADReceiverConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             # Get model from the device
             receiver = NADReceiver(serial_port)
             model = receiver.main_model("?")
+            assert model is not None, "Failed to retrieve receiver model"
 
             _LOGGER.info("Device %s available", serial_port)
         except serial.SerialException as ex:
-            raise CannotConnect(
+            raise CannotConnectError(
                 f"Unable to connect to the device {serial_port}: {ex}", ex
             ) from ex
 
@@ -167,7 +171,7 @@ class NADReceiverConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             {
                 CONF_MIN_VOLUME: CONF_DEFAULT_MIN_VOLUME,
                 CONF_MAX_VOLUME: CONF_DEFAULT_MAX_VOLUME,
-                CONF_SOURCE_DICT: {},
+                CONF_VOLUME_STEP: CONF_DEFAULT_VOLUME_STEP,
             },
         )
 
@@ -182,7 +186,7 @@ class NADReceiverConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 title, data, options = await self.validate_input_setup_telnet(
                     user_input, errors
                 )
-            except CannotConnect:
+            except CannotConnectError:
                 errors["base"] = "cannot_connect"
             except Exception as ex:
                 _LOGGER.exception("Unexpected exception: %s", ex)
@@ -216,7 +220,7 @@ class NADReceiverConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
             _LOGGER.info("Device %s available", host)
         except Exception as ex:
-            raise CannotConnect(
+            raise CannotConnectError(
                 f"Unable to connect to the device {host}: {ex}", ex
             ) from ex
 
@@ -227,7 +231,7 @@ class NADReceiverConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             {
                 CONF_MIN_VOLUME: CONF_DEFAULT_MIN_VOLUME,
                 CONF_MAX_VOLUME: CONF_DEFAULT_MAX_VOLUME,
-                CONF_SOURCE_DICT: {},
+                CONF_VOLUME_STEP: CONF_DEFAULT_VOLUME_STEP,
             },
         )
 
@@ -242,7 +246,7 @@ class NADReceiverConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 title, data, options = await self.validate_input_setup_tcp(
                     user_input, errors
                 )
-            except CannotConnect:
+            except CannotConnectError:
                 errors["base"] = "cannot_connect"
             except Exception as ex:
                 _LOGGER.exception("Unexpected exception: %s", ex)
@@ -275,7 +279,7 @@ class NADReceiverConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
             _LOGGER.info("Device %s available", host)
         except Exception as ex:
-            raise CannotConnect(
+            raise CannotConnectError(
                 f"Unable to connect to the device {host}: {ex}", ex
             ) from ex
 
@@ -288,6 +292,109 @@ class NADReceiverConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 CONF_MAX_VOLUME: CONF_DEFAULT_MAX_VOLUME,
                 CONF_VOLUME_STEP: CONF_DEFAULT_VOLUME_STEP,
             },
+        )
+
+    @staticmethod
+    @callback
+    def async_get_options_flow(
+        config_entry: config_entries.ConfigEntry,
+    ) -> config_entries.OptionsFlow:
+        """Create the options flow."""
+        return NADReceiverOptionsFlowHandler(config_entry)
+
+
+class NADReceiverOptionsFlowHandler(config_entries.OptionsFlow):
+    def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
+        """Initialize options flow."""
+        _LOGGER.debug(config_entry.data)
+        self.config_entry = config_entry
+        self.updated_options = {}
+        self.sources = None
+
+    async def async_step_init(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Manage the options."""
+        errors: dict[str, str] = {}
+
+        STEP_CONFIG_VOLUME_SCHEMA = vol.Schema(
+            {
+                vol.Required(
+                    CONF_MIN_VOLUME,
+                    default=self.config_entry.options.get(
+                        CONF_MIN_VOLUME, CONF_DEFAULT_MIN_VOLUME
+                    ),
+                ): vol.All(vol.Coerce(int), vol.Range(min=-92, max=20)),
+                vol.Required(
+                    CONF_MAX_VOLUME,
+                    default=self.config_entry.options.get(
+                        CONF_MAX_VOLUME, CONF_DEFAULT_MAX_VOLUME
+                    ),
+                ): vol.All(vol.Coerce(int), vol.Range(min=-92, max=20)),
+                # vol.Required(
+                #     CONF_VOLUME_STEP,
+                #     default=self.config_entry.options.get(
+                #         CONF_VOLUME_STEP, CONF_DEFAULT_VOLUME_STEP
+                #     ),
+                # ): cv.positive_int,
+            }
+        )
+
+        if user_input is not None:
+            STEP_CONFIG_VOLUME_SCHEMA(user_input)
+            # self.updated_options[CONF_MIN_VOLUME] = user_input[CONF_MIN_VOLUME]
+            # self.updated_options[CONF_MAX_VOLUME] = user_input[CONF_MAX_VOLUME]
+            # self.updated_options[CONF_VOLUME_STEP] = user_input[CONF_VOLUME_STEP]
+            # return await self.async_step_sources()
+            return self.async_create_entry(title="", data=user_input)
+
+        return self.async_show_form(
+            step_id="init", data_schema=STEP_CONFIG_VOLUME_SCHEMA, errors=errors
+        )
+
+    async def async_step_sources(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Manage the options."""
+        errors: dict[str, str] = {}
+
+        if CONF_SOURCE_DICT in self.updated_options:
+            sources = self.updated_options[CONF_SOURCE_DICT]
+        else:
+            sources = self.config_entry.options.get(CONF_SOURCE_DICT, {})
+
+            coordinator: NADReceiverCoordinator = self.hass.data[DOMAIN][
+                self.config_entry.entry_id
+            ]
+            sources = {**coordinator.get_sources(), **sources}
+            self.updated_options[CONF_SOURCE_DICT] = sources
+
+            self.STEP_CONFIG_SOURCES_SCHEMA = vol.Schema({})
+            for source in sources:
+                _LOGGER.debug(source)
+                self.STEP_CONFIG_SOURCES_SCHEMA = (
+                    self.STEP_CONFIG_SOURCES_SCHEMA.extend(
+                        {
+                            vol.Required(
+                                str(source),
+                                default=sources[source],
+                            ): str
+                        }
+                    )
+                )
+
+        if user_input is not None:
+            self.STEP_CONFIG_SOURCES_SCHEMA(user_input)
+            for item in user_input:
+                if item.isnumeric():
+                    self.updated_options[CONF_SOURCE_DICT][int(item)] = user_input[item]
+            _LOGGER.debug(self.updated_options)
+            return self.async_create_entry(title="", data=self.updated_options)
+
+        return self.async_show_form(
+            step_id="sources",
+            data_schema=self.STEP_CONFIG_SOURCES_SCHEMA,
+            errors=errors,
         )
 
 
@@ -303,5 +410,5 @@ def get_serial_by_id(dev_path: str) -> str:
     return dev_path
 
 
-class CannotConnect(HomeAssistantError):
+class CannotConnectError(HomeAssistantError):
     """Error to indicate we cannot connect."""

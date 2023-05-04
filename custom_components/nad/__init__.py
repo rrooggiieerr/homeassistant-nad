@@ -92,8 +92,11 @@ class NADReceiverCoordinator(DataUpdateCoordinator):
     async def connect(self):
         if not self.model:
             # Open the connection by requesting the model
-            self.model = self.exec_command("Main.Model", "?")
-            self.version = self.exec_command("Main.Version", "?")
+            try:
+                self.model = self.exec_command("Main.Model", "?")
+                self.version = self.exec_command("Main.Version", "?")
+            except CommandNotSupportedError:
+                raise ConfigEntryNotReady(f"Unable to connect to NAD receiver")
 
             self.device_info = DeviceInfo(
                 identifiers={(DOMAIN, self.unique_id)},

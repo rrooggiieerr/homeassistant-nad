@@ -180,7 +180,12 @@ class NADReceiverCoordinator(DataUpdateCoordinator):
 
     async def _async_update_data(self):
         """Fetch data from NAD Receiver."""
-        power_state = self.exec_command("Main.Power", "?")
+        try: 
+            power_state = self.exec_command("Main.Power", "?")
+        except CommandNotSupportedError:
+            self.power_state = None
+            raise UpdateFailed("Error communicating with NAD Receiver")
+
         _LOGGER.debug("power_state: %s", power_state)
         if not power_state:
             self.power_state = None

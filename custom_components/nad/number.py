@@ -354,9 +354,9 @@ async def async_setup_entry(
             device_class=NumberDeviceClass.FREQUENCY,
             # mode = NumberMode.SLIDER,
             native_unit_of_measurement=UnitOfFrequency.MEGAHERTZ,
-            native_min_value=87.5,
-            native_max_value=108.5,
-            native_step=0.05,
+            native_min_value=530,
+            native_max_value=1710,
+            native_step=1,
         ),
         NumberEntityDescription(
             key="Tuner.FM.Frequency",

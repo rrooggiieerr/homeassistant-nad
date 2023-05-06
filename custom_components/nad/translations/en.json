@@ -1,0 +1,88 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "Device is already configured"
+        },
+        "error": {
+            "cannot_connect": "Failed to connect",
+            "unknown": "Unexpected error"
+        },
+        "step": {
+        	"user": {
+        		"title": "Connection method"
+        	},
+            "setup_serial": {
+                "title": "Serial configuration",
+                "data": {
+                    "serial_port": "Serial port",
+                    "manual_path": "Or enter manually"
+                }
+            },
+            "setup_telnet": {
+            	"title": "Telnet configuration",
+                "data": {
+                	"host": "Host",
+                	"port": "Port"
+                }
+            },
+            "setup_tcp": {
+            	"title": "TCP configuration",
+                "data": {
+                	"host": "Host"
+                }
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "Volume settings",
+                "data": {
+                    "min_volume": "Minimum volume",
+                    "max_volume": "Maximum volume",
+                    "volume_step": "Volume step"
+                },
+                "data_description": {
+                    "min_volume": "Minimum volume in dB to use with the volume slider",
+                    "max_volume": "Maximum volume in dB to use with the volume slider",
+                    "volume_step": "The amount in dB you want to increase the volume with when pressing volume up/down"
+                }
+            },
+            "sources": {
+            	"title": "Source names",
+                "data": {
+                    "source_1": "Source 1",
+                    "source_2": "Source 2",
+                    "source_3": "Source 3",
+                    "source_4": "Source 4",
+                    "source_5": "Source 5",
+                    "source_6": "Source 6",
+                    "source_7": "Source 7",
+                    "source_8": "Source 8",
+                    "source_9": "Source 9",
+                    "source_10": "Source 10",
+                    "source_11": "Source 11",
+                    "source_12": "Source 12",
+                    "source_13": "Source 13",
+                    "source_14": "Source 14",
+                    "source_15": "Source 15",
+                    "1": "Source 1",
+                    "2": "Source 2",
+                    "3": "Source 3",
+                    "4": "Source 4",
+                    "5": "Source 5",
+                    "6": "Source 6",
+                    "7": "Source 7",
+                    "8": "Source 8",
+                    "9": "Source 9",
+                    "10": "Source 10",
+                    "11": "Source 11",
+                    "12": "Source 12",
+                    "13": "Source 13",
+                    "14": "Source 14",
+                    "15": "Source 15"
+                }
+            }
+        }
+    }
+}

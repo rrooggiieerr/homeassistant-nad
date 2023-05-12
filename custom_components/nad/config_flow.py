@@ -138,7 +138,7 @@ class NADReceiverConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             serial_port = data[CONF_SERIAL_PORT]
 
         if serial_port is None:
-            raise vol.error.RequiredFieldInvalid(CONF_SERIAL_PORT)
+            raise vol.error.RequiredFieldInvalid("No serial port configured")
 
         serial_port = await self.hass.async_add_executor_job(
             get_serial_by_id, serial_port

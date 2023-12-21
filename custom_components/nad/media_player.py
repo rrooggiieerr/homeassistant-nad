@@ -113,7 +113,7 @@ class NAD(CoordinatorEntity, MediaPlayerEntity):
             )
 
             volume = self.coordinator.data.get(self.zone + ".Volume")
-            if volume.lstrip("-").isnumeric():
+            if volume is not None and volume.lstrip("-").isnumeric():
                 volume = float(volume)
                 self._attr_volume_level = self.calc_volume(volume)
             else:

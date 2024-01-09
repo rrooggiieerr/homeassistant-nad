@@ -161,7 +161,7 @@ class NADReceiverConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             _LOGGER.info("Device %s available", serial_port)
         except serial.SerialException as ex:
             raise CannotConnectError(
-                f"Unable to connect to the device {serial_port}: {ex}", ex
+                f"Unable to connect to the device {serial_port}"
             ) from ex
 
         # Return info that you want to store in the config entry.
@@ -221,7 +221,7 @@ class NADReceiverConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             _LOGGER.info("Device %s available", host)
         except Exception as ex:
             raise CannotConnectError(
-                f"Unable to connect to the device {host}: {ex}", ex
+                f"Unable to connect to the device {host}"
             ) from ex
 
         # Return info that you want to store in the config entry.
@@ -280,7 +280,7 @@ class NADReceiverConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             _LOGGER.info("Device %s available", host)
         except Exception as ex:
             raise CannotConnectError(
-                f"Unable to connect to the device {host}: {ex}", ex
+                f"Unable to connect to the device {host}"
             ) from ex
 
         # Return info that you want to store in the config entry.

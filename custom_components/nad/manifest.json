@@ -7,6 +7,6 @@
   "integration_type": "device",
   "iot_class": "local_polling",
   "loggers": ["nad_receiver"],
-  "requirements": ["nad_receiver==0.3.0"],
+  "requirements": ["nad_receiver @ git+https://github.com/rrooggiieerr/nad_receiver.git@master"],
   "version": "0.0.1"
 }

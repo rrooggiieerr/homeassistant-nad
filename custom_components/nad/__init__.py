@@ -157,16 +157,16 @@ class NADReceiverCoordinator(DataUpdateCoordinator):
         return True
 
     def exec_command(self, command: str, operator: str, value: Optional = None):
-        command = f"{command}{operator}"
+        cmd = f"{command}{operator}"
         if value:
-            command = f"{command}{value}"
+            cmd = f"{command}{value}"
 
         if self.config[CONF_TYPE] == CONF_TYPE_SERIAL:
             self.receiver.transport.ser.reset_input_buffer()
 
         try:
             msg = self.receiver.transport.communicate(cmd)
-            _LOGGER.debug("sent: '%s' reply: '%s'", cmd, msg)
+            _LOGGER.debug("sent: '%s' reply: '%s'", command, msg)
 
             if msg == "":
                 raise CommandNotSupportedError()

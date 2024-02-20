@@ -80,12 +80,12 @@ class NADReceiverCoordinator(DataUpdateCoordinator):
             self.receiver = NADReceiver(serial_port)
             self.unique_id = serial_port
         elif config_type == CONF_TYPE_TELNET:
-            host = self.config(CONF_HOST)
+            host = self.config[CONF_HOST]
             port = self.config[CONF_PORT]
             self.receiver = NADReceiverTelnet(host, port)
             self.unique_id = entry.entry_id
         elif config_type == CONF_TYPE_TCP:
-            host = self.config(CONF_HOST)
+            host = self.config[CONF_HOST]
             self.receiver = NADReceiverTCP(host)
             self.unique_id = entry.entry_id
 

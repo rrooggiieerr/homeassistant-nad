@@ -22,7 +22,7 @@ from homeassistant.core import CALLBACK_TYPE, HomeAssistant, ServiceCall, callba
 from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
-from nad_receiver import NADCommandNotSupportedError, NADReceiver, NADReceiverTCP, NADReceiverTelnet
+from nad_receiver import NADReceiver, NADReceiverTCP, NADReceiverTelnet
 
 from .const import (
     CONF_SERIAL_PORT,
@@ -43,10 +43,12 @@ PLATFORMS: list[Platform] = [
 ]
 
 
+class CommandNotSupportedError(Exception):
+    """Error to indicate a command is not supported."""
+
+
 class NADReceiverCoordinator(DataUpdateCoordinator):
     """NAD Receiver Data Update Coordinator."""
-
-    receiver: NADReceiver
 
     unique_id = None
     model: str = None
@@ -93,7 +95,7 @@ class NADReceiverCoordinator(DataUpdateCoordinator):
             try:
                 self.model = self.exec_command("Main.Model", "?")
                 self.version = self.exec_command("Main.Version", "?")
-            except NADCommandNotSupportedError:
+            except CommandNotSupportedError:
                 raise ConfigEntryNotReady(f"Unable to connect to NAD receiver")
 
             self.device_info = DeviceInfo(
@@ -135,7 +137,7 @@ class NADReceiverCoordinator(DataUpdateCoordinator):
                 if response is not None and response.lower() == "yes":
                     response = self.exec_command(f"Source{i}.Name", "?")
                     sources[i] = response
-            except NADCommandNotSupportedError:
+            except CommandNotSupportedError:
                 break
 
         return sources
@@ -143,7 +145,7 @@ class NADReceiverCoordinator(DataUpdateCoordinator):
     def supports_command(self, command: str):
         try:
             response = self.exec_command(command, "?")
-        except NADCommandNotSupportedError:
+        except CommandNotSupportedError:
             _LOGGER.debug("%s not supported", command)
             return False
 
@@ -159,18 +161,30 @@ class NADReceiverCoordinator(DataUpdateCoordinator):
         if value:
             command = f"{command}{value}"
 
-        return self.receiver.exec_raw_command(command)
+        if self.config[CONF_TYPE] == CONF_TYPE_SERIAL:
+            self.receiver.transport.ser.reset_input_buffer()
+
+        try:
+            msg = self.receiver.transport.communicate(cmd)
+            _LOGGER.debug("sent: '%s' reply: '%s'", cmd, msg)
+
+            if msg == "":
+                raise CommandNotSupportedError()
+
+            if msg.lower().startswith(command.lower() + "="):
+                return msg.split("=")[1]
+        except UnicodeDecodeError as ex:
+            _LOGGER.error(ex)
+
+        return None
 
     async def _async_update_data(self):
         """Fetch data from NAD Receiver."""
         try: 
             power_state = self.exec_command("Main.Power", "?")
-        except NADCommandNotSupportedError:
+        except CommandNotSupportedError:
             self.power_state = None
             raise UpdateFailed("Error communicating with NAD Receiver")
-        except (termios.error, IOError) as ex:
-            self.power_state = None
-            raise UpdateFailed("Error communicating with NAD Receiver", ex)
 
         _LOGGER.debug("power_state: %s", power_state)
         if not power_state:

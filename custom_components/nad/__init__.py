@@ -159,7 +159,7 @@ class NADReceiverCoordinator(DataUpdateCoordinator):
     def exec_command(self, command: str, operator: str, value: Optional = None):
         cmd = f"{command}{operator}"
         if value:
-            cmd = f"{command}{value}"
+            cmd = f"{cmd}{value}"
 
         if self.config[CONF_TYPE] == CONF_TYPE_SERIAL:
             self.receiver.transport.ser.reset_input_buffer()

@@ -157,9 +157,9 @@ class NADReceiverCoordinator(DataUpdateCoordinator):
         return True
 
     def exec_command(self, command: str, operator: str, value: Optional = None):
-        cmd = command + operator
+        command = f"{command}{operator}"
         if value:
-            cmd = f"{cmd}{value}"
+            command = f"{command}{value}"
 
         if self.config[CONF_TYPE] == CONF_TYPE_SERIAL:
             self.receiver.transport.ser.reset_input_buffer()
@@ -216,7 +216,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
         _LOGGER.info("NAD receiver is available")
     except serial.SerialException as ex:
-        raise ConfigEntryNotReady(f"Unable to connect to NAD receiver: {ex}") from ex
+        raise ConfigEntryNotReady(f"Unable to connect to NAD receiver") from ex
 
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = receiver_coordinator
 

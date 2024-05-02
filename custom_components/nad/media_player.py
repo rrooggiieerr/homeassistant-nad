@@ -126,44 +126,44 @@ class NAD(CoordinatorEntity, MediaPlayerEntity):
 
         self.async_write_ha_state()
 
-    def async_turn_off(self) -> None:
+    def turn_off(self) -> None:
         """Turn the media player off."""
         response = self.coordinator.exec_command(self.zone + ".Power", "=", "Off")
         if response.lower() == "off":
             self._attr_state = MediaPlayerState.OFF
-            self.async_write_ha_state()
+            self.schedule_update_ha_state()
 
-    def async_turn_on(self) -> None:
+    def turn_on(self) -> None:
         """Turn the media player on."""
         response = self.coordinator.exec_command(self.zone + ".Power", "=", "On")
         if response.lower() == "on":
             self._attr_state = MediaPlayerState.ON
-            self.async_write_ha_state()
+            self.schedule_update_ha_state()
 
-    def async_volume_up(self) -> None:
+    def volume_up(self) -> None:
         """Volume up the media player."""
         response = self.coordinator.exec_command(self.zone + ".Volume", "+")
         if response is not None and response.lstrip("-").isnumeric():
             self._attr_volume_level = self.calc_volume(float(response))
-            self.async_write_ha_state()
+            self.schedule_update_ha_state()
 
-    def async_volume_down(self) -> None:
+    def volume_down(self) -> None:
         """Volume down the media player."""
         response = self.coordinator.exec_command(self.zone + ".Volume", "-")
         if response is not None and response.lstrip("-").isnumeric():
             self._attr_volume_level = self.calc_volume(float(response))
-            self.async_write_ha_state()
+            self.schedule_update_ha_state()
 
-    def async_set_volume_level(self, volume: float) -> None:
+    def set_volume_level(self, volume: float) -> None:
         """Set volume level, range 0..1."""
         response = self.coordinator.exec_command(
             self.zone + ".Volume", "=", int(self.calc_db(volume))
         )
         if response is not None and response.lstrip("-").isnumeric():
             self._attr_volume_level = self.calc_volume(float(response))
-            self.async_write_ha_state()
+            self.schedule_update_ha_state()
 
-    def async_mute_volume(self, mute: bool) -> None:
+    def mute_volume(self, mute: bool) -> None:
         """Mute (true) or unmute (false) media player."""
         if mute:
             response = self.coordinator.exec_command(self.zone + ".Mute", "=", "On")
@@ -177,9 +177,9 @@ class NAD(CoordinatorEntity, MediaPlayerEntity):
         else:
             _LOGGER.debug("Volume %s", "muted" if mute else "unmuted")
             self._attr_is_volume_muted = mute
-            self.async_write_ha_state()
+            self.schedule_update_ha_state()
 
-    def async_select_source(self, source: str) -> None:
+    def select_source(self, source: str) -> None:
         """Select input source."""
         _LOGGER.debug("select_source(%s)", source)
 
@@ -195,7 +195,7 @@ class NAD(CoordinatorEntity, MediaPlayerEntity):
         response = self.coordinator.exec_command(self.zone + ".Source", "=", source_id)
         if response.isnumeric():
             self._attr_source = self._source_dict.get(int(response))
-            self.async_write_ha_state()
+            self.schedule_update_ha_state()
 
     @property
     def source_list(self):
@@ -273,14 +273,14 @@ class NADMain(NAD):
             self._attr_sound_mode = response
             self.async_write_ha_state()
 
-    def async_select_sound_mode(self, sound_mode: str) -> None:
+    def select_sound_mode(self, sound_mode: str) -> None:
         """Select sound mode."""
         response = self.coordinator.exec_command(
             self.zone + ".ListeningMode", "=", sound_mode
         )
         if response is not None:
             self._attr_sound_mode = sound_mode
-            self.async_write_ha_state()
+            self.schedule_update_ha_state()
 
 
 class NADZone2(NAD):

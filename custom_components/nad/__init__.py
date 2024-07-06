@@ -87,14 +87,14 @@ class NADReceiverCoordinator(DataUpdateCoordinator):
             host = self.config[CONF_HOST]
             self.receiver = NADReceiverTCP(host)
 
-    async def connect(self):
+    async def connect(self) -> bool:
         if not self.model:
             # Open the connection by requesting the model
             try:
                 self.model = self.exec_command("Main.Model", "?")
                 self.version = self.exec_command("Main.Version", "?")
             except CommandNotSupportedError:
-                raise ConfigEntryNotReady(f"Unable to connect to NAD receiver")
+                return False
 
             identifiers = {(DOMAIN, self.unique_id)}
             if self.config[CONF_TYPE] == CONF_TYPE_SERIAL:
@@ -109,6 +109,8 @@ class NADReceiverCoordinator(DataUpdateCoordinator):
             )
 
             self.sources = self.get_sources()
+
+            return True
 
     async def disconnect(self):
         pass
@@ -236,7 +238,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         receiver_coordinator = NADReceiverCoordinator(hass, entry)
 
         # Open the connection.
-        await receiver_coordinator.connect()
+        if not await receiver_coordinator.connect():
+            raise ConfigEntryNotReady(f"Unable to connect to NAD receiver")
 
         _LOGGER.info("NAD receiver is available")
     except serial.SerialException as ex:

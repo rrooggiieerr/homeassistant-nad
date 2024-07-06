@@ -189,6 +189,9 @@ class NADReceiverCoordinator(DataUpdateCoordinator):
         except CommandNotSupportedError:
             self.power_state = None
             raise UpdateFailed("Error communicating with NAD Receiver")
+        except IOError as ex:
+            self.power_state = None
+            raise UpdateFailed("Error communicating with NAD Receiver", ex)
 
         _LOGGER.debug("power_state: %s", power_state)
         if not power_state:

@@ -1,4 +1,5 @@
 """Constants for the NAD Receiver integration."""
+
 from typing import Final
 
 DOMAIN: Final = "nad"
@@ -8,7 +9,6 @@ CONF_TYPE_TELNET: Final = "Telnet"
 CONF_TYPE_TCP: Final = "TCP"
 
 CONF_SERIAL_PORT: Final = "serial_port"  # for NADReceiver
-CONF_MANUAL_PATH: Final = "manual_path"
 CONF_DEFAULT_PORT: Final = 53
 
 CONF_MIN_VOLUME: Final = "min_volume"

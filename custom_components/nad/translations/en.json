@@ -8,39 +8,53 @@
             "unknown": "Unexpected error"
         },
         "step": {
-        	"user": {
-        		"title": "Connection method"
-        	},
+			"user": {
+				"title": "Connection Method",
+				"menu_options": {
+					"setup_serial": "Serial",
+					"setup_telnet": "Telnet",
+					"setup_tcp": "TCP"
+				}
+			},
             "setup_serial": {
-                "title": "Serial configuration",
+                "title": "Serial Receiver",
                 "data": {
-                    "serial_port": "Serial port",
-                    "manual_path": "Or enter manually"
-                }
+                    "serial_port": "Serial Port"
+                },
+				"data_description": {
+					"serial_port": "The serial port the NAD receiver is connected to."
+				}
             },
             "setup_telnet": {
-            	"title": "Telnet configuration",
+            	"title": "Telnet Receiver",
                 "data": {
                 	"host": "Host",
                 	"port": "Port"
-                }
+                },
+				"data_description": {
+					"host": "The hostname or IP address of the NAD receiver.",
+					"port": "The port number needed to communicate with the receiver. 53 is the default port for native network connected receivers but if a serial to network bridges like esp-link is used port 23 might need to be selected."
+				}
             },
             "setup_tcp": {
-            	"title": "TCP configuration",
+            	"title": "TCP Receiver",
                 "data": {
                 	"host": "Host"
-                }
+                },
+				"data_description": {
+					"host": "The hostname or IP address of the NAD receiver."
+				}
             }
         }
     },
     "options": {
         "step": {
             "init": {
-                "title": "Volume settings",
+                "title": "Volume Settings",
                 "data": {
-                    "min_volume": "Minimum volume",
-                    "max_volume": "Maximum volume",
-                    "volume_step": "Volume step"
+                    "min_volume": "Minimum Volume",
+                    "max_volume": "Maximum Volume",
+                    "volume_step": "Volume Step"
                 },
                 "data_description": {
                     "min_volume": "Minimum volume in dB to use with the volume slider",

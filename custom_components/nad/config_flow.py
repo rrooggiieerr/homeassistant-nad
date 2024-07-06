@@ -1,4 +1,5 @@
 """Config flow for the NAD Receiver integration."""
+
 from __future__ import annotations
 
 import logging
@@ -11,10 +12,20 @@ import serial.tools.list_ports
 import voluptuous as vol
 from aiodiscover.discovery import _LOGGER
 from homeassistant import config_entries
-from homeassistant.const import CONF_HOST, CONF_PORT, CONF_TYPE
+from homeassistant.const import CONF_HOST, CONF_PORT, CONF_TYPE, UnitOfSoundPressure
 from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.exceptions import HomeAssistantError
+from homeassistant.helpers.selector import (
+    NumberSelector,
+    NumberSelectorConfig,
+    NumberSelectorMode,
+    SelectOptionDict,
+    SelectSelector,
+    SelectSelectorConfig,
+    SelectSelectorMode,
+    TextSelector,
+)
 from nad_receiver import NADReceiver, NADReceiverTCP, NADReceiverTelnet
 
 from . import NADReceiverCoordinator
@@ -23,7 +34,6 @@ from .const import (
     CONF_DEFAULT_MIN_VOLUME,
     CONF_DEFAULT_PORT,
     CONF_DEFAULT_VOLUME_STEP,
-    CONF_MANUAL_PATH,
     CONF_MAX_VOLUME,
     CONF_MIN_VOLUME,
     CONF_SERIAL_PORT,
@@ -39,14 +49,49 @@ _LOGGER = logging.getLogger(__name__)
 
 STEP_SETUP_TELNET_SCHEMA = vol.Schema(
     {
-        vol.Required(CONF_HOST): cv.string,
-        vol.Required(CONF_PORT, default=CONF_DEFAULT_PORT): cv.port,
+        vol.Required(CONF_HOST): TextSelector(),
+        vol.Required(CONF_PORT, default=CONF_DEFAULT_PORT): NumberSelector(
+            NumberSelectorConfig(min=1, max=65535, mode=NumberSelectorMode.BOX)
+        ),
     }
 )
 
 STEP_SETUP_TCP_SCHEMA = vol.Schema(
     {
-        vol.Required(CONF_HOST): cv.string,
+        vol.Required(CONF_HOST): TextSelector(),
+    }
+)
+
+STEP_CONFIG_VOLUME_SCHEMA = vol.Schema(
+    {
+        vol.Required(
+            CONF_MIN_VOLUME,
+            default=CONF_DEFAULT_MIN_VOLUME,
+        ): NumberSelector(
+            NumberSelectorConfig(
+                min=-92,
+                max=20,
+                mode=NumberSelectorMode.BOX,
+                unit_of_measurement=UnitOfSoundPressure.DECIBEL,
+            )
+        ),
+        vol.Required(
+            CONF_MAX_VOLUME,
+            default=CONF_DEFAULT_MAX_VOLUME,
+        ): NumberSelector(
+            NumberSelectorConfig(
+                min=-92,
+                max=20,
+                mode=NumberSelectorMode.BOX,
+                unit_of_measurement=UnitOfSoundPressure.DECIBEL,
+            )
+        ),
+        # vol.Required(
+        #     CONF_VOLUME_STEP,
+        #     default=self.config_entry.options.get(
+        #         CONF_VOLUME_STEP, CONF_DEFAULT_VOLUME_STEP
+        #     ),
+        # ): cv.positive_int,
     }
 )
 
@@ -60,21 +105,10 @@ class NADReceiverConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
         """Handle the initial step."""
-        if user_input is not None:
-            user_selection = user_input[CONF_TYPE]
-            if user_selection == CONF_TYPE_SERIAL:
-                return await self.async_step_setup_serial()
-
-            if user_selection == CONF_TYPE_TELNET:
-                return await self.async_step_setup_telnet()
-
-            if user_selection == CONF_TYPE_TCP:
-                return await self.async_step_setup_tcp()
-
-        list_of_types = [CONF_TYPE_SERIAL, CONF_TYPE_TELNET, CONF_TYPE_TCP]
-
-        schema = vol.Schema({vol.Required(CONF_TYPE): vol.In(list_of_types)})
-        return self.async_show_form(step_id="user", data_schema=schema)
+        return self.async_show_menu(
+            step_id="user",
+            menu_options=["setup_serial", "setup_telnet", "setup_tcp"],
+        )
 
     async def async_step_setup_serial(
         self, user_input: dict[str, Any] | None = None
@@ -82,42 +116,48 @@ class NADReceiverConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         """Handle the setup serial step."""
         errors: dict[str, str] = {}
 
+        if user_input is not None:
+            title, data, options = await self.validate_input_setup_serial(
+                user_input, errors
+            )
+
+            if not errors:
+                return self.async_create_entry(title=title, data=data, options=options)
+
         ports = await self.hass.async_add_executor_job(serial.tools.list_ports.comports)
         list_of_ports = {}
         for port in ports:
-            list_of_ports[
-                port.device
-            ] = f"{port}, s/n: {port.serial_number or 'n/a'}" + (
-                f" - {port.manufacturer}" if port.manufacturer else ""
+            list_of_ports[port.device] = (
+                f"{port}, s/n: {port.serial_number or 'n/a'}"
+                + (f" - {port.manufacturer}" if port.manufacturer else "")
             )
 
-        self.STEP_SETUP_SERIAL_SCHEMA = vol.Schema(
+        self._step_setup_serial_schema = vol.Schema(
             {
-                vol.Exclusive(CONF_SERIAL_PORT, CONF_SERIAL_PORT): vol.In(
-                    list_of_ports
+                vol.Required(CONF_SERIAL_PORT, default=""): SelectSelector(
+                    SelectSelectorConfig(
+                        options=[
+                            SelectOptionDict(value=k, label=v)
+                            for k, v in list_of_ports.items()
+                        ],
+                        mode=SelectSelectorMode.DROPDOWN,
+                        custom_value=True,
+                        sort=True,
+                    )
                 ),
-                vol.Exclusive(
-                    CONF_MANUAL_PATH, CONF_SERIAL_PORT, CONF_MANUAL_PATH
-                ): cv.string,
             }
         )
 
         if user_input is not None:
-            try:
-                title, data, options = await self.validate_input_setup_serial(
-                    user_input, errors
-                )
-            except CannotConnectError:
-                errors["base"] = "cannot_connect"
-            except Exception as ex:
-                _LOGGER.exception("Unexpected exception: %s", ex)
-                errors["base"] = "unknown"
-            else:
-                return self.async_create_entry(title=title, data=data, options=options)
+            data_schema = self.add_suggested_values_to_schema(
+                self._step_setup_serial_schema, user_input
+            )
+        else:
+            data_schema = self._step_setup_serial_schema
 
         return self.async_show_form(
             step_id="setup_serial",
-            data_schema=self.STEP_SETUP_SERIAL_SCHEMA,
+            data_schema=data_schema,
             errors=errors,
         )
 
@@ -126,16 +166,12 @@ class NADReceiverConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     ) -> dict[str, Any]:
         """Validate the user input allows us to connect.
 
-        Data has the keys from STEP_SETUP_SERIAL_SCHEMA with values provided by the user.
+        Data has the keys from _step_setup_serial_schema with values provided by the user.
         """
         # Validate the data can be used to set up a connection.
-        self.STEP_SETUP_SERIAL_SCHEMA(data)
+        self._step_setup_serial_schema(data)
 
-        serial_port = None
-        if CONF_MANUAL_PATH in data:
-            serial_port = data[CONF_MANUAL_PATH]
-        elif CONF_SERIAL_PORT in data:
-            serial_port = data[CONF_SERIAL_PORT]
+        serial_port = data.get(CONF_SERIAL_PORT)
 
         if serial_port is None:
             raise vol.error.RequiredFieldInvalid("No serial port configured")
@@ -144,30 +180,33 @@ class NADReceiverConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             get_serial_by_id, serial_port
         )
 
-        # Test if the device exists
+        # Test if the device exists.
         if not os.path.exists(serial_port):
-            raise vol.error.PathInvalid(f"Device {serial_port} does not exists")
+            errors[CONF_SERIAL_PORT] = "nonexisting_serial_port"
 
         await self.async_set_unique_id(serial_port)
         self._abort_if_unique_id_configured()
 
-        # Test if we can connect to the device
-        try:
-            # Get model from the device
-            receiver = NADReceiver(serial_port)
-            model = receiver.main_model("?")
-            assert model is not None, "Failed to retrieve receiver model"
+        if errors.get(CONF_SERIAL_PORT) is None:
+            # Test if we can connect to the device and get model
+            try:
+                receiver = NADReceiver(serial_port)
+                model = self.exec_command("Main.Model", "?")
+            except (serial.SerialException, CommandNotSupportedError):
+                errors["base"] = "cannot_connect"
+            else:
+                model = receiver.main_model("?")
+                assert model is not None, "Failed to retrieve receiver model"
 
-            _LOGGER.info("Device %s available", serial_port)
-        except serial.SerialException as ex:
-            raise CannotConnectError(
-                f"Unable to connect to the device {serial_port}"
-            ) from ex
+                _LOGGER.info("Device %s available", serial_port)
 
         # Return info that you want to store in the config entry.
         return (
             f"NAD {model}",
-            {CONF_TYPE: CONF_TYPE_SERIAL, CONF_SERIAL_PORT: serial_port},
+            {
+                CONF_TYPE: CONF_TYPE_SERIAL,
+                CONF_SERIAL_PORT: serial_port,
+            },
             {
                 CONF_MIN_VOLUME: CONF_DEFAULT_MIN_VOLUME,
                 CONF_MAX_VOLUME: CONF_DEFAULT_MAX_VOLUME,
@@ -182,16 +221,11 @@ class NADReceiverConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         errors: dict[str, str] = {}
 
         if user_input is not None:
-            try:
-                title, data, options = await self.validate_input_setup_telnet(
-                    user_input, errors
-                )
-            except CannotConnectError:
-                errors["base"] = "cannot_connect"
-            except Exception as ex:
-                _LOGGER.exception("Unexpected exception: %s", ex)
-                errors["base"] = "unknown"
-            else:
+            title, data, options = await self.validate_input_setup_telnet(
+                user_input, errors
+            )
+
+            if not errors:
                 return self.async_create_entry(title=title, data=data, options=options)
 
         return self.async_show_form(
@@ -207,22 +241,19 @@ class NADReceiverConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         STEP_SETUP_TELNET_SCHEMA(data)
 
         host = data[CONF_HOST]
-        port = data[CONF_PORT]
+        port = int(data[CONF_PORT])
 
         await self.async_set_unique_id(host)
         self._abort_if_unique_id_configured()
 
         try:
-            # Test if we can connect to the device
+            # Test if we can connect to the device and get model
             receiver = NADReceiverTelnet(host, port)
-            # Get model from the device
             model = receiver.main_model("?")
 
             _LOGGER.info("Device %s available", host)
-        except Exception as ex:
-            raise CannotConnectError(
-                f"Unable to connect to the device {host}"
-            ) from ex
+        except CommandNotSupportedError as ex:
+            errors["base"] = "cannot_connect"
 
         # Return info that you want to store in the config entry.
         return (
@@ -231,7 +262,6 @@ class NADReceiverConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             {
                 CONF_MIN_VOLUME: CONF_DEFAULT_MIN_VOLUME,
                 CONF_MAX_VOLUME: CONF_DEFAULT_MAX_VOLUME,
-                CONF_VOLUME_STEP: CONF_DEFAULT_VOLUME_STEP,
             },
         )
 
@@ -242,16 +272,11 @@ class NADReceiverConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         errors: dict[str, str] = {}
 
         if user_input is not None:
-            try:
-                title, data, options = await self.validate_input_setup_tcp(
-                    user_input, errors
-                )
-            except CannotConnectError:
-                errors["base"] = "cannot_connect"
-            except Exception as ex:
-                _LOGGER.exception("Unexpected exception: %s", ex)
-                errors["base"] = "unknown"
-            else:
+            title, data, options = await self.validate_input_setup_tcp(
+                user_input, errors
+            )
+
+            if not errors:
                 return self.async_create_entry(title=title, data=data, options=options)
 
         return self.async_show_form(
@@ -272,16 +297,13 @@ class NADReceiverConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self._abort_if_unique_id_configured()
 
         try:
-            # Test if we can connect to the device
+            # Test if we can connect to the device and get model
             receiver = NADReceiverTCP(host)
-            # Get model from the device
             model = receiver.main_model("?")
 
             _LOGGER.info("Device %s available", host)
-        except Exception as ex:
-            raise CannotConnectError(
-                f"Unable to connect to the device {host}"
-            ) from ex
+        except CommandNotSupportedError as ex:
+            errors["base"] = "cannot_connect"
 
         # Return info that you want to store in the config entry.
         return (
@@ -308,7 +330,6 @@ class NADReceiverOptionsFlowHandler(config_entries.OptionsFlow):
         """Initialize options flow."""
         _LOGGER.debug(config_entry.data)
         self.config_entry = config_entry
-        self.updated_options = {}
         self.sources = None
 
     async def async_step_init(
@@ -317,84 +338,24 @@ class NADReceiverOptionsFlowHandler(config_entries.OptionsFlow):
         """Manage the options."""
         errors: dict[str, str] = {}
 
-        STEP_CONFIG_VOLUME_SCHEMA = vol.Schema(
-            {
-                vol.Required(
-                    CONF_MIN_VOLUME,
-                    default=self.config_entry.options.get(
-                        CONF_MIN_VOLUME, CONF_DEFAULT_MIN_VOLUME
-                    ),
-                ): vol.All(vol.Coerce(int), vol.Range(min=-92, max=20)),
-                vol.Required(
-                    CONF_MAX_VOLUME,
-                    default=self.config_entry.options.get(
-                        CONF_MAX_VOLUME, CONF_DEFAULT_MAX_VOLUME
-                    ),
-                ): vol.All(vol.Coerce(int), vol.Range(min=-92, max=20)),
-                # vol.Required(
-                #     CONF_VOLUME_STEP,
-                #     default=self.config_entry.options.get(
-                #         CONF_VOLUME_STEP, CONF_DEFAULT_VOLUME_STEP
-                #     ),
-                # ): cv.positive_int,
-            }
-        )
-
         if user_input is not None:
             STEP_CONFIG_VOLUME_SCHEMA(user_input)
-            # self.updated_options[CONF_MIN_VOLUME] = user_input[CONF_MIN_VOLUME]
-            # self.updated_options[CONF_MAX_VOLUME] = user_input[CONF_MAX_VOLUME]
-            # self.updated_options[CONF_VOLUME_STEP] = user_input[CONF_VOLUME_STEP]
-            # return await self.async_step_sources()
+            user_input[CONF_MIN_VOLUME] = int(user_input[CONF_MIN_VOLUME])
+            user_input[CONF_MAX_VOLUME] = int(user_input[CONF_MAX_VOLUME])
+            # user_input[CONF_VOLUME_STEP] = int(user_input[CONF_VOLUME_STEP])
             return self.async_create_entry(title="", data=user_input)
 
-        return self.async_show_form(
-            step_id="init", data_schema=STEP_CONFIG_VOLUME_SCHEMA, errors=errors
-        )
-
-    async def async_step_sources(
-        self, user_input: dict[str, Any] | None = None
-    ) -> FlowResult:
-        """Manage the options."""
-        errors: dict[str, str] = {}
-
-        if CONF_SOURCE_DICT in self.updated_options:
-            sources = self.updated_options[CONF_SOURCE_DICT]
-        else:
-            sources = self.config_entry.options.get(CONF_SOURCE_DICT, {})
-
-            coordinator: NADReceiverCoordinator = self.hass.data[DOMAIN][
-                self.config_entry.entry_id
-            ]
-            sources = {**coordinator.get_sources(), **sources}
-            self.updated_options[CONF_SOURCE_DICT] = sources
-
-            self.STEP_CONFIG_SOURCES_SCHEMA = vol.Schema({})
-            for source in sources:
-                _LOGGER.debug(source)
-                self.STEP_CONFIG_SOURCES_SCHEMA = (
-                    self.STEP_CONFIG_SOURCES_SCHEMA.extend(
-                        {
-                            vol.Required(
-                                str(source),
-                                default=sources[source],
-                            ): str
-                        }
-                    )
-                )
-
         if user_input is not None:
-            self.STEP_CONFIG_SOURCES_SCHEMA(user_input)
-            for item in user_input:
-                if item.isnumeric():
-                    self.updated_options[CONF_SOURCE_DICT][int(item)] = user_input[item]
-            _LOGGER.debug(self.updated_options)
-            return self.async_create_entry(title="", data=self.updated_options)
+            data_schema = self.add_suggested_values_to_schema(
+                STEP_CONFIG_VOLUME_SCHEMA, user_input
+            )
+        else:
+            data_schema = self.add_suggested_values_to_schema(
+                STEP_CONFIG_VOLUME_SCHEMA, self.config_entry.options
+            )
 
         return self.async_show_form(
-            step_id="sources",
-            data_schema=self.STEP_CONFIG_SOURCES_SCHEMA,
-            errors=errors,
+            step_id="init", data_schema=data_schema, errors=errors
         )
 
 

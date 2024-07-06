@@ -72,22 +72,19 @@ class NADReceiverCoordinator(DataUpdateCoordinator):
 
         self.config = entry.data
         self.options = entry.options
-        self.receiver: NADReceiver = None
+        self.unique_id = entry.entry_id
 
         config_type = self.config[CONF_TYPE]
         if config_type == CONF_TYPE_SERIAL:
             serial_port = self.config[CONF_SERIAL_PORT]
             self.receiver = NADReceiver(serial_port)
-            self.unique_id = serial_port
         elif config_type == CONF_TYPE_TELNET:
             host = self.config[CONF_HOST]
             port = self.config[CONF_PORT]
             self.receiver = NADReceiverTelnet(host, port)
-            self.unique_id = entry.entry_id
         elif config_type == CONF_TYPE_TCP:
             host = self.config[CONF_HOST]
             self.receiver = NADReceiverTCP(host)
-            self.unique_id = entry.entry_id
 
     async def connect(self):
         if not self.model:
@@ -98,8 +95,12 @@ class NADReceiverCoordinator(DataUpdateCoordinator):
             except CommandNotSupportedError:
                 raise ConfigEntryNotReady(f"Unable to connect to NAD receiver")
 
+            identifiers = {(DOMAIN, self.unique_id)}
+            if self.config[CONF_TYPE] == CONF_TYPE_SERIAL:
+                identifiers.add((DOMAIN, self.config[CONF_SERIAL_PORT]))
+
             self.device_info = DeviceInfo(
-                identifiers={(DOMAIN, self.unique_id)},
+                identifiers=identifiers,
                 name=f"NAD {self.model}",
                 model=self.model,
                 manufacturer="NAD",
@@ -208,6 +209,28 @@ class NADReceiverCoordinator(DataUpdateCoordinator):
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up NAD Receiver from a config entry."""
+    @callback
+    def _async_migrate_entity_entry(
+        registry_entry: entity_registry.RegistryEntry,
+    ) -> dict[str, Any] | None:
+        """
+        Migrates old unique ID to the new unique ID.
+        """
+        if entry.data[CONF_TYPE] == CONF_TYPE_SERIAL:
+            if registry_entry.unique_id.startswith(f"{entry.data[CONF_SERIAL_PORT]}-"):
+                new_unique_id = registry_entry.unique_id.replace(
+                    f"{entry.data[CONF_SERIAL_PORT]}-", f"{registry_entry.config_entry_id}-"
+                )
+                _LOGGER.debug("Migrating entity unique id to %s", new_unique_id)
+                return {"new_unique_id": new_unique_id}
+
+        # No migration needed
+        return None
+
+    await entity_registry.async_migrate_entries(
+        hass, entry.entry_id, _async_migrate_entity_entry
+    )
+
     try:
         receiver_coordinator = NADReceiverCoordinator(hass, entry)
 

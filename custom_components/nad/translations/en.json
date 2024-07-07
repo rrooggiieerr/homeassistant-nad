@@ -57,9 +57,9 @@
                     "volume_step": "Volume Step"
                 },
                 "data_description": {
-                    "min_volume": "Minimum volume in dB to use with the volume slider",
-                    "max_volume": "Maximum volume in dB to use with the volume slider",
-                    "volume_step": "The amount in dB you want to increase the volume with when pressing volume up/down"
+                    "min_volume": "Minimum volume to use with the volume slider.",
+                    "max_volume": "Maximum volume to use with the volume slider.",
+                    "volume_step": "The amount you want to increase the volume with when pressing volume up/down."
                 }
             },
             "sources": {

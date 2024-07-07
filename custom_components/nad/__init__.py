@@ -1,4 +1,5 @@
 """The NAD Receiver component."""
+
 from __future__ import annotations
 
 import logging
@@ -50,6 +51,8 @@ class CommandNotSupportedError(Exception):
 
 class NADReceiverCoordinator(DataUpdateCoordinator):
     """NAD Receiver Data Update Coordinator."""
+
+    receiver: NADReceiver = None
 
     unique_id = None
     model: str = None
@@ -184,7 +187,7 @@ class NADReceiverCoordinator(DataUpdateCoordinator):
 
     async def _async_update_data(self):
         """Fetch data from NAD Receiver."""
-        try: 
+        try:
             power_state = self.exec_command("Main.Power", "?")
         except CommandNotSupportedError:
             self.power_state = None
@@ -215,6 +218,7 @@ class NADReceiverCoordinator(DataUpdateCoordinator):
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up NAD Receiver from a config entry."""
+
     @callback
     def _async_migrate_entity_entry(
         registry_entry: entity_registry.RegistryEntry,
@@ -225,7 +229,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         if entry.data[CONF_TYPE] == CONF_TYPE_SERIAL:
             if registry_entry.unique_id.startswith(f"{entry.data[CONF_SERIAL_PORT]}-"):
                 new_unique_id = registry_entry.unique_id.replace(
-                    f"{entry.data[CONF_SERIAL_PORT]}-", f"{registry_entry.config_entry_id}-"
+                    f"{entry.data[CONF_SERIAL_PORT]}-",
+                    f"{registry_entry.config_entry_id}-",
                 )
                 _LOGGER.debug("Migrating entity unique id to %s", new_unique_id)
                 return {"new_unique_id": new_unique_id}

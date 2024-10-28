@@ -28,7 +28,7 @@ from homeassistant.helpers.selector import (
 )
 from nad_receiver import NADReceiver, NADReceiverTCP, NADReceiverTelnet
 
-from . import NADReceiverCoordinator
+from . import NADReceiverCoordinator, CommandNotSupportedError
 from .const import (
     CONF_DEFAULT_MAX_VOLUME,
     CONF_DEFAULT_MIN_VOLUME,

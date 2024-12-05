@@ -11,7 +11,7 @@ import serial
 import serial.tools.list_ports
 import voluptuous as vol
 from aiodiscover.discovery import _LOGGER
-from homeassistant import config_entries
+from homeassistant.config_entries import ConfigEntry, ConfigFlow, OptionsFlow
 from homeassistant.const import CONF_HOST, CONF_PORT, CONF_TYPE, UnitOfSoundPressure
 from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
@@ -28,7 +28,7 @@ from homeassistant.helpers.selector import (
 )
 from nad_receiver import NADReceiver, NADReceiverTCP, NADReceiverTelnet
 
-from . import NADReceiverCoordinator, CommandNotSupportedError
+from . import CommandNotSupportedError, NADReceiverCoordinator
 from .const import (
     CONF_DEFAULT_MAX_VOLUME,
     CONF_DEFAULT_MIN_VOLUME,
@@ -96,7 +96,7 @@ STEP_CONFIG_VOLUME_SCHEMA = vol.Schema(
 )
 
 
-class NADReceiverConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+class NADReceiverConfigFlow(ConfigFlow, domain=DOMAIN):
     """Handle a config flow for NAD Receiver."""
 
     VERSION = 1
@@ -319,19 +319,13 @@ class NADReceiverConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     @staticmethod
     @callback
     def async_get_options_flow(
-        config_entry: config_entries.ConfigEntry,
-    ) -> config_entries.OptionsFlow:
+        config_entry: ConfigEntry,
+    ) -> OptionsFlow:
         """Create the options flow."""
-        return NADReceiverOptionsFlowHandler(config_entry)
+        return NADReceiverOptionsFlowHandler()
 
 
-class NADReceiverOptionsFlowHandler(config_entries.OptionsFlow):
-    def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
-        """Initialize options flow."""
-        _LOGGER.debug(config_entry.data)
-        self.config_entry = config_entry
-        self.sources = None
-
+class NADReceiverOptionsFlowHandler(OptionsFlow):
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:

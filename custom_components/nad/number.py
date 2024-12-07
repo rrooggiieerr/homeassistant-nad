@@ -10,7 +10,7 @@ from homeassistant.components.number import (
     NumberMode,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import UnitOfFrequency, UnitOfLength, UnitOfTime
+from homeassistant.const import PERCENTAGE, UnitOfFrequency, UnitOfLength, UnitOfSoundPressure, UnitOfTime
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -37,7 +37,7 @@ async def async_setup_entry(
         NumberEntityDescription(
             key="Main.Bass",
             name="Bass Tone Control",
-            native_unit_of_measurement="db",
+            native_unit_of_measurement=UnitOfSoundPressure.DECIBEL,
             native_min_value=-10,
             native_max_value=10,
         ),
@@ -144,7 +144,7 @@ async def async_setup_entry(
             name="Dolby Dynamic Range Control",
             icon="mdi:dolby",
             entity_category=EntityCategory.CONFIG,
-            native_unit_of_measurement="%",
+            native_unit_of_measurement=PERCENTAGE,
             native_min_value=25,
             native_max_value=100,
             native_step=25,
@@ -173,7 +173,7 @@ async def async_setup_entry(
             key="Main.Level.BackLeft",
             name="Speaker Level Back Left",
             entity_category=EntityCategory.CONFIG,
-            native_unit_of_measurement="db",
+            native_unit_of_measurement=UnitOfSoundPressure.DECIBEL,
             native_min_value=-12,
             native_max_value=12,
             entity_registry_enabled_default=False,
@@ -182,7 +182,7 @@ async def async_setup_entry(
             key="Main.Level.BackRight",
             name="Speaker Level Back Rigt",
             entity_category=EntityCategory.CONFIG,
-            native_unit_of_measurement="db",
+            native_unit_of_measurement=UnitOfSoundPressure.DECIBEL,
             native_min_value=-12,
             native_max_value=12,
             entity_registry_enabled_default=False,
@@ -191,7 +191,7 @@ async def async_setup_entry(
             key="Main.Level.Center",
             name="Speaker Level Center",
             entity_category=EntityCategory.CONFIG,
-            native_unit_of_measurement="db",
+            native_unit_of_measurement=UnitOfSoundPressure.DECIBEL,
             native_min_value=-12,
             native_max_value=12,
             entity_registry_enabled_default=False,
@@ -200,7 +200,7 @@ async def async_setup_entry(
             key="Main.Level.Left",
             name="Speaker Level Left",
             entity_category=EntityCategory.CONFIG,
-            native_unit_of_measurement="db",
+            native_unit_of_measurement=UnitOfSoundPressure.DECIBEL,
             native_min_value=-12,
             native_max_value=12,
             entity_registry_enabled_default=False,
@@ -209,7 +209,7 @@ async def async_setup_entry(
             key="Main.Level.Right",
             name="Speaker Level Right",
             entity_category=EntityCategory.CONFIG,
-            native_unit_of_measurement="db",
+            native_unit_of_measurement=UnitOfSoundPressure.DECIBEL,
             native_min_value=-12,
             native_max_value=12,
             entity_registry_enabled_default=False,
@@ -218,7 +218,7 @@ async def async_setup_entry(
             key="Main.Level.Sub",
             name="Speaker Level Subwoofer",
             entity_category=EntityCategory.CONFIG,
-            native_unit_of_measurement="db",
+            native_unit_of_measurement=UnitOfSoundPressure.DECIBEL,
             native_min_value=-12,
             native_max_value=12,
             entity_registry_enabled_default=False,
@@ -227,7 +227,7 @@ async def async_setup_entry(
             key="Main.Level.SurroundLeft",
             name="Speaker Level Surround Left",
             entity_category=EntityCategory.CONFIG,
-            native_unit_of_measurement="db",
+            native_unit_of_measurement=UnitOfSoundPressure.DECIBEL,
             native_min_value=-12,
             native_max_value=12,
             entity_registry_enabled_default=False,
@@ -236,7 +236,7 @@ async def async_setup_entry(
             key="Main.Level.SurroundRight",
             name="Speaker Level Surround Right",
             entity_category=EntityCategory.CONFIG,
-            native_unit_of_measurement="db",
+            native_unit_of_measurement=UnitOfSoundPressure.DECIBEL,
             native_min_value=-12,
             native_max_value=12,
             entity_registry_enabled_default=False,

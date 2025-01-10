@@ -58,11 +58,11 @@ When your wiring is right a new NAD receiver integration and device will now
 be added to your Integrations view. If your wiring is not right you will get a
 *Failed to connect* error message.
 
-## Contributing
+## Contribute your language
 
-If you would like to use this Home Assistant integration in your own language you can provide me
-with a translation file as found in the `custom_components/nad/translations` directory.
-Create a pull request (preferred) or issue with the file attached.
+If you would like to use this Home Assistant integration in your own language you can provide a
+translation file as found in the `custom_components/nad/translations` directory. Create a pull
+request (preferred) or issue with the file attached.
 
 More on translating custom integrations can be found
 [here](https://developers.home-assistant.io/docs/internationalization/custom_integration/).

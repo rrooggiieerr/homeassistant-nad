@@ -191,11 +191,10 @@ class NADReceiverConfigFlow(ConfigFlow, domain=DOMAIN):
             # Test if we can connect to the device and get model
             try:
                 receiver = NADReceiver(serial_port)
-                model = self.exec_command("Main.Model", "?")
+                model = receiver.main_model("?")
             except (serial.SerialException, CommandNotSupportedError):
                 errors["base"] = "cannot_connect"
             else:
-                model = receiver.main_model("?")
                 assert model is not None, "Failed to retrieve receiver model"
 
                 _LOGGER.info("Device %s available", serial_port)

@@ -1,12 +1,19 @@
 {
   "domain": "nad",
   "name": "NAD",
-  "codeowners": [],
+  "codeowners": [
+    "@rrooggiieerr"
+  ],
   "config_flow": true,
-  "documentation": "https://www.home-assistant.io/integrations/nad",
+  "documentation": "https://github.com/rrooggiieerr/homeassistant-nad",
   "integration_type": "device",
   "iot_class": "local_polling",
-  "loggers": ["nad_receiver"],
-  "requirements": ["nad_receiver==0.3.0"],
+  "issue_tracker": "https://github.com/rrooggiieerr/homeassistant-nad/issues",
+  "loggers": [
+  	"nad_receiver"
+  ],
+  "requirements": [
+  	"nad_receiver==0.3.0"
+  ],
   "version": "0.0.3"
 }

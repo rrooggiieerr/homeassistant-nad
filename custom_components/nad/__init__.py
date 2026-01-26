@@ -253,7 +253,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     except serial.SerialException as ex:
         raise ConfigEntryNotReady(f"Unable to connect to NAD receiver") from ex
 
-    hass.data.setdefault(DOMAIN, {})[entry.entry_id] = receiver_coordinator
+    entry.runtime_data = receiver_coordinator
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
@@ -264,13 +264,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
-    receiver_coordinator: NADReceiverCoordinator = hass.data[DOMAIN][entry.entry_id]
+    receiver_coordinator: NADReceiverCoordinator = entry.runtime_data
     await receiver_coordinator.disconnect()
 
-    if unload_ok := await hass.config_entries.async_unload_platforms(entry, PLATFORMS):
-        hass.data[DOMAIN].pop(entry.entry_id)
-
-    return unload_ok
+    return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
 
 
 async def update_listener(hass: HomeAssistant, entry: ConfigEntry) -> None:

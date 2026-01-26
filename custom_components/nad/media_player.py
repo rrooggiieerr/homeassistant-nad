@@ -43,7 +43,7 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the NAD Receiver media player."""
-    coordinator: NADReceiverCoordinator = hass.data[DOMAIN][config_entry.entry_id]
+    coordinator: NADReceiverCoordinator = config_entry.runtime_data
 
     # Fetch initial data so we have data when entities subscribe
     await coordinator.async_config_entry_first_refresh()

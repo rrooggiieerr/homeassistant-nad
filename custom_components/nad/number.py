@@ -10,7 +10,13 @@ from homeassistant.components.number import (
     NumberMode,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import PERCENTAGE, UnitOfFrequency, UnitOfLength, UnitOfSoundPressure, UnitOfTime
+from homeassistant.const import (
+    PERCENTAGE,
+    UnitOfFrequency,
+    UnitOfLength,
+    UnitOfSoundPressure,
+    UnitOfTime,
+)
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback

@@ -11,10 +11,14 @@ import serial
 import serial.tools.list_ports
 import voluptuous as vol
 from aiodiscover.discovery import _LOGGER
-from homeassistant.config_entries import ConfigEntry, ConfigFlow, OptionsFlow
+from homeassistant.config_entries import (
+    ConfigEntry,
+    ConfigFlow,
+    ConfigFlowResult,
+    OptionsFlow,
+)
 from homeassistant.const import CONF_HOST, CONF_PORT, CONF_TYPE, UnitOfSoundPressure
 from homeassistant.core import callback
-from homeassistant.data_entry_flow import FlowResult
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.selector import (
     NumberSelector,
@@ -103,7 +107,7 @@ class NADReceiverConfigFlow(ConfigFlow, domain=DOMAIN):
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
-    ) -> FlowResult:
+    ) -> ConfigFlowResult:
         """Handle the initial step."""
         return self.async_show_menu(
             step_id="user",
@@ -112,7 +116,7 @@ class NADReceiverConfigFlow(ConfigFlow, domain=DOMAIN):
 
     async def async_step_setup_serial(
         self, user_input: dict[str, Any] | None = None
-    ) -> FlowResult:
+    ) -> ConfigFlowResult:
         """Handle the setup serial step."""
         errors: dict[str, str] = {}
 
@@ -215,7 +219,7 @@ class NADReceiverConfigFlow(ConfigFlow, domain=DOMAIN):
 
     async def async_step_setup_telnet(
         self, user_input: dict[str, Any] | None = None
-    ) -> FlowResult:
+    ) -> ConfigFlowResult:
         """Handle the setup serial step."""
         errors: dict[str, str] = {}
 
@@ -266,7 +270,7 @@ class NADReceiverConfigFlow(ConfigFlow, domain=DOMAIN):
 
     async def async_step_setup_tcp(
         self, user_input: dict[str, Any] | None = None
-    ) -> FlowResult:
+    ) -> ConfigFlowResult:
         """Handle the setup serial step."""
         errors: dict[str, str] = {}
 
@@ -327,7 +331,7 @@ class NADReceiverConfigFlow(ConfigFlow, domain=DOMAIN):
 class NADReceiverOptionsFlowHandler(OptionsFlow):
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
-    ) -> FlowResult:
+    ) -> ConfigFlowResult:
         """Manage the options."""
         errors: dict[str, str] = {}
 

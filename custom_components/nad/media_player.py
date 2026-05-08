@@ -1,7 +1,5 @@
 """Support for interfacing with NAD receivers through RS-232."""
 
-from __future__ import annotations
-
 import logging
 
 from aiodiscover.discovery import _LOGGER

@@ -5,10 +5,11 @@ import logging
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     CONF_HOST,
+    CONF_MODEL,
     Platform,
 )
 from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
+from homeassistant.exceptions import ConfigEntryNotReady
 from nad_serial import NADDevice
 from nad_serial.exceptions import NADConnectionError
 
@@ -28,20 +29,31 @@ PLATFORMS: list[Platform] = [
 async def async_setup_entry(hass: HomeAssistant, entry: NADConfigEntry) -> bool:
     """Set up NAD device from a config entry."""
 
+    url = entry.data[CONF_HOST]
+    model = entry.data.get(CONF_MODEL)
+
     try:
-        device = await NADDevice.async_connect(entry.data[CONF_HOST])
+        device = await NADDevice.async_connect(url)
     except NADConnectionError as ex:
-        raise ConfigEntryNotReady("Unable to connect to NAD device") from ex
+        raise ConfigEntryNotReady(
+            f"Unable to connect to NAD {model or 'device'} on {url}"
+        ) from ex
 
-    coordinator = NADCoordinator(hass, entry, device)
+    if (
+        device.serial_number and device.serial_number != entry.unique_id
+    ) or device.model != model:
+        await device.async_disconnect()
+        raise ConfigEntryNotReady(
+            "Unable to connect to NAD {model or 'device'}, not the same device"
+        )
 
-    try:
-        await coordinator.async_config_entry_first_refresh()
-    except ConfigEntryNotReady, ConfigEntryAuthFailed:
-        await coordinator.device.async_disconnect()
-        raise
+    if not await device.async_ping():
+        await device.async_disconnect()
+        raise ConfigEntryNotReady(
+            f"Unable to connect to NAD {model or 'device'} on {url}"
+        )
 
-    entry.runtime_data = coordinator
+    entry.runtime_data = NADCoordinator(hass, entry, device)
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 

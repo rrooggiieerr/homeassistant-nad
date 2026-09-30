@@ -8,7 +8,7 @@ from homeassistant.config_entries import (
     ConfigFlow,
     ConfigFlowResult,
 )
-from homeassistant.const import CONF_HOST
+from homeassistant.const import CONF_HOST, CONF_MODEL
 from homeassistant.helpers.selector import (
     SerialPortSelector,
 )
@@ -61,7 +61,9 @@ class NADConfigFlow(ConfigFlow, domain=DOMAIN):
 
             if device and not errors:
                 return self.async_create_entry(
-                    title=device.name, data={CONF_HOST: url}, options={}
+                    title=device.name,
+                    data={CONF_HOST: url, CONF_MODEL: device.model},
+                    options={},
                 )
 
         return self.async_show_form(

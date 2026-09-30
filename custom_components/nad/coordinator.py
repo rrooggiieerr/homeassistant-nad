@@ -6,7 +6,7 @@ from typing import Final, override
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.entity import DeviceInfo
-from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
+from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from nad_serial import NADDevice
 
 from .const import DOMAIN
@@ -52,6 +52,6 @@ class NADCoordinator(DataUpdateCoordinator):
     @override
     async def _async_update_data(self) -> None:
         """Fetch the latest data from the source."""
-        if not self.device.sends_updates:
-            # ToDo
-            pass
+        if self.device.sends_updates:
+            if not await self.device.async_ping():
+                raise UpdateFailed(f"Error communicating with NAD {self.device.name}")

@@ -16,13 +16,18 @@ class NADEntity(CoordinatorEntity):
     _device: NADDevice
 
     def __init__(
-        self, coordinator: NADCoordinator, device: NADDevice | None = None
+        self,
+        coordinator: NADCoordinator,
+        device: NADDevice | None = None,
     ) -> None:
         """Initialize the NAD entity."""
         super().__init__(coordinator)
 
-        self._attr_device_info = coordinator.device_info
-        self._device = device or coordinator.device
+        if device:
+            self._device = device
+        else:
+            self._device = coordinator.device
+            self._attr_device_info = coordinator.device_info
 
     @override
     async def async_added_to_hass(self) -> None:

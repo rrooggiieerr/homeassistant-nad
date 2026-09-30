@@ -12,9 +12,12 @@ from homeassistant.components.media_player import (
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
+from homeassistant.helpers import device_registry as dr
+from homeassistant.helpers.device_registry import ChildDeviceInfo
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from nad_serial import NADAmplifier, NADMultiZoneAmplifier, NADZone
 
+from .const import DOMAIN
 from .coordinator import NADCoordinator
 from .entity import NADEntity
 
@@ -32,14 +35,24 @@ async def async_setup_entry(
     entities: list[NADMediaPlayer] = []
 
     if isinstance(coordinator.device, NADAmplifier):
-        entities.append(NADMainMediaPlayer(coordinator, coordinator.device))
+        entities.append(NADMainMediaPlayer(coordinator))
 
     if (
         isinstance(coordinator.device, NADMultiZoneAmplifier)
         and coordinator.device.zones
     ):
+        parent_device_id = dr.async_get_device_id_by_identifier(
+            hass, (DOMAIN, coordinator.unique_id), config_entry_id=config_entry.entry_id
+        )
         for zone in coordinator.device.zones:
-            entities.append(NADZoneMediaPlayer(coordinator, zone))
+            device_info = ChildDeviceInfo(
+                parent_device_id=parent_device_id,
+                identifiers={
+                    (DOMAIN, f"{coordinator.unique_id}_zone{zone.zone_number}")
+                },
+                name=zone.name,
+            )
+            entities.append(NADZoneMediaPlayer(coordinator, zone, device_info))
 
     async_add_entities(entities)
 
@@ -63,7 +76,7 @@ class NADMediaPlayer(NADEntity, MediaPlayerEntity):
     _device: NADAmplifier
     _zone: str
 
-    def __init__(self, coordinator: NADCoordinator, device: NADAmplifier):
+    def __init__(self, coordinator: NADCoordinator, device: NADAmplifier | None = None):
         """Initialize the NAD media player."""
         super().__init__(coordinator, device)
 
@@ -181,11 +194,11 @@ class NADMainMediaPlayer(NADMediaPlayer):
         | MediaPlayerEntityFeature.SELECT_SOUND_MODE
     )
 
-    def __init__(self, coordinator: NADCoordinator, device: NADAmplifier):
+    def __init__(self, coordinator: NADCoordinator):
         """Initialize the NAD Receiver device."""
         self._zone = "Main"
 
-        super().__init__(coordinator, device)
+        super().__init__(coordinator)
 
         self._attr_name = f"{coordinator.device.name}"
         self._attr_unique_id = coordinator.unique_id
@@ -219,7 +232,9 @@ class NADZoneMediaPlayer(NADMediaPlayer):
 
     _device: NADZone
 
-    def __init__(self, coordinator: NADCoordinator, device: NADZone):
+    def __init__(
+        self, coordinator: NADCoordinator, device: NADZone, device_info: ChildDeviceInfo
+    ):
         """Initialize the NAD Receiver device."""
         self._zone = f"Zone{device.zone_number}"
 
@@ -227,3 +242,5 @@ class NADZoneMediaPlayer(NADMediaPlayer):
 
         self._attr_name = f"{coordinator.device.name} Zone {device.zone_number}"
         self._attr_unique_id = f"{coordinator.unique_id}_zone{self._device.zone_number}"
+
+        self._attr_device_info = device_info

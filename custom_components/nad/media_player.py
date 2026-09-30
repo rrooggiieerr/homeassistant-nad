@@ -41,6 +41,7 @@ async def async_setup_entry(
         isinstance(coordinator.device, NADMultiZoneAmplifier)
         and coordinator.device.zones
     ):
+        device_registry = dr.async_get(hass)
         parent_device_id = dr.async_get_device_id_by_identifier(
             hass, (DOMAIN, coordinator.unique_id), config_entry_id=config_entry.entry_id
         )
@@ -51,6 +52,11 @@ async def async_setup_entry(
                     (DOMAIN, f"{coordinator.unique_id}_zone{zone.zone_number}")
                 },
                 name=zone.name,
+            )
+            device_registry.async_get_or_create_child(
+                config_entry_id=config_entry.entry_id,
+                disabled_by=dr.DeviceEntryDisabler.INTEGRATION,
+                **device_info,
             )
             entities.append(NADZoneMediaPlayer(coordinator, zone, device_info))
 
@@ -226,8 +232,6 @@ class NADMainMediaPlayer(NADMediaPlayer):
 
 class NADZoneMediaPlayer(NADMediaPlayer):
     """Representation of a NAD zone."""
-
-    _attr_entity_registry_enabled_default = False
 
     _device: NADZone
 

@@ -18,12 +18,13 @@ type NADConfigEntry = ConfigEntry[NADCoordinator]
 UPDATE_INTERVAL = timedelta(seconds=5)
 
 
-class NADCoordinator(DataUpdateCoordinator):
+class NADCoordinator(DataUpdateCoordinator[None]):
     """NAD Data Update Coordinator."""
 
     config_entry: NADConfigEntry
 
     device: Final[NADDevice]
+    unique_id: str
     device_info: Final[DeviceInfo]
 
     def __init__(self, hass, config_entry: NADConfigEntry, device: NADDevice):
@@ -52,6 +53,5 @@ class NADCoordinator(DataUpdateCoordinator):
     @override
     async def _async_update_data(self) -> None:
         """Fetch the latest data from the source."""
-        if self.device.sends_updates:
-            if not await self.device.async_ping():
-                raise UpdateFailed(f"Error communicating with NAD {self.device.name}")
+        if self.device.sends_updates and not await self.device.async_ping():
+            raise UpdateFailed(f"Error communicating with NAD {self.device.name}")

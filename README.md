@@ -1,4 +1,4 @@
-# Home Assistant integration for NAD receivers
+# Home Assistant integration for NAD amplifiers, tuners and receivers over serial (RS-232) or Ethernet (telnet)
 
 ![Python][python-shield]
 [![GitHub Release][releases-shield]][releases]
@@ -13,12 +13,84 @@
 
 ## Introduction
 
-Home Assistant integration to control NAD receivers over the serial interface or serial
-to network bridges like [esp-link](https://github.com/jeelabs/esp-link).
+Home Assistant integration to control **[NAD](https://nadelectronics.com/)** amplifiers, tuners and
+receivers over serial (RS-232) or Ethernet (telnet).
 
 ## Features
 
 - Installation/Configuration through Config Flow UI
+- Asynchronous, built on [serialx](https://github.com/puddly/serialx).
+- Connects over serial (RS-232) or Ethernet (telnet).
+- Supports Serial to Ethernet/WiFi bridge and [ESPHome Serial Proxy](https://esphome.io/components/serial_proxy/)
+- Detects the device model and loads the matching configuration.
+- Detects the device type for models without configuration.
+- Read, set, increment and decrement any supported setting.
+- Reads the source names on supported devices.
+
+## Supported protocol
+
+If your device follows the second generation NAD protocol (v2.x), it is supported by this
+integration. This protocol is used by NAD amplifiers, tuners and receivers with a serial (RS-232)
+or Ethernet port.
+
+The binary protocol that some NAD devices, like the D-series, use on TCP port 50001 is not
+supported.
+
+The serial and Ethernet commands are identical. All communication is plain ASCII text. Every
+command and response has the format:
+
+`<Prefix>.<Variable><Operator><Value>`
+
+The prefix groups related variables, e.g. `Main`, `Zone2`, `Source1` or `Tuner`. Prefix and
+variable together name a setting, e.g. `Main.Volume`. Every message is terminated by a carriage
+return and/or line feed.
+
+| Operator | Meaning | Example |
+|---|---|---|
+| `?` | Query the value | `Main.Volume?` |
+| `=` | Set the value | `Main.Volume=-30` |
+| `+` | Increment or cycle to the next value | `Main.Volume+` |
+| `-` | Decrement or cycle to the previous value | `Main.Volume-` |
+
+The device responds with the `=` operator and the resulting value, e.g. `Main.Volume=-30`.
+
+## Supported devices
+
+The following devices are known to work:
+
+**Receivers:**
+
+- T755
+- T757
+
+Additionally, the integrations includes untested configuration files for the following devices:
+
+**Receivers:**
+
+- T765
+- T775
+- T777
+- T785
+- T787
+
+**Surround preamplifiers:**
+
+- M15HD
+- T175
+- T187
+
+**Amplifiers:**
+
+- C356
+- C368
+- C388
+
+**Tuners:**
+
+- C427
+
+Other NAD devices that use the [supported protocol](#supported-protocol) should work too, with a
+basic set of settings: power, model, version, volume, mute and source.
 
 ## Installation
 
@@ -29,39 +101,33 @@ Click the following button to open the integration directly on the HACS integrat
 
 [![Install NAD from HACS.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=rrooggiieerr&repository=homeassistant-nad&category=integration)
 
-Or follow these instructions:
-
-- Go to your **HACS** view in Home Assistant and then to **Integrations**
-- Open the **Custom repositories** menu
-- Add this repository URL to the **Custom repositories** and select
-**Integration** as the **Category**
-- Click **Add**
-- Close the **Custom repositories** menu
-- Select **+ Explore & download repositories** and search for *NAD*
-- Select **Download**
-- Restart Home Assistant
-
 ### Manually
 
 - Copy the `custom_components/nad` directory of this repository into the
 `config/custom_components/` directory of your Home Assistant installation
 - Restart Home Assistant
 
-## Adding a new NAD receiver
+## Adding a new NAD device
 
-- After restarting go to **Settings** then **Devices & Services**
-- Select **+ Add integration** and type in *NAD*
-- Select the *Serial port* or enter the path manually
-- Select **Submit**
+- Browse to your Home Assistant instance.
+- Go to [**Settings > Devices & services**](https://my.home-assistant.io/redirect/integrations).
+- In the bottom right corner, select the [+ Add Integration](https://my.home-assistant.io/redirect/config_flow_start?domain=xyscreens) button.
+- From the list, select **NAD**.
+- Follow the instructions on screen to complete the setup.
 
-When your wiring is right a new NAD receiver integration and device will now
-be added to your Integrations view. If your wiring is not right you will get a
-*Failed to connect* error message.
+When your wiring is right a new NAD integration and device will now be added to your Integrations
+view. If your wiring is not right you will get a *Failed to connect* error message.
 
 ## Contribution and appreciation
 
-You can contribute to this integration, or show your appreciation, in the following ways.
+Do you enjoy using this Home Assistant integration? You can contribute to this integration,
+or show your appreciation, in the following ways.
 
+### Contribute your NAD model
+
+Is your NAD device supported by this Home Assistant integration but not listed under Supported
+devices? Let me know your NAD model so I can improve the overview of supported devices.
+ 
 ### Contribute your language
 
 If you would like to use this Home Assistant integration in your own language you can provide a
@@ -78,8 +144,8 @@ page. Click **⭐ Star** on the top right of the GitHub page.
 
 ### Support my work
 
-Do you enjoy using this Home Assistant integration? Please consider supporting my work through one
-of the following platforms, your contribution is greatly appreciated and keeps me motivated:
+Please consider supporting my work through one of the following platforms, your contribution is
+greatly appreciated and keeps me motivated:
 
 [![GitHub Sponsors][github-shield]][github]
 [![PayPal][paypal-shield]][paypal]
@@ -89,13 +155,13 @@ of the following platforms, your contribution is greatly appreciated and keeps m
 ### Home Assistant support
 
 [Let me answer your Home Assistant questions](https://buymeacoffee.com/rrooggiieerr/e/447353). During
-a 1 hour Q&A session I help you solve your Home Assistant related issues with.
+a 1 hour Q&A session I help you solve your Home Assistant related issues.
 
 What can be done in one hour:
-- Home Assistant walktrough, I explain you where is what in the Home Assistant UI
+- Home Assistant walkthrough, I explain to you what's where in the Home Assistant UI
 - Install and configure a Home Assistant integration
 - Explain and create scenes
-- Explain and create a simple automations
+- Explain and create a simple automation
 - Install a ZHA quirk, to make your unsupported Zigbee device work in Home Assistant
 
 What takes more time:

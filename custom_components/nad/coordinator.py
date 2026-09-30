@@ -5,6 +5,7 @@ from datetime import timedelta
 from typing import Final, override
 
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from nad_serial import NADDevice
@@ -48,6 +49,12 @@ class NADCoordinator(DataUpdateCoordinator[None]):
             name=device.name,
             serial_number=device.serial_number,
             sw_version=device.firmware_version,
+        )
+
+        device_registry = dr.async_get(hass)
+        device_registry.async_get_or_create(
+            config_entry_id=config_entry.entry_id,
+            **self.device_info,
         )
 
     @override

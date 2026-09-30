@@ -4,7 +4,6 @@ import logging
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
-    CONF_HOST,
     CONF_MODEL,
     Platform,
 )
@@ -13,6 +12,7 @@ from homeassistant.exceptions import ConfigEntryNotReady
 from nad_serial import NADDevice
 from nad_serial.exceptions import NADConnectionError
 
+from .const import CONF_SERIAL_PORT
 from .coordinator import NADConfigEntry, NADCoordinator
 
 _LOGGER = logging.getLogger(__name__)
@@ -29,7 +29,7 @@ PLATFORMS: list[Platform] = [
 async def async_setup_entry(hass: HomeAssistant, entry: NADConfigEntry) -> bool:
     """Set up NAD device from a config entry."""
 
-    url = entry.data[CONF_HOST]
+    url = entry.data[CONF_SERIAL_PORT]
     model = entry.data.get(CONF_MODEL)
 
     try:

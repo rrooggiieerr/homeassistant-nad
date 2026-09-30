@@ -8,7 +8,7 @@ from homeassistant.config_entries import (
     ConfigFlow,
     ConfigFlowResult,
 )
-from homeassistant.const import CONF_HOST, CONF_MODEL
+from homeassistant.const import CONF_MODEL
 from homeassistant.helpers.selector import (
     SerialPortSelector,
 )
@@ -16,6 +16,7 @@ from nad_serial import NADDevice
 from nad_serial.exceptions import NADConnectionError
 
 from .const import (
+    CONF_SERIAL_PORT,
     DOMAIN,
 )
 
@@ -23,7 +24,7 @@ _LOGGER = logging.getLogger(__name__)
 
 USER_SCHEMA = probatio.Schema(
     {
-        probatio.Required(CONF_HOST): SerialPortSelector(),
+        probatio.Required(CONF_SERIAL_PORT): SerialPortSelector(),
     }
 )
 
@@ -41,7 +42,7 @@ class NADConfigFlow(ConfigFlow, domain=DOMAIN):
 
         if user_input is not None:
             # Validate user input.
-            url = user_input[CONF_HOST]
+            url = user_input[CONF_SERIAL_PORT]
 
             device = None
             try:
@@ -62,7 +63,7 @@ class NADConfigFlow(ConfigFlow, domain=DOMAIN):
             if device and not errors:
                 return self.async_create_entry(
                     title=device.name,
-                    data={CONF_HOST: url, CONF_MODEL: device.model},
+                    data={CONF_SERIAL_PORT: url, CONF_MODEL: device.model},
                     options={},
                 )
 

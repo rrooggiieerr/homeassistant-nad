@@ -4,7 +4,9 @@ import logging
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
+    CONF_HOST,
     CONF_MODEL,
+    CONF_PORT,
     Platform,
 )
 from homeassistant.core import HomeAssistant
@@ -29,7 +31,15 @@ PLATFORMS: list[Platform] = [
 async def async_setup_entry(hass: HomeAssistant, entry: NADConfigEntry) -> bool:
     """Set up NAD device from a config entry."""
 
-    url = entry.data[CONF_SERIAL_PORT]
+    if CONF_SERIAL_PORT in entry.data:
+        url = entry.data[CONF_SERIAL_PORT]
+    elif CONF_HOST in entry.data and CONF_PORT in entry.data:
+        url = f"socket://{entry.data[CONF_HOST]}:{entry.data[CONF_PORT]}"
+    else:
+        raise ConfigEntryNotReady(
+            "The binary protocol that some NAD devices, like the D-series, use on TCP port 50001 is currently not supported."
+        )
+
     model = entry.data.get(CONF_MODEL)
 
     try:

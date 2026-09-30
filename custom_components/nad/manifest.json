@@ -16,5 +16,5 @@
   "requirements": [
   	"nad_serial==0.0.1rc4"
   ],
-  "version": "0.0.4rc2"
+  "version": "0.1.0rc2"
 }

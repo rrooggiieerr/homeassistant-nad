@@ -10,10 +10,10 @@
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/rrooggiieerr/homeassistant-nad/issues",
   "loggers": [
-  	"nad_receiver"
+  	"nad_serial"
   ],
   "requirements": [
-  	"nad_receiver==0.3.0"
+  	"nad_serial==0.0.1rc2"
   ],
-  "version": "0.0.3"
+  "version": "0.0.4rc1"
 }

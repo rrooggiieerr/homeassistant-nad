@@ -200,7 +200,6 @@ class NADMainMediaPlayer(NADMediaPlayer):
 
         super().__init__(coordinator)
 
-        self._attr_name = f"{coordinator.device.name}"
         self._attr_unique_id = coordinator.unique_id
 
     @property
@@ -240,7 +239,6 @@ class NADZoneMediaPlayer(NADMediaPlayer):
 
         super().__init__(coordinator, device)
 
-        self._attr_name = f"{coordinator.device.name} Zone {device.zone_number}"
         self._attr_unique_id = f"{coordinator.unique_id}_zone{self._device.zone_number}"
 
         self._attr_device_info = device_info

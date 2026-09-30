@@ -46,8 +46,12 @@ class NADEntity(CoordinatorEntity[NADCoordinator]):
 
     @callback
     def _async_nad_callback(self, setting: str, value: Any) -> None:
-        _LOGGER.debug("%s changed to %s", setting, value)
-        self.async_write_ha_state()
+        if (
+            not hasattr(self, "entity_description")
+            or setting.lower() == self.entity_description.key.lower()
+        ):
+            _LOGGER.debug("%s changed to %s", setting, value)
+            self.async_write_ha_state()
 
     @override
     async def async_update(self) -> None:

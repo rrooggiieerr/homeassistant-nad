@@ -39,13 +39,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: NADConfigEntry) -> bool:
             f"Unable to connect to NAD {model or 'device'} on {url}"
         ) from ex
 
-    if (
-        device.serial_number and device.serial_number != entry.unique_id
-    ) or device.model != model:
-        await device.async_disconnect()
-        raise ConfigEntryNotReady(
-            "Unable to connect to NAD {model or 'device'}, not the same device"
-        )
+    # if (
+    #     device.serial_number and device.serial_number != entry.unique_id
+    # ) or (model and device.model != model):
+    #     await device.async_disconnect()
+    #     raise ConfigEntryNotReady(
+    #         f"Unable to connect to NAD {model or 'device'}, not the same device"
+    #     )
 
     if not await device.async_ping():
         await device.async_disconnect()

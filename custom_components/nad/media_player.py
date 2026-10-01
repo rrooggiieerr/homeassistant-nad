@@ -90,8 +90,9 @@ class NADMediaPlayer(NADEntity, MediaPlayerEntity):
         if volume_config:
             self._min_volume = volume_config.get("min")
             self._max_volume = volume_config.get("max")
-            self._attr_volume_step = volume_config.get("step", 1)
-            # self._attr_volume_step = 100 / (abs(self._max_volume - self._min_volume) / volume_config.get("max"))
+            step_db = volume_config.get("step", 1)
+            if self._min_volume is not None and self._max_volume is not None:
+                self._attr_volume_step = step_db / abs(self._max_volume - self._min_volume)
 
     def calc_volume(self, decibel):
         """Calculate the volume given the decibel.

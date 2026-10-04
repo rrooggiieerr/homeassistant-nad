@@ -111,7 +111,7 @@ Click the following button to open the integration directly on the HACS integrat
 
 - Browse to your Home Assistant instance.
 - Go to [**Settings > Devices & services**](https://my.home-assistant.io/redirect/integrations).
-- In the bottom right corner, select the [+ Add Integration](https://my.home-assistant.io/redirect/config_flow_start?domain=xyscreens) button.
+- In the bottom right corner, select the [+ Add Integration](https://my.home-assistant.io/redirect/config_flow_start?domain=nad) button.
 - From the list, select **NAD**.
 - Follow the instructions on screen to complete the setup.
 

@@ -145,7 +145,9 @@ async def async_setup_entry(
     entities = []
 
     for entity_description in _ENTITY_DESCRIPTIONS:
-        if config := coordinator.device.get_setting_config(entity_description.key):
+        if (
+            config := coordinator.device.get_setting_config(entity_description.key)
+        ) and config["type"] == "enum":
             entities.append(NADSelect(coordinator, entity_description, config))
 
     async_add_entities(entities)

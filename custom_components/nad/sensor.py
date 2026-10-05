@@ -82,8 +82,11 @@ async def async_setup_entry(
 
     for entity_description in _ENTITY_DESCRIPTIONS:
         if (
-            config := coordinator.device.get_setting_config(entity_description.key)
-        ) and config["type"] in ("number", "string"):
+            (config := coordinator.device.get_setting_config(entity_description.key))
+            and config["type"] in ("number", "string")
+            and "?" in config["operators"]
+            and "=" not in config["operators"]
+        ):
             entities.append(NADSensor(coordinator, entity_description, config))
 
     async_add_entities(entities)

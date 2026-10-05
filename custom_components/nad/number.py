@@ -377,8 +377,11 @@ async def async_setup_entry(
 
     for entity_description in _ENTITY_DESCRIPTIONS:
         if (
-            config := coordinator.device.get_setting_config(entity_description.key)
-        ) and config["type"] == "number":
+            (config := coordinator.device.get_setting_config(entity_description.key))
+            and config["type"] == "number"
+            and "?" in config["operators"]
+            and "=" in config["operators"]
+        ):
             entities.append(NADNumber(coordinator, entity_description, config))
 
     async_add_entities(entities)

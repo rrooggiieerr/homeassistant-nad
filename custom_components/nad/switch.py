@@ -135,8 +135,11 @@ async def async_setup_entry(
 
     for entity_description in _ENTITY_DESCRIPTIONS:
         if (
-            config := coordinator.device.get_setting_config(entity_description.key)
-        ) and config["type"] == "boolean":
+            (config := coordinator.device.get_setting_config(entity_description.key))
+            and config["type"] == "boolean"
+            and "?" in config["operators"]
+            and "=" in config["operators"]
+        ):
             entities.append(NADSwitch(coordinator, entity_description))
 
     async_add_entities(entities)

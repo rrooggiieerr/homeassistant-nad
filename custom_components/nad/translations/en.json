@@ -8,95 +8,285 @@
             "unknown": "Unexpected error"
         },
         "step": {
-			"user": {
-				"title": "Connection Method",
-				"menu_options": {
-					"setup_serial": "Serial",
-					"setup_telnet": "Telnet",
-					"setup_tcp": "TCP"
-				}
-			},
-            "setup_serial": {
-                "title": "Serial Receiver",
+            "user": {
+                "title": "Connect to NAD device",
                 "data": {
-                    "serial_port": "Serial Port"
+                    "serial_port": "Serial port"
                 },
-				"data_description": {
-					"serial_port": "The serial port the NAD receiver is connected to."
-				}
-            },
-            "setup_telnet": {
-            	"title": "Telnet Receiver",
-                "data": {
-                	"host": "Host",
-                	"port": "Port"
-                },
-				"data_description": {
-					"host": "The hostname or IP address of the NAD receiver.",
-					"port": "The port number needed to communicate with the receiver. 53 is the default port for native network connected receivers but if a serial to network bridges like esp-link is used port 23 might need to be selected."
-				}
-            },
-            "setup_tcp": {
-            	"title": "TCP Receiver",
-                "data": {
-                	"host": "Host"
-                },
-				"data_description": {
-					"host": "The hostname or IP address of the NAD receiver."
-				}
+                "data_description": {
+                    "serial_port": "The serial port the NAD device is connected to, or a URL for the telnet connection or serial to network bridge (e.g. socket://192.0.2.1:23)."
+                }
             }
         }
     },
-    "options": {
-        "step": {
-            "init": {
-                "title": "Volume Settings",
-                "data": {
-                    "min_volume": "Minimum Volume",
-                    "max_volume": "Maximum Volume",
-                    "volume_step": "Volume Step"
-                },
-                "data_description": {
-                    "min_volume": "Minimum volume to use with the volume slider.",
-                    "max_volume": "Maximum volume to use with the volume slider.",
-                    "volume_step": "The amount you want to increase the volume with when pressing volume up/down."
-                }
+    "entity": {
+        "number": {
+            "main_bass": {
+                "name": "Bass tone control"
             },
-            "sources": {
-            	"title": "Source names",
-                "data": {
-                    "source_1": "Source 1",
-                    "source_2": "Source 2",
-                    "source_3": "Source 3",
-                    "source_4": "Source 4",
-                    "source_5": "Source 5",
-                    "source_6": "Source 6",
-                    "source_7": "Source 7",
-                    "source_8": "Source 8",
-                    "source_9": "Source 9",
-                    "source_10": "Source 10",
-                    "source_11": "Source 11",
-                    "source_12": "Source 12",
-                    "source_13": "Source 13",
-                    "source_14": "Source 14",
-                    "source_15": "Source 15",
-                    "1": "Source 1",
-                    "2": "Source 2",
-                    "3": "Source 3",
-                    "4": "Source 4",
-                    "5": "Source 5",
-                    "6": "Source 6",
-                    "7": "Source 7",
-                    "8": "Source 8",
-                    "9": "Source 9",
-                    "10": "Source 10",
-                    "11": "Source 11",
-                    "12": "Source 12",
-                    "13": "Source 13",
-                    "14": "Source 14",
-                    "15": "Source 15"
-                }
+            "main_distance_back_left": {
+                "name": "Distance back left"
+            },
+            "main_distance_back_right": {
+                "name": "Distance back right"
+            },
+            "main_distance_center": {
+                "name": "Distance center"
+            },
+            "main_distance_left": {
+                "name": "Distance left"
+            },
+            "main_distance_right": {
+                "name": "Distance right"
+            },
+            "main_distance_sub": {
+                "name": "Distance subwoofer"
+            },
+            "main_distance_surround_left": {
+                "name": "Distance surround left"
+            },
+            "main_distance_surround_right": {
+                "name": "Distance surround right"
+            },
+            "main_dolby_center_width": {
+                "name": "Dolby center width"
+            },
+            "main_dolby_dimension": {
+                "name": "Dolby dimension"
+            },
+            "main_dolby_drc": {
+                "name": "Dolby dynamic range control"
+            },
+            "main_dts_center_gain": {
+                "name": "DTS center gain"
+            },
+            "main_dts_drc": {
+                "name": "DTS dynamic range control"
+            },
+            "main_level_back_left": {
+                "name": "Speaker level back left"
+            },
+            "main_level_back_right": {
+                "name": "Speaker level back right"
+            },
+            "main_level_center": {
+                "name": "Speaker level center"
+            },
+            "main_level_left": {
+                "name": "Speaker level left"
+            },
+            "main_level_right": {
+                "name": "Speaker level right"
+            },
+            "main_level_sub": {
+                "name": "Speaker level subwoofer"
+            },
+            "main_level_surround_left": {
+                "name": "Speaker level surround left"
+            },
+            "main_level_surround_right": {
+                "name": "Speaker level surround right"
+            },
+            "main_lip_sync_delay": {
+                "name": "Lip sync delay"
+            },
+            "main_speaker_back_frequency": {
+                "name": "Speaker crossover back"
+            },
+            "main_speaker_center_frequency": {
+                "name": "Speaker crossover center"
+            },
+            "main_speaker_front_frequency": {
+                "name": "Speaker crossover front"
+            },
+            "main_speaker_surround_frequency": {
+                "name": "Speaker crossover surround"
+            },
+            "main_treble": {
+                "name": "Treble tone control"
+            },
+            "main_trigger1_delay": {
+                "name": "Trigger 1 delay"
+            },
+            "main_trigger2_delay": {
+                "name": "Trigger 2 delay"
+            },
+            "main_trigger3_delay": {
+                "name": "Trigger 3 delay"
+            },
+            "main_trim_center": {
+                "name": "Trim level center"
+            },
+            "main_trim_sub": {
+                "name": "Trim level subwoofer"
+            },
+            "main_trim_surround": {
+                "name": "Trim level surround"
+            },
+            "tuner_am_frequency": {
+                "name": "Tuner AM frequency"
+            },
+            "tuner_fm_frequency": {
+                "name": "Tuner FM frequency"
+            },
+            "tuner_preset": {
+                "name": "Tuner preset"
+            },
+            "tuner_xm_channel": {
+                "name": "Tuner XM channel"
             }
+        },
+        "select": {
+            "main_auto_trigger": {
+                "name": "Trigger input"
+            },
+            "main_listening_mode_analog": {
+                "name": "Analog signal listening mode"
+            },
+            "main_listening_mode_digital": {
+                "name": "Digital signal listening mode"
+            },
+            "main_listening_mode_dolby_digital": {
+                "name": "Dolby Digital listening mode"
+            },
+            "main_listening_mode_dolby_digital2ch": {
+                "name": "Dolby Digital 2 channel listening mode"
+            },
+            "main_listening_mode_dts": {
+                "name": "DTS listening mode"
+            },
+            "main_speaker_back_config": {
+                "name": "Speaker size back"
+            },
+            "main_speaker_center_config": {
+                "name": "Speaker size center"
+            },
+            "main_speaker_front_config": {
+                "name": "Speaker size front"
+            },
+            "main_speaker_surround_config": {
+                "name": "Speaker size surround"
+            },
+            "main_trigger1_out": {
+                "name": "Trigger 1"
+            },
+            "main_trigger2_out": {
+                "name": "Trigger 2"
+            },
+            "main_trigger3_out": {
+                "name": "Trigger 3"
+            },
+            "main_vfd_display": {
+                "name": "Main VFD display"
+            },
+            "main_vfd_line1": {
+                "name": "VFD line 1"
+            },
+            "main_vfd_line2": {
+                "name": "VFD line 2"
+            },
+            "main_vfd_temp_line": {
+                "name": "VFD temp line"
+            },
+            "main_video_mode": {
+                "name": "Video mode"
+            },
+            "tuner_band": {
+                "name": "Tuner band"
+            },
+            "tuner_digital_mode": {
+                "name": "Tuner digital mode"
+            }
+        },
+        "switch": {
+            "main_dimmer": {
+                "name": "Front VFD dimmer"
+            },
+            "main_dolby_panorama": {
+                "name": "Dolby panorama"
+            },
+            "main_enhanced_bass": {
+                "name": "Enhanced bass"
+            },
+            "main_enhanced_stereo_back": {
+                "name": "Enhanced stereo back"
+            },
+            "main_enhanced_stereo_center": {
+                "name": "Enhanced stereo center"
+            },
+            "main_enhanced_stereo_front": {
+                "name": "Enhanced stereo front"
+            },
+            "main_enhanced_stereo_surround": {
+                "name": "Enhanced stereo surround"
+            },
+            "main_osd_temp_display": {
+                "name": "OSD temp display"
+            },
+            "main_speaker_sub": {
+                "name": "Subwoofer"
+            },
+            "main_speaker_a": {
+                "name": "Speakers A"
+            },
+            "main_speaker_b": {
+                "name": "Speakers B"
+            },
+            "main_tone_defeat": {
+                "name": "Tone defeat"
+            },
+            "tuner_fm_mute": {
+                "name": "Tuner FM mute"
+            }
+        },
+        "sensor": {
+            "dsp_version": {
+                "name": "DSP version"
+            },
+            "tuner_dab_dls": {
+                "name": "DAB DLS"
+            },
+            "tuner_dab_service": {
+                "name": "DAB service"
+            },
+            "tuner_fm_rdsname": {
+                "name": "FM RDS name"
+            },
+            "tuner_fm_rdstext": {
+                "name": "FM RDS text"
+            },
+            "tuner_xm_channel_name": {
+                "name": "XM channel name"
+            },
+            "tuner_xm_name": {
+                "name": "XM name"
+            },
+            "tuner_xm_title": {
+                "name": "XM title"
+            },
+            "uart_version": {
+                "name": "UART version"
+            }
+        }
+    },
+    "exceptions": {
+        "binary_protocol_not_supported": {
+            "message": "The binary protocol that some NAD devices, like the D-series, use on TCP port 50001 is currently not supported."
+        },
+        "cannot_connect": {
+            "message": "Unable to connect to NAD device on {url}."
+        },
+        "communication_error": {
+            "message": "Error communicating with NAD {name}."
+        },
+        "timeout_error": {
+            "message": "Communicating with NAD {name} timed out."
+        },
+        "unknown_error": {
+            "message": "Unknown error: {error}"
+        },
+        "unknown_source": {
+            "message": "Unknown source {source}."
         }
     }
 }

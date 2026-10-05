@@ -20,64 +20,63 @@ _LOGGER = logging.getLogger(__name__)
 _ENTITY_DESCRIPTIONS = [
     SwitchEntityDescription(
         key="Main.Dimmer",
-        name="Front VFD Dimmer",
-        icon="mdi:text-short",
+        translation_key="main_dimmer",
         entity_category=EntityCategory.CONFIG,
     ),
     SwitchEntityDescription(
         key="Main.Dolby.Panorama",
-        name="Dolby Panorama",
-        icon="mdi:dolby",
+        translation_key="main_dolby_panorama",
         entity_category=EntityCategory.CONFIG,
         entity_registry_enabled_default=False,
     ),
     SwitchEntityDescription(
         key="Main.EnhancedBass",
-        name="Enhanced Bass",
+        translation_key="main_enhanced_bass",
         entity_category=EntityCategory.CONFIG,
     ),
     SwitchEntityDescription(
         key="Main.EnhancedStereo.Back",
-        name="Enhanced Stereo Back",
+        translation_key="main_enhanced_stereo_back",
         entity_category=EntityCategory.CONFIG,
         entity_registry_enabled_default=False,
     ),
     SwitchEntityDescription(
         key="Main.EnhancedStereo.Center",
-        name="Enhanced Stereo Center",
+        translation_key="main_enhanced_stereo_center",
         entity_category=EntityCategory.CONFIG,
         entity_registry_enabled_default=False,
     ),
     SwitchEntityDescription(
         key="Main.EnhancedStereo.Front",
-        name="Enhanced Stereo Front",
+        translation_key="main_enhanced_stereo_front",
         entity_category=EntityCategory.CONFIG,
         entity_registry_enabled_default=False,
     ),
     SwitchEntityDescription(
         key="Main.EnhancedStereo.Surround",
-        name="Enhanced Stereo Surround",
+        translation_key="main_enhanced_stereo_surround",
         entity_category=EntityCategory.CONFIG,
         entity_registry_enabled_default=False,
     ),
     SwitchEntityDescription(
         key="Main.OSD.TempDisplay",
-        name="OSD Temp Display",
+        translation_key="main_osd_temp_display",
         entity_category=EntityCategory.CONFIG,
         entity_registry_enabled_default=False,
     ),
-    SwitchEntityDescription(key="Main.Speaker.Sub", name="Subwoofer"),
+    SwitchEntityDescription(key="Main.Speaker.Sub", translation_key="main_speaker_sub"),
     SwitchEntityDescription(
-        key="Main.SpeakerA", name="Speakers A", icon="mdi:speaker-multiple"
+        key="Main.SpeakerA",
+        translation_key="main_speaker_a",
     ),
     SwitchEntityDescription(
-        key="Main.SpeakerB", name="Speakers B", icon="mdi:speaker-multiple"
+        key="Main.SpeakerB",
+        translation_key="main_speaker_b",
     ),
-    SwitchEntityDescription(key="Main.ToneDefeat", name="Tone Defeat"),
+    SwitchEntityDescription(key="Main.ToneDefeat", translation_key="main_tone_defeat"),
     SwitchEntityDescription(
         key="Tuner.FM.Mute",
-        name="Tuner FM Mute",
-        icon="mdi:radio-fm",
+        translation_key="tuner_fm_mute",
         entity_registry_enabled_default=False,
     ),
 ]

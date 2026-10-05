@@ -16,40 +16,50 @@ _LOGGER = logging.getLogger(__name__)
 
 _ENTITY_DESCRIPTIONS = [
     SensorEntityDescription(
-        key="DSP.Version", name="DSP Version", entity_registry_enabled_default=False
+        key="DSP.Version",
+        translation_key="dsp_version",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
     ),
     SensorEntityDescription(
-        key="Tuner.DAB.DLS", name="DAB DLS", entity_registry_enabled_default=False
+        key="Tuner.DAB.DLS",
+        translation_key="tuner_dab_dls",
+        entity_registry_enabled_default=False,
     ),
     SensorEntityDescription(
         key="Tuner.DAB.Service",
-        name="DAB Service",
+        translation_key="tuner_dab_service",
         entity_registry_enabled_default=False,
     ),
     SensorEntityDescription(
         key="Tuner.FM.RDSName",
-        name="FM RDS Name",
+        translation_key="tuner_fm_rdsname",
         entity_registry_enabled_default=False,
     ),
     SensorEntityDescription(
         key="Tuner.FM.RDSText",
-        name="FM RDS Text",
+        translation_key="tuner_fm_rdstext",
         entity_registry_enabled_default=False,
     ),
     SensorEntityDescription(
         key="Tuner.XM.ChannelName",
-        name="XM Channel Name",
+        translation_key="tuner_xm_channel_name",
         entity_registry_enabled_default=False,
     ),
     SensorEntityDescription(
-        key="Tuner.XM.Name", name="XM Name", entity_registry_enabled_default=False
+        key="Tuner.XM.Name",
+        translation_key="tuner_xm_name",
+        entity_registry_enabled_default=False,
     ),
     SensorEntityDescription(
-        key="Tuner.XM.Title", name="XM Title", entity_registry_enabled_default=False
+        key="Tuner.XM.Title",
+        translation_key="tuner_xm_title",
+        entity_registry_enabled_default=False,
     ),
     SensorEntityDescription(
         key="UART.Version",
-        name="UART Version",
+        translation_key="uart_version",
+        entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
     ),
 ]

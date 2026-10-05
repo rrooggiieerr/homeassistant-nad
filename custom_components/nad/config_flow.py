@@ -1,7 +1,7 @@
 """Config flow for the NAD integration."""
 
 import logging
-from typing import Any
+from typing import Any, override
 
 import probatio
 from homeassistant.config_entries import (
@@ -13,7 +13,7 @@ from homeassistant.helpers.selector import (
     SerialPortSelector,
 )
 from nad_serial import NADDevice
-from nad_serial.exceptions import NADConnectionError
+from nad_serial.exceptions import NADBaseError
 
 from .const import (
     CONF_SERIAL_PORT,
@@ -34,6 +34,7 @@ class NADConfigFlow(ConfigFlow, domain=DOMAIN):
 
     VERSION = 1
 
+    @override
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
@@ -43,6 +44,7 @@ class NADConfigFlow(ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             # Validate user input.
             url = user_input[CONF_SERIAL_PORT]
+            self._async_abort_entries_match({CONF_SERIAL_PORT: url})
 
             device = None
             try:
@@ -54,7 +56,7 @@ class NADConfigFlow(ConfigFlow, domain=DOMAIN):
                     self._abort_if_unique_id_configured()
 
                 _LOGGER.info("NAD %s available on %s", device.model, url)
-            except NADConnectionError:
+            except NADBaseError:
                 errors["base"] = "cannot_connect"
             finally:
                 if device:

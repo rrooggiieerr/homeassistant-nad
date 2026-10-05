@@ -9,6 +9,7 @@ from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from nad_serial import NADDevice
+from nad_serial.exceptions import NADBaseError
 
 from .const import DOMAIN
 
@@ -36,7 +37,7 @@ class NADCoordinator(DataUpdateCoordinator[None]):
             config_entry=config_entry,
             name=DOMAIN,
             update_interval=UPDATE_INTERVAL,
-            always_update=True,
+            always_update=False,
         )
 
         self.device = device
@@ -58,7 +59,22 @@ class NADCoordinator(DataUpdateCoordinator[None]):
         )
 
     @override
+    async def async_shutdown(self) -> None:
+        """Disconnect from the NAD device."""
+        await super().async_shutdown()
+        await self.device.async_disconnect()
+
+    @override
     async def _async_update_data(self) -> None:
         """Fetch the latest data from the source."""
-        if self.device.sends_updates and not await self.device.async_ping():
-            raise UpdateFailed(f"Error communicating with NAD {self.device.name}")
+        try:
+            if not self.device.connected:
+                await self.device.async_reconnect()
+            else:
+                await self.device.async_request_is_on()
+        except NADBaseError as ex:
+            raise UpdateFailed(
+                translation_domain=DOMAIN,
+                translation_key="communication_error",
+                translation_placeholders={"name": self.device.name},
+            ) from ex

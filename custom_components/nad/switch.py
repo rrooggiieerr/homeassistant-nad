@@ -1,4 +1,5 @@
 import logging
+from datetime import timedelta
 from typing import override
 
 from homeassistant.components.switch import (
@@ -12,9 +13,12 @@ from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from .coordinator import NADCoordinator
-from .entity import NADEntity
+from .entity import NADEntity, handle_nad_action_errors
 
 _LOGGER = logging.getLogger(__name__)
+
+SCAN_INTERVAL = timedelta(seconds=5)
+PARALLEL_UPDATES = 1
 
 
 _ENTITY_DESCRIPTIONS = [
@@ -102,7 +106,6 @@ async def async_setup_entry(
 class NADSwitch(NADEntity, SwitchEntity):
     _attr_has_entity_name = True
     _attr_device_class = SwitchDeviceClass.SWITCH
-    _attr_available = False
 
     _attr_is_on = None
 
@@ -128,13 +131,13 @@ class NADSwitch(NADEntity, SwitchEntity):
         return bool(value) if value is not None else None
 
     @override
+    @handle_nad_action_errors
     async def async_turn_on(self, **kwargs) -> None:
         """Turn the entity on."""
         await self._device.async_change_setting(self.entity_description.key, True)
-        self.async_write_ha_state()
 
     @override
+    @handle_nad_action_errors
     async def async_turn_off(self, **kwargs) -> None:
         """Turn the entity off."""
         await self._device.async_change_setting(self.entity_description.key, False)
-        self.async_write_ha_state()

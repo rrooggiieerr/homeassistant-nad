@@ -1,7 +1,8 @@
 """Support for interfacing with NAD receivers through RS-232."""
 
 import logging
-from typing import override
+from datetime import timedelta
+from typing import Any, override
 
 from homeassistant.components.media_player import (
     MediaPlayerDeviceClass,
@@ -10,7 +11,7 @@ from homeassistant.components.media_player import (
     MediaPlayerState,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.device_registry import ChildDeviceInfo
@@ -19,9 +20,12 @@ from nad_serial import NADAmplifier, NADMultiZoneAmplifier, NADZone
 
 from .const import DOMAIN
 from .coordinator import NADCoordinator
-from .entity import NADEntity
+from .entity import NADEntity, handle_nad_action_errors, handle_nad_update_errors
 
 _LOGGER = logging.getLogger(__name__)
+
+SCAN_INTERVAL = timedelta(seconds=5)
+PARALLEL_UPDATES = 1
 
 
 async def async_setup_entry(
@@ -71,16 +75,14 @@ class NADMediaPlayer(NADEntity, MediaPlayerEntity):
     _attr_device_class = MediaPlayerDeviceClass.RECEIVER
 
     _attr_supported_features = (
-        MediaPlayerEntityFeature.VOLUME_SET
-        | MediaPlayerEntityFeature.VOLUME_MUTE
-        | MediaPlayerEntityFeature.TURN_ON
-        | MediaPlayerEntityFeature.TURN_OFF
-        | MediaPlayerEntityFeature.VOLUME_STEP
-        | MediaPlayerEntityFeature.SELECT_SOURCE
+        MediaPlayerEntityFeature.TURN_ON | MediaPlayerEntityFeature.TURN_OFF
     )
 
     _device: NADAmplifier
     _zone: str
+
+    _min_db: int | None = None
+    _max_db: int | None = None
 
     def __init__(self, coordinator: NADCoordinator, device: NADAmplifier | None = None):
         """Initialize the NAD media player."""
@@ -88,29 +90,72 @@ class NADMediaPlayer(NADEntity, MediaPlayerEntity):
 
         volume_config = self._device.get_setting_config(f"{self._zone}.Volume")
         if volume_config:
-            self._min_volume = volume_config.get("min")
-            self._max_volume = volume_config.get("max")
-            step_db = volume_config.get("step", 1)
-            if self._min_volume is not None and self._max_volume is not None:
-                self._attr_volume_step = step_db / abs(self._max_volume - self._min_volume)
+            self._attr_supported_features |= MediaPlayerEntityFeature.VOLUME_STEP
+            min_db = volume_config.get("min")
+            max_db = volume_config.get("max")
+            if min_db is not None and max_db is not None:
+                self._min_db = int(min_db)
+                self._max_db = int(max_db)
+                self._attr_supported_features |= MediaPlayerEntityFeature.VOLUME_SET
+                step_db = volume_config.get("step", 1)
+                self._attr_volume_step = step_db / abs(self._max_db - self._min_db)
 
-    def calc_volume(self, decibel):
+        if self._device.supports_setting(f"{self._zone}.Mute"):
+            self._attr_supported_features |= MediaPlayerEntityFeature.VOLUME_MUTE
+
+        if self._device.source_names:
+            self._attr_supported_features |= MediaPlayerEntityFeature.SELECT_SOURCE
+
+    @override
+    @callback
+    def _async_nad_callback(self, setting: str, value: Any) -> None:
+        """Handle settings pushed by the device."""
+        if setting.lower().startswith((f"{self._zone.lower()}.", "source")):
+            _LOGGER.debug("%s changed to %s", setting, value)
+            self.async_write_ha_state()
+
+    @override
+    @handle_nad_update_errors
+    async def async_update(self) -> None:
+        """Update the media player."""
+        if self._device.sends_updates:
+            return
+
+        if self._zone != "Main":
+            await self._device.async_request_is_on()
+        if not self._device.is_on:
+            return
+
+        if self.supported_features & MediaPlayerEntityFeature.VOLUME_SET:
+            await self._device.async_request_volume()
+
+        if self.supported_features & MediaPlayerEntityFeature.VOLUME_MUTE:
+            await self._device.async_request_mute()
+
+        if self.supported_features & MediaPlayerEntityFeature.SELECT_SOURCE:
+            await self._device.async_request_source_name()
+
+        if self.supported_features & MediaPlayerEntityFeature.SELECT_SOUND_MODE:
+            await self._device.async_request_setting(f"{self._zone}.ListeningMode")
+
+    def calc_volume(self, decibel: int | None) -> float | None:
         """Calculate the volume given the decibel.
 
         Return the volume (0..1).
         """
-        return abs(self._min_volume - decibel) / abs(
-            self._min_volume - self._max_volume
-        )
+        if decibel is None or self._min_db is None or self._max_db is None:
+            return None
 
-    def calc_db(self, volume):
+        level = (decibel - self._min_db) / (self._max_db - self._min_db)
+        return max(0.0, min(1.0, level))
+
+    def calc_db(self, volume: float) -> int:
         """Calculate the decibel given the volume.
 
         Return the dB.
         """
-        return self._min_volume + round(
-            abs(self._min_volume - self._max_volume) * volume
-        )
+        assert self._min_db is not None and self._max_db is not None
+        return self._min_db + round(abs(self._min_db - self._max_db) * volume)
 
     @property
     @override
@@ -147,33 +192,34 @@ class NADMediaPlayer(NADEntity, MediaPlayerEntity):
         )
 
     @override
+    @handle_nad_action_errors
     async def async_turn_on(self) -> None:
         """Turn the media player on."""
         await self._device.async_turn_on()
-        self.async_write_ha_state()
 
     @override
+    @handle_nad_action_errors
     async def async_turn_off(self) -> None:
         """Turn the media player off."""
         await self._device.async_turn_off()
-        self.async_write_ha_state()
 
     @override
+    @handle_nad_action_errors
     async def async_mute_volume(self, mute: bool) -> None:
         """Mute the volume."""
         if mute:
             await self._device.async_mute()
         else:
             await self._device.async_unmute()
-        self.async_write_ha_state()
 
     @override
+    @handle_nad_action_errors
     async def async_set_volume_level(self, volume: float) -> None:
         """Set volume level, range 0..1."""
         await self._device.async_set_volume(self.calc_db(volume))
-        self.async_write_ha_state()
 
     @override
+    @handle_nad_action_errors
     async def async_select_source(self, source: str) -> None:
         """Select input source."""
         keys = (
@@ -183,23 +229,34 @@ class NADMediaPlayer(NADEntity, MediaPlayerEntity):
         )
         if keys:
             await self._device.async_set_source(keys[0])
-            self.async_write_ha_state()
         else:
-            raise HomeAssistantError("Unknown source")
+            raise HomeAssistantError(
+                translation_domain=DOMAIN,
+                translation_key="unknown_source",
+                translation_placeholders={"source": source},
+            )
+
+    @override
+    @handle_nad_action_errors
+    async def async_volume_up(self) -> None:
+        """Turn volume up for media player."""
+        if None in [self._max_db, self._min_db]:
+            await self._device.async_increment(f"{self._zone}.Volume")
+        else:
+            await super().async_volume_up()
+
+    @override
+    @handle_nad_action_errors
+    async def async_volume_down(self) -> None:
+        """Turn volume down for media player."""
+        if None in [self._max_db, self._min_db]:
+            await self._device.async_decrement(f"{self._zone}.Volume")
+        else:
+            await super().async_volume_down()
 
 
 class NADMainMediaPlayer(NADMediaPlayer):
     """Representation of a NAD zone."""
-
-    _attr_supported_features = (
-        MediaPlayerEntityFeature.VOLUME_SET
-        | MediaPlayerEntityFeature.VOLUME_MUTE
-        | MediaPlayerEntityFeature.TURN_ON
-        | MediaPlayerEntityFeature.TURN_OFF
-        | MediaPlayerEntityFeature.VOLUME_STEP
-        | MediaPlayerEntityFeature.SELECT_SOURCE
-        | MediaPlayerEntityFeature.SELECT_SOUND_MODE
-    )
 
     def __init__(self, coordinator: NADCoordinator):
         """Initialize the NAD Receiver device."""
@@ -209,13 +266,18 @@ class NADMainMediaPlayer(NADMediaPlayer):
 
         self._attr_unique_id = coordinator.unique_id
 
+        if self._device.get_setting_config(f"{self._zone}.ListeningMode"):
+            self._attr_supported_features |= MediaPlayerEntityFeature.SELECT_SOUND_MODE
+
     @property
+    @override
     def sound_mode(self) -> str | None:
         """Name of the current sound mode."""
         value = self._device.get_setting_value(f"{self._zone}.ListeningMode")
         return str(value) if value else None
 
     @property
+    @override
     def sound_mode_list(self) -> list[str] | None:
         """List of available sound modes."""
         listening_mode_config = self._device.get_setting_config(
@@ -223,12 +285,13 @@ class NADMainMediaPlayer(NADMediaPlayer):
         )
         return listening_mode_config.get("values") if listening_mode_config else None
 
+    @override
+    @handle_nad_action_errors
     async def async_select_sound_mode(self, sound_mode: str) -> None:
         """Select sound mode."""
         await self._device.async_change_setting(
             f"{self._zone}.ListeningMode", sound_mode
         )
-        self.async_write_ha_state()
 
 
 class NADZoneMediaPlayer(NADMediaPlayer):

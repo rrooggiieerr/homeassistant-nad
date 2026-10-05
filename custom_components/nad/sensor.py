@@ -1,4 +1,5 @@
 import logging
+from datetime import timedelta
 from typing import Any, override
 
 from homeassistant.components.sensor import (
@@ -6,6 +7,7 @@ from homeassistant.components.sensor import (
     SensorEntityDescription,
 )
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
@@ -13,6 +15,9 @@ from .coordinator import NADCoordinator
 from .entity import NADEntity
 
 _LOGGER = logging.getLogger(__name__)
+
+SCAN_INTERVAL = timedelta(seconds=5)
+PARALLEL_UPDATES = 1
 
 _ENTITY_DESCRIPTIONS = [
     SensorEntityDescription(
@@ -84,7 +89,6 @@ async def async_setup_entry(
 
 class NADSensor(NADEntity, SensorEntity):
     _attr_has_entity_name = True
-    _attr_available = False
     _attr_native_value = None
 
     def __init__(
@@ -93,7 +97,7 @@ class NADSensor(NADEntity, SensorEntity):
         entity_description: SensorEntityDescription,
         config: dict[str, Any],
     ) -> None:
-        """Initialize the number."""
+        """Initialize the sensor."""
         super().__init__(coordinator)
 
         self._attr_unique_id = (

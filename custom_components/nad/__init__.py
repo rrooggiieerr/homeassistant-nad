@@ -10,11 +10,11 @@ from homeassistant.const import (
     Platform,
 )
 from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ConfigEntryNotReady
+from homeassistant.exceptions import ConfigEntryError, ConfigEntryNotReady
 from nad_serial import NADDevice
-from nad_serial.exceptions import NADConnectionError
+from nad_serial.exceptions import NADBaseError
 
-from .const import CONF_SERIAL_PORT
+from .const import CONF_SERIAL_PORT, DOMAIN
 from .coordinator import NADConfigEntry, NADCoordinator
 
 _LOGGER = logging.getLogger(__name__)
@@ -36,17 +36,20 @@ async def async_setup_entry(hass: HomeAssistant, entry: NADConfigEntry) -> bool:
     elif CONF_HOST in entry.data and CONF_PORT in entry.data:
         url = f"socket://{entry.data[CONF_HOST]}:{entry.data[CONF_PORT]}"
     else:
-        raise ConfigEntryNotReady(
-            "The binary protocol that some NAD devices, like the D-series, use on TCP port 50001 is currently not supported."
+        raise ConfigEntryError(
+            translation_domain=DOMAIN,
+            translation_key="binary_protocol_not_supported",
         )
 
     model = entry.data.get(CONF_MODEL)
 
     try:
-        device = await NADDevice.async_connect(url)
-    except NADConnectionError as ex:
+        device = await NADDevice.async_connect(url, model_hint=model)
+    except NADBaseError as ex:
         raise ConfigEntryNotReady(
-            f"Unable to connect to NAD {model or 'device'} on {url}"
+            translation_domain=DOMAIN,
+            translation_key="cannot_connect",
+            translation_placeholders={"url": url},
         ) from ex
 
     # if (
@@ -60,7 +63,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: NADConfigEntry) -> bool:
     if not await device.async_ping():
         await device.async_disconnect()
         raise ConfigEntryNotReady(
-            f"Unable to connect to NAD {model or 'device'} on {url}"
+            translation_domain=DOMAIN,
+            translation_key="cannot_connect",
+            translation_placeholders={"url": url},
         )
 
     entry.runtime_data = NADCoordinator(hass, entry, device)
@@ -72,7 +77,4 @@ async def async_setup_entry(hass: HomeAssistant, entry: NADConfigEntry) -> bool:
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
-    coordinator: NADCoordinator = entry.runtime_data
-    await coordinator.device.async_disconnect()
-
     return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)

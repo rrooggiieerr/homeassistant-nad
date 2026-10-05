@@ -1,4 +1,5 @@
 import logging
+from datetime import timedelta
 from typing import Any, override
 
 from homeassistant.components.number import (
@@ -19,9 +20,12 @@ from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from .coordinator import NADCoordinator
-from .entity import NADEntity
+from .entity import NADEntity, handle_nad_action_errors
 
 _LOGGER = logging.getLogger(__name__)
+
+SCAN_INTERVAL = timedelta(seconds=5)
+PARALLEL_UPDATES = 1
 
 
 _ENTITY_DESCRIPTIONS = [
@@ -306,7 +310,6 @@ async def async_setup_entry(
 
 class NADNumber(NADEntity, NumberEntity):
     _attr_has_entity_name = True
-    _attr_available = False
 
     def __init__(
         self,
@@ -332,9 +335,9 @@ class NADNumber(NADEntity, NumberEntity):
     def native_value(self) -> float | None:
         """Return the value reported by the number."""
         value = self._device.get_setting_value(self.entity_description.key)
-        return float(value) if value else None
+        return float(value) if value is not None else None
 
     @override
+    @handle_nad_action_errors
     async def async_set_native_value(self, value: float) -> None:
         await self._device.async_change_setting(self.entity_description.key, value)
-        self.async_write_ha_state()

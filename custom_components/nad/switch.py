@@ -23,6 +23,42 @@ PARALLEL_UPDATES = 1
 
 _ENTITY_DESCRIPTIONS = [
     SwitchEntityDescription(
+        key="Main.AutoSense",
+        translation_key="main_auto_sense",
+        entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=False,
+    ),
+    SwitchEntityDescription(
+        key="Main.AutoStandby",
+        translation_key="main_auto_standby",
+        entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=False,
+    ),
+    SwitchEntityDescription(
+        key="Main.CEC.Audio",
+        translation_key="main_cec_audio",
+        entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=False,
+    ),
+    SwitchEntityDescription(
+        key="Main.CEC.Power",
+        translation_key="main_cec_power",
+        entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=False,
+    ),
+    SwitchEntityDescription(
+        key="Main.CEC.Switch",
+        translation_key="main_cec_switch",
+        entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=False,
+    ),
+    SwitchEntityDescription(
+        key="Main.ControlStandby",
+        translation_key="main_control_standby",
+        entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=False,
+    ),
+    SwitchEntityDescription(
         key="Main.Dimmer",
         translation_key="main_dimmer",
         entity_category=EntityCategory.CONFIG,
@@ -77,6 +113,7 @@ _ENTITY_DESCRIPTIONS = [
         key="Main.SpeakerB",
         translation_key="main_speaker_b",
     ),
+    SwitchEntityDescription(key="Main.Tape1", translation_key="main_tape1"),
     SwitchEntityDescription(key="Main.ToneDefeat", translation_key="main_tone_defeat"),
     SwitchEntityDescription(
         key="Tuner.FM.Mute",

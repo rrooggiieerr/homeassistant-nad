@@ -30,9 +30,28 @@ PARALLEL_UPDATES = 1
 
 _ENTITY_DESCRIPTIONS = [
     NumberEntityDescription(
+        key="Main.Audyssey.Offset",
+        translation_key="main_audyssey_offset",
+        entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=False,
+    ),
+    NumberEntityDescription(
         key="Main.Bass",
         translation_key="main_bass",
         native_unit_of_measurement=UnitOfSoundPressure.DECIBEL,
+    ),
+    NumberEntityDescription(
+        key="Main.Brightness",
+        translation_key="main_brightness",
+        entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=False,
+    ),
+    NumberEntityDescription(
+        key="Main.CenterDialog",
+        translation_key="main_center_dialog",
+        entity_category=EntityCategory.CONFIG,
+        native_unit_of_measurement=UnitOfSoundPressure.DECIBEL,
+        entity_registry_enabled_default=False,
     ),
     NumberEntityDescription(
         key="Main.Distance.BackLeft",
@@ -131,6 +150,12 @@ _ENTITY_DESCRIPTIONS = [
         entity_registry_enabled_default=False,
     ),
     NumberEntityDescription(
+        key="Main.IR.Channel",
+        translation_key="main_ir_channel",
+        entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=False,
+    ),
+    NumberEntityDescription(
         key="Main.Level.BackLeft",
         translation_key="main_level_back_left",
         entity_category=EntityCategory.CONFIG,
@@ -193,7 +218,20 @@ _ENTITY_DESCRIPTIONS = [
         native_unit_of_measurement=UnitOfTime.MILLISECONDS,
         entity_registry_enabled_default=False,
     ),
-    # NumberEntityDescription(key = "Main.Sleep", name = "Time Before Sleep"),
+    NumberEntityDescription(
+        key="Main.Sleep",
+        translation_key="main_sleep",
+        entity_category=EntityCategory.CONFIG,
+        device_class=NumberDeviceClass.DURATION,
+        native_unit_of_measurement=UnitOfTime.MINUTES,
+        entity_registry_enabled_default=False,
+    ),
+    NumberEntityDescription(
+        key="Main.Speaker.Back.Config1",
+        translation_key="main_speaker_back_config1",
+        entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=False,
+    ),
     NumberEntityDescription(
         key="Main.Speaker.Back.Frequency",
         translation_key="main_speaker_back_frequency",
@@ -263,6 +301,42 @@ _ENTITY_DESCRIPTIONS = [
     NumberEntityDescription(
         key="Main.Trim.Surround",
         translation_key="main_trim_surround",
+    ),
+    NumberEntityDescription(
+        key="Main.VFD.TempLine",
+        translation_key="main_vfd_temp_line",
+        entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=False,
+    ),
+    NumberEntityDescription(
+        key="Main.Video.Brightness",
+        translation_key="main_video_brightness",
+        entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=False,
+    ),
+    NumberEntityDescription(
+        key="Main.Video.Contrast",
+        translation_key="main_video_contrast",
+        entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=False,
+    ),
+    NumberEntityDescription(
+        key="Main.Video.EdgeEnhancement.Level",
+        translation_key="main_video_edge_enhancement_level",
+        entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=False,
+    ),
+    NumberEntityDescription(
+        key="Main.Video.EdgeEnhancement.Treshold",
+        translation_key="main_video_edge_enhancement_treshold",
+        entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=False,
+    ),
+    NumberEntityDescription(
+        key="Main.Video.NoiseReduction",
+        translation_key="main_video_noise_reduction",
+        entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=False,
     ),
     NumberEntityDescription(
         key="Tuner.AM.Frequency",

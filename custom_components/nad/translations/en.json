@@ -21,8 +21,17 @@
     },
     "entity": {
         "number": {
+            "main_audyssey_offset": {
+                "name": "Audyssey dynamic EQ offset"
+            },
             "main_bass": {
                 "name": "Bass tone control"
+            },
+            "main_brightness": {
+                "name": "Display brightness"
+            },
+            "main_center_dialog": {
+                "name": "Center dialog"
             },
             "main_distance_back_left": {
                 "name": "Distance back left"
@@ -63,6 +72,9 @@
             "main_dts_drc": {
                 "name": "DTS dynamic range control"
             },
+            "main_ir_channel": {
+                "name": "IR channel"
+            },
             "main_level_back_left": {
                 "name": "Speaker level back left"
             },
@@ -89,6 +101,12 @@
             },
             "main_lip_sync_delay": {
                 "name": "Lip sync delay"
+            },
+            "main_sleep": {
+                "name": "Sleep timer"
+            },
+            "main_speaker_back_config1": {
+                "name": "Speaker count back"
             },
             "main_speaker_back_frequency": {
                 "name": "Speaker crossover back"
@@ -123,6 +141,24 @@
             "main_trim_surround": {
                 "name": "Trim level surround"
             },
+            "main_vfd_temp_line": {
+                "name": "VFD temp line"
+            },
+            "main_video_brightness": {
+                "name": "Video brightness"
+            },
+            "main_video_contrast": {
+                "name": "Video contrast"
+            },
+            "main_video_edge_enhancement_level": {
+                "name": "Video edge enhancement level"
+            },
+            "main_video_edge_enhancement_treshold": {
+                "name": "Video edge enhancement threshold"
+            },
+            "main_video_noise_reduction": {
+                "name": "Video noise reduction"
+            },
             "tuner_am_frequency": {
                 "name": "Tuner AM frequency"
             },
@@ -155,7 +191,7 @@
             "main_listening_mode_dts": {
                 "name": "DTS listening mode"
             },
-            "main_speaker_back_config": {
+            "main_speaker_back_config2": {
                 "name": "Speaker size back"
             },
             "main_speaker_center_config": {
@@ -185,8 +221,17 @@
             "main_vfd_line2": {
                 "name": "VFD line 2"
             },
-            "main_vfd_temp_line": {
-                "name": "VFD temp line"
+            "main_video_aspect_mode": {
+                "name": "Video aspect mode"
+            },
+            "main_video_aspect_ratio": {
+                "name": "Video aspect ratio"
+            },
+            "main_video_rate": {
+                "name": "Video frame rate"
+            },
+            "main_video_resolution": {
+                "name": "Video resolution"
             },
             "main_video_mode": {
                 "name": "Video mode"
@@ -199,6 +244,24 @@
             }
         },
         "switch": {
+            "main_auto_sense": {
+                "name": "Auto sense"
+            },
+            "main_auto_standby": {
+                "name": "Auto standby"
+            },
+            "main_cec_audio": {
+                "name": "HDMI CEC system audio"
+            },
+            "main_cec_power": {
+                "name": "HDMI CEC power control"
+            },
+            "main_cec_switch": {
+                "name": "HDMI CEC input switching"
+            },
+            "main_control_standby": {
+                "name": "Control standby"
+            },
             "main_dimmer": {
                 "name": "Front VFD dimmer"
             },
@@ -231,6 +294,9 @@
             },
             "main_speaker_b": {
                 "name": "Speakers B"
+            },
+            "main_tape1": {
+                "name": "Tape 1"
             },
             "main_tone_defeat": {
                 "name": "Tone defeat"

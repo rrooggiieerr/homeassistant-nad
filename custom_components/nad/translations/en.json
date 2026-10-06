@@ -333,6 +333,41 @@
             "uart_version": {
                 "name": "UART version"
             }
+        },
+        "text": {
+            "main_bt_name": {
+                "name": "Bluetooth name"
+            },
+            "source1_name": {
+                "name": "Source 1 name"
+            },
+            "source2_name": {
+                "name": "Source 2 name"
+            },
+            "source3_name": {
+                "name": "Source 3 name"
+            },
+            "source4_name": {
+                "name": "Source 4 name"
+            },
+            "source5_name": {
+                "name": "Source 5 name"
+            },
+            "source6_name": {
+                "name": "Source 6 name"
+            },
+            "source7_name": {
+                "name": "Source 7 name"
+            },
+            "source8_name": {
+                "name": "Source 8 name"
+            },
+            "source9_name": {
+                "name": "Source 9 name"
+            },
+            "source10_name": {
+                "name": "Source 10 name"
+            }
         }
     },
     "exceptions": {

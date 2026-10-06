@@ -1,7 +1,5 @@
 """The NAD Device component."""
 
-import logging
-
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     CONF_HOST,
@@ -16,8 +14,6 @@ from nad_serial.exceptions import NADBaseError
 
 from .const import CONF_SERIAL_PORT, DOMAIN
 from .coordinator import NADConfigEntry, NADCoordinator
-
-_LOGGER = logging.getLogger(__name__)
 
 PLATFORMS: list[Platform] = [
     Platform.MEDIA_PLAYER,

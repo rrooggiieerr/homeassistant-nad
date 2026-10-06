@@ -1,4 +1,3 @@
-import logging
 from datetime import timedelta
 from typing import override
 
@@ -14,8 +13,6 @@ from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from .coordinator import NADCoordinator
 from .entity import NADEntity, handle_nad_action_errors
-
-_LOGGER = logging.getLogger(__name__)
 
 SCAN_INTERVAL = timedelta(seconds=5)
 PARALLEL_UPDATES = 1

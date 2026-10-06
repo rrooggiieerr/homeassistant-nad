@@ -59,6 +59,7 @@ _ENTITY_DESCRIPTIONS = [
         key="Main.Dimmer",
         translation_key="main_dimmer",
         entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=False,
     ),
     SwitchEntityDescription(
         key="Main.Dolby.Panorama",
@@ -70,6 +71,7 @@ _ENTITY_DESCRIPTIONS = [
         key="Main.EnhancedBass",
         translation_key="main_enhanced_bass",
         entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=False,
     ),
     SwitchEntityDescription(
         key="Main.EnhancedStereo.Back",
@@ -101,17 +103,31 @@ _ENTITY_DESCRIPTIONS = [
         entity_category=EntityCategory.CONFIG,
         entity_registry_enabled_default=False,
     ),
-    SwitchEntityDescription(key="Main.Speaker.Sub", translation_key="main_speaker_sub"),
+    SwitchEntityDescription(
+        key="Main.Speaker.Sub",
+        translation_key="main_speaker_sub",
+        entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=False,
+    ),
     SwitchEntityDescription(
         key="Main.SpeakerA",
         translation_key="main_speaker_a",
+        entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=False,
     ),
     SwitchEntityDescription(
         key="Main.SpeakerB",
         translation_key="main_speaker_b",
+        entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=False,
     ),
     SwitchEntityDescription(key="Main.Tape1", translation_key="main_tape1"),
-    SwitchEntityDescription(key="Main.ToneDefeat", translation_key="main_tone_defeat"),
+    SwitchEntityDescription(
+        key="Main.ToneDefeat",
+        translation_key="main_tone_defeat",
+        entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=False,
+    ),
     SwitchEntityDescription(
         key="Tuner.FM.Mute",
         translation_key="tuner_fm_mute",

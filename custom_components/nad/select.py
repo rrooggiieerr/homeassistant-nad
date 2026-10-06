@@ -138,6 +138,7 @@ _ENTITY_DESCRIPTIONS = [
         key="Main.VideoMode",
         translation_key="main_video_mode",
         entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=False,
     ),
     SelectEntityDescription(key="Tuner.Band", translation_key="tuner_band"),
     SelectEntityDescription(

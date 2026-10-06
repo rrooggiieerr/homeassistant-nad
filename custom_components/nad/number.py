@@ -5,6 +5,7 @@ from homeassistant.components.number import (
     NumberDeviceClass,
     NumberEntity,
     NumberEntityDescription,
+    NumberMode,
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
@@ -35,7 +36,9 @@ _ENTITY_DESCRIPTIONS = [
     NumberEntityDescription(
         key="Main.Bass",
         translation_key="main_bass",
+        entity_category=EntityCategory.CONFIG,
         native_unit_of_measurement=UnitOfSoundPressure.DECIBEL,
+        entity_registry_enabled_default=False,
     ),
     NumberEntityDescription(
         key="Main.Brightness",
@@ -264,7 +267,9 @@ _ENTITY_DESCRIPTIONS = [
     NumberEntityDescription(
         key="Main.Treble",
         translation_key="main_treble",
+        entity_category=EntityCategory.CONFIG,
         native_unit_of_measurement=UnitOfSoundPressure.DECIBEL,
+        entity_registry_enabled_default=False,
     ),
     NumberEntityDescription(
         key="Main.Trigger1.Delay",
@@ -290,14 +295,20 @@ _ENTITY_DESCRIPTIONS = [
     NumberEntityDescription(
         key="Main.Trim.Center",
         translation_key="main_trim_center",
+        entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=False,
     ),
     NumberEntityDescription(
         key="Main.Trim.Sub",
         translation_key="main_trim_sub",
+        entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=False,
     ),
     NumberEntityDescription(
         key="Main.Trim.Surround",
         translation_key="main_trim_surround",
+        entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=False,
     ),
     NumberEntityDescription(
         key="Main.VFD.TempLine",
@@ -352,7 +363,7 @@ _ENTITY_DESCRIPTIONS = [
     NumberEntityDescription(
         key="Tuner.Preset",
         translation_key="tuner_preset",
-        # mode = NumberMode.BOX,
+        mode=NumberMode.BOX,
     ),
     NumberEntityDescription(
         key="Tuner.XM.Channel",

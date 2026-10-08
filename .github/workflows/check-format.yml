@@ -4,18 +4,12 @@ name: Check Python code format
 on: [push]
 
 jobs:
-  linter_name:
-    name: runner / isort & black formatter
+  ruff:
+    name: ruff check
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - name: Check files using the isort import sorter
-        uses: isort/isort-action@v1
+      - uses: astral-sh/ruff-action@v3
+      - uses: astral-sh/ruff-action@v3
         with:
-          configuration: "--profile black --check-only"
-          requirements-files: "requirements.txt"
-      - name: Check files using the black formatter
-        uses: psf/black@stable
-        with:
-          options: "--check"
-          src: "."
+          args: "format --check"

@@ -3,22 +3,15 @@
 import logging
 from typing import Any, override
 
-import probatio
-from homeassistant.config_entries import (
-    ConfigFlow,
-    ConfigFlowResult,
-)
-from homeassistant.const import CONF_MODEL
-from homeassistant.helpers.selector import (
-    SerialPortSelector,
-)
 from nad_serial import NADDevice
 from nad_serial.exceptions import NADBaseError
+import probatio
 
-from .const import (
-    CONF_SERIAL_PORT,
-    DOMAIN,
-)
+from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
+from homeassistant.const import CONF_MODEL
+from homeassistant.helpers.selector import SerialPortSelector
+
+from .const import CONF_SERIAL_PORT, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 

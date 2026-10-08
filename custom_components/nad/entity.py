@@ -1,15 +1,16 @@
-"""Nad Entity."""
+"""NAD Entity."""
 
+from collections.abc import Callable, Coroutine
 import functools
 import logging
-from collections.abc import Callable, Coroutine
 from typing import Any, Concatenate, override
+
+from nad_serial import NADDevice
+from nad_serial.exceptions import NADBaseError, NADConnectionError, NADTimeoutError
 
 from homeassistant.core import callback
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
-from nad_serial import NADDevice
-from nad_serial.exceptions import NADBaseError, NADConnectionError, NADTimeoutError
 
 from .const import DOMAIN
 from .coordinator import NADCoordinator
@@ -76,6 +77,10 @@ def handle_nad_update_errors[EntityT: NADEntity](
 
 
 class NADEntity(CoordinatorEntity[NADCoordinator]):
+    """Base NAD entity."""
+
+    _attr_available: bool = False
+
     _device: NADDevice
 
     coordinator: NADCoordinator

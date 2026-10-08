@@ -511,8 +511,7 @@ mark-parentheses = false
 
 [tool.ruff.lint.isort]
 force-sort-within-sections = true
-known-first-party = ["custom_components.nad"]
-known-third-party = ["nad_serial"]
+known-first-party = ["homeassistant"]
 combine-as-imports = true
 split-on-trailing-comma = false
 

@@ -1,16 +1,12 @@
 """The NAD Device component."""
 
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import (
-    CONF_HOST,
-    CONF_MODEL,
-    CONF_PORT,
-    Platform,
-)
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ConfigEntryError, ConfigEntryNotReady
 from nad_serial import NADDevice
 from nad_serial.exceptions import NADBaseError
+
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import CONF_HOST, CONF_MODEL, CONF_PORT, Platform
+from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import ConfigEntryError, ConfigEntryNotReady
 
 from .const import CONF_SERIAL_PORT, DOMAIN
 from .coordinator import NADConfigEntry, NADCoordinator

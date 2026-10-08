@@ -1,8 +1,10 @@
-"""Support for interfacing with NAD receivers through RS-232."""
+"""Creates Media Player entities for the NAD Home Assistant integration."""
 
-import logging
 from datetime import timedelta
+import logging
 from typing import Any, override
+
+from nad_serial import NADAmplifier, NADMultiZoneAmplifier, NADZone
 
 from homeassistant.components.media_player import (
     MediaPlayerDeviceClass,
@@ -16,7 +18,6 @@ from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.device_registry import ChildDeviceInfo
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
-from nad_serial import NADAmplifier, NADMultiZoneAmplifier, NADZone
 
 from .const import DOMAIN
 from .coordinator import NADCoordinator
@@ -33,7 +34,7 @@ async def async_setup_entry(
     config_entry: ConfigEntry,
     async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
-    """Set up the NAD Receiver media player."""
+    """Set up the NAD Media Player entities."""
     coordinator: NADCoordinator = config_entry.runtime_data
 
     entities: list[NADMediaPlayer] = []
@@ -68,7 +69,7 @@ async def async_setup_entry(
 
 
 class NADMediaPlayer(NADEntity, MediaPlayerEntity):
-    """Representation of a NAD media player."""
+    """NAD Media Player."""
 
     _attr_has_entity_name = True
     _attr_name: str | None = None
@@ -154,7 +155,8 @@ class NADMediaPlayer(NADEntity, MediaPlayerEntity):
 
         Return the dB.
         """
-        assert self._min_db is not None and self._max_db is not None
+        assert self._min_db is not None
+        assert self._max_db is not None
         return self._min_db + round(abs(self._min_db - self._max_db) * volume)
 
     @property
@@ -256,7 +258,7 @@ class NADMediaPlayer(NADEntity, MediaPlayerEntity):
 
 
 class NADMainMediaPlayer(NADMediaPlayer):
-    """Representation of a NAD zone."""
+    """NAD Main Media Player."""
 
     def __init__(self, coordinator: NADCoordinator):
         """Initialize the NAD Receiver device."""
@@ -295,7 +297,7 @@ class NADMainMediaPlayer(NADMediaPlayer):
 
 
 class NADZoneMediaPlayer(NADMediaPlayer):
-    """Representation of a NAD zone."""
+    """NAD Zone Media Player."""
 
     _device: NADZone
 

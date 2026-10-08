@@ -1,10 +1,9 @@
+"""Creates Sensor entities for the NAD Home Assistant integration."""
+
 from datetime import timedelta
 from typing import Any, override
 
-from homeassistant.components.sensor import (
-    SensorEntity,
-    SensorEntityDescription,
-)
+from homeassistant.components.sensor import SensorEntity, SensorEntityDescription
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
@@ -72,24 +71,24 @@ async def async_setup_entry(
     config_entry: ConfigEntry,
     async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
-    """Set up the NAD Receiver sensor."""
+    """Set up the NAD Sensor entities."""
     coordinator: NADCoordinator = config_entry.runtime_data
 
-    entities = []
-
-    for entity_description in _ENTITY_DESCRIPTIONS:
-        if (
-            (config := coordinator.device.get_setting_config(entity_description.key))
+    async_add_entities(
+        [
+            NADSensor(coordinator, entity_description, config)
+            for entity_description in _ENTITY_DESCRIPTIONS
+            if (config := coordinator.device.get_setting_config(entity_description.key))
             and config["type"] in ("number", "string")
             and "?" in config["operators"]
             and "=" not in config["operators"]
-        ):
-            entities.append(NADSensor(coordinator, entity_description, config))
-
-    async_add_entities(entities)
+        ]
+    )
 
 
 class NADSensor(NADEntity, SensorEntity):
+    """NAD Sensor."""
+
     _attr_has_entity_name = True
     _attr_native_value = None
 

@@ -1,3 +1,5 @@
+"""Creates Text entities for the NAD Home Assistant integration."""
+
 from datetime import timedelta
 from typing import override
 
@@ -88,24 +90,24 @@ async def async_setup_entry(
     config_entry: ConfigEntry,
     async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
-    """Set up the NAD Receiver text."""
+    """Set up the NAD Text entities."""
     coordinator: NADCoordinator = config_entry.runtime_data
 
-    entities = []
-
-    for entity_description in _ENTITY_DESCRIPTIONS:
-        if (
-            (config := coordinator.device.get_setting_config(entity_description.key))
+    async_add_entities(
+        [
+            NADText(coordinator, entity_description)
+            for entity_description in _ENTITY_DESCRIPTIONS
+            if (config := coordinator.device.get_setting_config(entity_description.key))
             and config["type"] == "string"
             and "?" in config["operators"]
             and "=" in config["operators"]
-        ):
-            entities.append(NADText(coordinator, entity_description))
-
-    async_add_entities(entities)
+        ]
+    )
 
 
 class NADText(NADEntity, TextEntity):
+    """NAD Text."""
+
     _attr_has_entity_name = True
 
     def __init__(

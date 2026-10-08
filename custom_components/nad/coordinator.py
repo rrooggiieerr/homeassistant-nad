@@ -1,15 +1,16 @@
-"""The NAD Data Update Coordinator"""
+"""The NAD Data Update Coordinator."""
 
-import logging
 from datetime import timedelta
+import logging
 from typing import Final, override
+
+from nad_serial import NADDevice
+from nad_serial.exceptions import NADBaseError
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
-from nad_serial import NADDevice
-from nad_serial.exceptions import NADBaseError
 
 from .const import DOMAIN
 

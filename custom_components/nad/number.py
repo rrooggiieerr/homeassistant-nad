@@ -1,3 +1,5 @@
+"""Creates Number entities for the NAD Home Assistant integration."""
+
 from datetime import timedelta
 from typing import Any, override
 
@@ -378,24 +380,24 @@ async def async_setup_entry(
     config_entry: ConfigEntry,
     async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
-    """Set up the NAD Receiver number."""
+    """Set up the NAD Number entities."""
     coordinator: NADCoordinator = config_entry.runtime_data
 
-    entities = []
-
-    for entity_description in _ENTITY_DESCRIPTIONS:
-        if (
-            (config := coordinator.device.get_setting_config(entity_description.key))
+    async_add_entities(
+        [
+            NADNumber(coordinator, entity_description, config)
+            for entity_description in _ENTITY_DESCRIPTIONS
+            if (config := coordinator.device.get_setting_config(entity_description.key))
             and config["type"] == "number"
             and "?" in config["operators"]
             and "=" in config["operators"]
-        ):
-            entities.append(NADNumber(coordinator, entity_description, config))
-
-    async_add_entities(entities)
+        ]
+    )
 
 
 class NADNumber(NADEntity, NumberEntity):
+    """NAD Number."""
+
     _attr_has_entity_name = True
 
     def __init__(
@@ -427,4 +429,5 @@ class NADNumber(NADEntity, NumberEntity):
     @override
     @handle_nad_action_errors
     async def async_set_native_value(self, value: float) -> None:
+        """Change the value."""
         await self._device.async_change_setting(self.entity_description.key, value)

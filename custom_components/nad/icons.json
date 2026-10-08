@@ -1,32 +1,32 @@
 {
-    "entity": {
-        "number": {
-            "main_dolby_center_width": {
-                "default": "mdi:dolby"
-            },
-            "main_dolby_dimension": {
-                "default": "mdi:dolby"
-            },
-            "main_dolby_drc": {
-                "default": "mdi:dolby"
-            }
-        },
-        "switch": {
-            "main_dimmer": {
-                "default": "mdi:text-short"
-            },
-            "main_dolby_panorama": {
-                "default": "mdi:dolby"
-            },
-            "main_speaker_a": {
-                "default": "mdi:speaker-multiple"
-            },
-            "main_speaker_b": {
-                "default": "mdi:speaker-multiple"
-            },
-            "tuner_fm_mute": {
-                "default": "mdi:radio-fm"
-            }
-        }
+  "entity": {
+    "number": {
+      "main_dolby_center_width": {
+        "default": "mdi:dolby"
+      },
+      "main_dolby_dimension": {
+        "default": "mdi:dolby"
+      },
+      "main_dolby_drc": {
+        "default": "mdi:dolby"
+      }
+    },
+    "switch": {
+      "main_dimmer": {
+        "default": "mdi:text-short"
+      },
+      "main_dolby_panorama": {
+        "default": "mdi:dolby"
+      },
+      "main_speaker_a": {
+        "default": "mdi:speaker-multiple"
+      },
+      "main_speaker_b": {
+        "default": "mdi:speaker-multiple"
+      },
+      "tuner_fm_mute": {
+        "default": "mdi:radio-fm"
+      }
     }
+  }
 }

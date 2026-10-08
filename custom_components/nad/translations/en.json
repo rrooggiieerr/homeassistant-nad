@@ -9,13 +9,13 @@
         },
         "step": {
             "user": {
-                "title": "Connect to NAD device",
                 "data": {
                     "serial_port": "Serial port"
                 },
                 "data_description": {
                     "serial_port": "The serial port the NAD device is connected to, or a URL for the telnet connection or serial to network bridge (e.g. socket://192.0.2.1:23)."
-                }
+                },
+                "title": "Connect to NAD device"
             }
         }
     },
@@ -227,20 +227,49 @@
             "main_video_aspect_ratio": {
                 "name": "Video aspect ratio"
             },
+            "main_video_mode": {
+                "name": "Video mode"
+            },
             "main_video_rate": {
                 "name": "Video frame rate"
             },
             "main_video_resolution": {
                 "name": "Video resolution"
             },
-            "main_video_mode": {
-                "name": "Video mode"
-            },
             "tuner_band": {
                 "name": "Tuner band"
             },
             "tuner_digital_mode": {
                 "name": "Tuner digital mode"
+            }
+        },
+        "sensor": {
+            "dsp_version": {
+                "name": "DSP version"
+            },
+            "tuner_dab_dls": {
+                "name": "DAB DLS"
+            },
+            "tuner_dab_service": {
+                "name": "DAB service"
+            },
+            "tuner_fm_rdsname": {
+                "name": "FM RDS name"
+            },
+            "tuner_fm_rdstext": {
+                "name": "FM RDS text"
+            },
+            "tuner_xm_channel_name": {
+                "name": "XM channel name"
+            },
+            "tuner_xm_name": {
+                "name": "XM name"
+            },
+            "tuner_xm_title": {
+                "name": "XM title"
+            },
+            "uart_version": {
+                "name": "UART version"
             }
         },
         "switch": {
@@ -286,14 +315,14 @@
             "main_osd_temp_display": {
                 "name": "OSD temp display"
             },
-            "main_speaker_sub": {
-                "name": "Subwoofer"
-            },
             "main_speaker_a": {
                 "name": "Speakers A"
             },
             "main_speaker_b": {
                 "name": "Speakers B"
+            },
+            "main_speaker_sub": {
+                "name": "Subwoofer"
             },
             "main_tape1": {
                 "name": "Tape 1"
@@ -305,38 +334,12 @@
                 "name": "Tuner FM mute"
             }
         },
-        "sensor": {
-            "dsp_version": {
-                "name": "DSP version"
-            },
-            "tuner_dab_dls": {
-                "name": "DAB DLS"
-            },
-            "tuner_dab_service": {
-                "name": "DAB service"
-            },
-            "tuner_fm_rdsname": {
-                "name": "FM RDS name"
-            },
-            "tuner_fm_rdstext": {
-                "name": "FM RDS text"
-            },
-            "tuner_xm_channel_name": {
-                "name": "XM channel name"
-            },
-            "tuner_xm_name": {
-                "name": "XM name"
-            },
-            "tuner_xm_title": {
-                "name": "XM title"
-            },
-            "uart_version": {
-                "name": "UART version"
-            }
-        },
         "text": {
             "main_bt_name": {
                 "name": "Bluetooth name"
+            },
+            "source10_name": {
+                "name": "Source 10 name"
             },
             "source1_name": {
                 "name": "Source 1 name"
@@ -364,9 +367,6 @@
             },
             "source9_name": {
                 "name": "Source 9 name"
-            },
-            "source10_name": {
-                "name": "Source 10 name"
             }
         }
     },

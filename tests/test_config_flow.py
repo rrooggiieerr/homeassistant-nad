@@ -30,6 +30,7 @@ async def test_reconfigure(
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"], {CONF_SERIAL_PORT: NEW_URL}
     )
+    await hass.async_block_till_done()
     assert result["type"] is FlowResultType.ABORT
     assert result["reason"] == "reconfigure_successful"
     assert mock_config_entry.data == {CONF_SERIAL_PORT: NEW_URL, CONF_MODEL: MODEL}
@@ -52,6 +53,7 @@ async def test_reconfigure_not_same_device(
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"], {CONF_SERIAL_PORT: NEW_URL}
     )
+    await hass.async_block_till_done()
     assert result["type"] is FlowResultType.FORM
     assert result["errors"] == {"base": "not_same_device"}
     assert mock_config_entry.data[CONF_SERIAL_PORT] == SERIAL_PORT
@@ -77,6 +79,7 @@ async def test_reconfigure_cannot_connect_recovers(
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"], {CONF_SERIAL_PORT: NEW_URL}
     )
+    await hass.async_block_till_done()
     assert result["type"] is FlowResultType.ABORT
     assert result["reason"] == "reconfigure_successful"
     assert mock_config_entry.data[CONF_SERIAL_PORT] == NEW_URL
@@ -97,6 +100,7 @@ async def test_reconfigure_without_serial_number(
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"], {CONF_SERIAL_PORT: NEW_URL}
     )
+    await hass.async_block_till_done()
     assert result["type"] is FlowResultType.ABORT
     assert result["reason"] == "reconfigure_successful"
     assert mock_config_entry.data[CONF_SERIAL_PORT] == NEW_URL

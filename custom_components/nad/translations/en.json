@@ -392,6 +392,9 @@
         "communication_error": {
             "message": "Error communicating with NAD {name}."
         },
+        "not_same_device": {
+            "message": "The device you connected to is not the same NAD device that was previously configured."
+        },
         "timeout_error": {
             "message": "Communicating with NAD {name} timed out."
         },
@@ -403,6 +406,10 @@
         }
     },
     "issues": {
+        "binary_protocol_not_supported": {
+            "description": "The NAD device {title} was configured with an earlier version of this custom integration using the binary TCP protocol (e.g. the D 7050). This protocol is not supported by this custom integration, so the device is not available.\n\nRemove this device from the NAD integration. To use the device with the built-in NAD integration instead, uninstall this custom integration and configure the device in YAML.",
+            "title": "{title} uses an unsupported protocol"
+        },
         "deprecated_yaml": {
             "description": "Configuring NAD using YAML is not supported by this custom integration.\n\nYour existing YAML configuration has been imported into the UI automatically.\n\nRemove the `nad` configuration from your configuration.yaml file and restart Home Assistant to fix this issue.",
             "title": "The NAD YAML configuration is not supported"

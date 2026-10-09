@@ -42,7 +42,7 @@ class NADCoordinator(DataUpdateCoordinator[None]):
         )
 
         self.device = device
-        self.unique_id = self.device.serial_number or config_entry.entry_id
+        self.unique_id = config_entry.unique_id or config_entry.entry_id
 
         self.device_info = DeviceInfo(
             identifiers={(DOMAIN, self.unique_id)},

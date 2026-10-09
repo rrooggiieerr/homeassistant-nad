@@ -41,6 +41,7 @@ def mock_config_entry() -> MockConfigEntry:
         title=f"NAD {MODEL}",
         unique_id=SERIAL_NUMBER,
         data={CONF_SERIAL_PORT: SERIAL_PORT, CONF_MODEL: MODEL},
+        version=2,
     )
 
 
@@ -52,14 +53,23 @@ def mock_nad_device() -> MagicMock:
     device.name = f"NAD {MODEL}"
     device.serial_number = SERIAL_NUMBER
     device.async_disconnect = AsyncMock()
+    device.firmware_version = "1.0"
+    device.async_disconnect = AsyncMock()
+    device.async_ping = AsyncMock(return_value=True)
     return device
 
 
 @pytest.fixture
 def mock_connect(mock_nad_device: MagicMock) -> Generator[AsyncMock]:
-    """Patch NADDevice.async_connect in the config flow."""
+    """Patch NADDevice.async_connect, used by both the config flow and setup."""
     with patch(
-        "custom_components.nad.config_flow.NADDevice.async_connect",
-        return_value=mock_nad_device,
+        "nad_serial.NADDevice.async_connect", return_value=mock_nad_device
     ) as mock:
         yield mock
+
+
+@pytest.fixture
+def mock_no_platforms() -> Generator[None]:
+    """Set up the config entry without loading any platforms."""
+    with patch("custom_components.nad.PLATFORMS", []):
+        yield

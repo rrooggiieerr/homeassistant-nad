@@ -26,7 +26,7 @@ RECONFIGURE_SCHEMA = USER_SCHEMA
 class NADConfigFlow(ConfigFlow, domain=DOMAIN):
     """Handle a config flow for NAD."""
 
-    VERSION = 1
+    VERSION = 2
 
     @override
     async def async_step_user(

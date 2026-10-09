@@ -20,6 +20,7 @@ USER_SCHEMA = probatio.Schema(
         probatio.Required(CONF_SERIAL_PORT): SerialPortSelector(),
     }
 )
+RECONFIGURE_SCHEMA = USER_SCHEMA
 
 
 class NADConfigFlow(ConfigFlow, domain=DOMAIN):
@@ -102,4 +103,52 @@ class NADConfigFlow(ConfigFlow, domain=DOMAIN):
                 CONF_MODEL: device.model,
                 CONF_NAME: import_data[CONF_NAME],
             },
+        )
+
+    async def async_step_reconfigure(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Handle a reconfigure flow."""
+        errors: dict[str, str] = {}
+        reconfigure_entry = self._get_reconfigure_entry()
+
+        if user_input is not None:
+            url = user_input[CONF_SERIAL_PORT]
+
+            device = None
+            try:
+                # Test if we can connect to the device
+                device = await NADDevice.async_connect(url)
+
+                if (
+                    reconfigure_entry.unique_id
+                    and device.serial_number
+                    and reconfigure_entry.unique_id != device.serial_number
+                ):
+                    errors["base"] = "not_same_device"
+
+                _LOGGER.info("NAD %s available on %s", device.model, url)
+            except NADBaseError:
+                errors["base"] = "cannot_connect"
+            finally:
+                if device:
+                    await device.async_disconnect()
+
+            if not errors:
+                return self.async_update_reload_and_abort(
+                    reconfigure_entry,
+                    data_updates={CONF_SERIAL_PORT: url},
+                )
+
+        # Combine the current entry data with schema.
+        data_schema = self.add_suggested_values_to_schema(
+            RECONFIGURE_SCHEMA,
+            user_input or reconfigure_entry.data,
+        )
+
+        return self.async_show_form(
+            step_id="reconfigure",
+            description_placeholders={"title": reconfigure_entry.title},
+            data_schema=data_schema,
+            errors=errors,
         )

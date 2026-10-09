@@ -12,6 +12,8 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import issue_registry as ir
 from homeassistant.setup import async_setup_component
 
+from . import HOST, SERIAL_NUMBER, SERIAL_PORT
+
 
 async def _setup_yaml(hass: HomeAssistant, platform_config: dict) -> None:
     assert await async_setup_component(
@@ -28,13 +30,13 @@ async def _setup_yaml(hass: HomeAssistant, platform_config: dict) -> None:
     [
         ({}, "/dev/ttyUSB0", "NAD Receiver"),
         (
-            {"type": "RS232", "serial_port": "/dev/ttyUSB1"},
-            "/dev/ttyUSB1",
+            {"type": "RS232", "serial_port": SERIAL_PORT},
+            SERIAL_PORT,
             "NAD Receiver",
         ),
         (
-            {"type": "Telnet", "host": "192.0.2.1", "port": 23, "name": "Living room"},
-            "socket://192.0.2.1:23",
+            {"type": "Telnet", "host": HOST, "port": 23, "name": "Living room"},
+            f"socket://{HOST}:23",
             "Living room",
         ),
     ],
@@ -55,7 +57,7 @@ async def test_import(
     entry = entries[0]
     assert entry.source == SOURCE_IMPORT
     assert entry.title == expected_title
-    assert entry.unique_id == "K25T757A12345"
+    assert entry.unique_id == SERIAL_NUMBER
     assert entry.data[CONF_SERIAL_PORT] == expected_url
     mock_connect.assert_awaited_once_with(expected_url)
 
@@ -66,7 +68,7 @@ async def test_import_tcp(
     hass: HomeAssistant, issue_registry: ir.IssueRegistry, mock_connect: AsyncMock
 ) -> None:
     """Test that TCP is not imported but raises the not supported issue."""
-    await _setup_yaml(hass, {"type": "TCP", "host": "192.0.2.1"})
+    await _setup_yaml(hass, {"type": "TCP", "host": HOST})
 
     assert not hass.config_entries.async_entries(DOMAIN)
     mock_connect.assert_not_awaited()
@@ -97,14 +99,14 @@ async def test_import_cannot_connect(
     """Test the import when the device can't be reached."""
     mock_connect.side_effect = NADConnectionError
 
-    await _setup_yaml(hass, {"type": "RS232", "serial_port": "/dev/ttyUSB1"})
+    await _setup_yaml(hass, {"type": "RS232", "serial_port": SERIAL_PORT})
 
     assert not hass.config_entries.async_entries(DOMAIN)
     issue = issue_registry.async_get_issue(
         DOMAIN, "deprecated_yaml_import_issue_cannot_connect"
     )
     assert issue
-    assert issue.translation_placeholders["url"] == "/dev/ttyUSB1"
+    assert issue.translation_placeholders["url"] == SERIAL_PORT
     assert not issue_registry.async_get_issue(DOMAIN, "deprecated_yaml")
 
 
@@ -113,7 +115,7 @@ async def test_import_already_configured(
     hass: HomeAssistant, issue_registry: ir.IssueRegistry, mock_connect: AsyncMock
 ) -> None:
     """Test that a second import fails, but still shows the YAML issue."""
-    config = {"type": "RS232", "serial_port": "/dev/ttyUSB1"}
+    config = {"type": "RS232", "serial_port": SERIAL_PORT}
     await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_IMPORT}, data={**config, "name": "NAD"}
     )

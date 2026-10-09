@@ -4,8 +4,13 @@ from collections.abc import Generator
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
+from pytest_homeassistant_custom_component.common import MockConfigEntry
 
+from custom_components.nad.const import CONF_SERIAL_PORT, DOMAIN
+from homeassistant.const import CONF_MODEL
 from homeassistant.core import HomeAssistant
+
+from . import MODEL, SERIAL_NUMBER, SERIAL_PORT
 
 
 @pytest.fixture(autouse=True)
@@ -29,12 +34,23 @@ def mock_setup_entry() -> Generator[AsyncMock]:
 
 
 @pytest.fixture
+def mock_config_entry() -> MockConfigEntry:
+    """Return an existing NAD config entry."""
+    return MockConfigEntry(
+        domain=DOMAIN,
+        title=f"NAD {MODEL}",
+        unique_id=SERIAL_NUMBER,
+        data={CONF_SERIAL_PORT: SERIAL_PORT, CONF_MODEL: MODEL},
+    )
+
+
+@pytest.fixture
 def mock_nad_device() -> MagicMock:
     """Return a mocked NAD device."""
     device = MagicMock()
-    device.model = "T755"
-    device.name = "NAD T755"
-    device.serial_number = "K25T757A12345"
+    device.model = MODEL
+    device.name = f"NAD {MODEL}"
+    device.serial_number = SERIAL_NUMBER
     device.async_disconnect = AsyncMock()
     return device
 

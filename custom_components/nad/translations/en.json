@@ -2,13 +2,24 @@
     "config": {
         "abort": {
             "already_configured": "Device is already configured",
-            "cannot_connect": "Failed to connect"
+            "cannot_connect": "Failed to connect",
+            "reconfigure_successful": "Re-configuration was successful"
         },
         "error": {
             "cannot_connect": "Failed to connect",
+            "not_same_device": "The device you connected to is not the same NAD device that was previously configured.",
             "unknown": "Unexpected error"
         },
         "step": {
+            "reconfigure": {
+                "data": {
+                    "serial_port": "Serial port"
+                },
+                "data_description": {
+                    "serial_port": "The serial port the NAD device is connected to, or a URL for the telnet connection or serial to network bridge (e.g. socket://192.0.2.1:23)."
+                },
+                "title": "Reconfigure {title}"
+            },
             "user": {
                 "data": {
                     "serial_port": "Serial port"

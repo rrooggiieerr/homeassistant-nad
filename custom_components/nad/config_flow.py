@@ -8,7 +8,7 @@ from nad_serial.exceptions import NADBaseError
 import probatio
 
 from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
-from homeassistant.const import CONF_MODEL
+from homeassistant.const import CONF_HOST, CONF_MODEL, CONF_NAME, CONF_PORT, CONF_TYPE
 from homeassistant.helpers.selector import SerialPortSelector
 
 from .const import CONF_SERIAL_PORT, DOMAIN
@@ -66,4 +66,40 @@ class NADConfigFlow(ConfigFlow, domain=DOMAIN):
             step_id="user",
             data_schema=USER_SCHEMA,
             errors=errors,
+        )
+
+    async def async_step_import(self, import_data: dict[str, Any]) -> ConfigFlowResult:
+        """Import a YAML configuration."""
+        if import_data[CONF_TYPE] == "Telnet":
+            url = f"socket://{import_data[CONF_HOST]}:{import_data[CONF_PORT]}"
+        else:
+            url = import_data[CONF_SERIAL_PORT]
+
+        self._async_abort_entries_match({CONF_SERIAL_PORT: url})
+
+        device = None
+        try:
+            # Test if we can connect to the device
+            device = await NADDevice.async_connect(url)
+
+            if device.serial_number:
+                await self.async_set_unique_id(device.serial_number)
+                self._abort_if_unique_id_configured()
+
+            _LOGGER.info("NAD %s available on %s", device.model, url)
+        except NADBaseError:
+            return self.async_abort(
+                reason="cannot_connect", description_placeholders={"url": url}
+            )
+        finally:
+            if device:
+                await device.async_disconnect()
+
+        return self.async_create_entry(
+            title=import_data[CONF_NAME],
+            data={
+                CONF_SERIAL_PORT: url,
+                CONF_MODEL: device.model,
+                CONF_NAME: import_data[CONF_NAME],
+            },
         )

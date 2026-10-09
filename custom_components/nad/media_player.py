@@ -5,21 +5,33 @@ import logging
 from typing import Any, override
 
 from nad_serial import NADAmplifier, NADMultiZoneAmplifier, NADZone
+import probatio
 
 from homeassistant.components.media_player import (
+    PLATFORM_SCHEMA as MEDIA_PLAYER_PLATFORM_SCHEMA,
     MediaPlayerDeviceClass,
     MediaPlayerEntity,
     MediaPlayerEntityFeature,
     MediaPlayerState,
 )
-from homeassistant.config_entries import ConfigEntry
+from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
+from homeassistant.const import CONF_HOST, CONF_NAME, CONF_PORT, CONF_TYPE
 from homeassistant.core import HomeAssistant, callback
+from homeassistant.data_entry_flow import FlowResultType
 from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr
+from homeassistant.helpers import (
+    config_validation as cv,
+    device_registry as dr,
+    issue_registry as ir,
+)
 from homeassistant.helpers.device_registry import ChildDeviceInfo
-from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
+from homeassistant.helpers.entity_platform import (
+    AddConfigEntryEntitiesCallback,
+    AddEntitiesCallback,
+)
+from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 
-from .const import DOMAIN
+from .const import CONF_SERIAL_PORT, DOMAIN
 from .coordinator import NADCoordinator
 from .entity import NADEntity, handle_nad_action_errors, handle_nad_update_errors
 
@@ -27,6 +39,76 @@ _LOGGER = logging.getLogger(__name__)
 
 SCAN_INTERVAL = timedelta(seconds=5)
 PARALLEL_UPDATES = 1
+
+PLATFORM_SCHEMA = MEDIA_PLAYER_PLATFORM_SCHEMA.extend(
+    {
+        probatio.Optional(CONF_TYPE, default="RS232"): probatio.In(
+            ["RS232", "Telnet", "TCP"]
+        ),
+        probatio.Optional(CONF_SERIAL_PORT, default="/dev/ttyUSB0"): cv.string,
+        probatio.Optional(CONF_HOST): cv.string,
+        probatio.Optional(CONF_PORT, default=53): cv.port,
+        probatio.Optional(CONF_NAME, default="NAD Receiver"): cv.string,
+        # Accepted for backwards compatibility, ignored
+        probatio.Optional("min_volume"): int,
+        probatio.Optional("max_volume"): int,
+        probatio.Optional("volume_step"): int,
+        probatio.Optional("sources"): dict,
+    }
+)
+
+
+async def async_setup_platform(
+    hass: HomeAssistant,
+    config: ConfigType,
+    async_add_entities: AddEntitiesCallback,
+    discovery_info: DiscoveryInfoType | None = None,
+) -> None:
+    """Import the YAML configuration into a config entry."""
+    if CONF_HOST not in config and config[CONF_TYPE] in ("Telnet", "TCP"):
+        # This would have never worked in the first place...
+        return
+
+    if config[CONF_TYPE] == "TCP":
+        ir.async_create_issue(
+            hass,
+            DOMAIN,
+            "yaml_tcp_not_supported",
+            is_fixable=False,
+            issue_domain=DOMAIN,
+            severity=ir.IssueSeverity.ERROR,
+            translation_key="yaml_tcp_not_supported",
+        )
+        return
+
+    result = await hass.config_entries.flow.async_init(
+        DOMAIN, context={"source": SOURCE_IMPORT}, data=dict(config)
+    )
+    if (
+        result.get("type") is FlowResultType.ABORT
+        and result.get("reason") != "already_configured"
+    ):
+        ir.async_create_issue(
+            hass,
+            DOMAIN,
+            f"deprecated_yaml_import_issue_{result.get('reason')}",
+            is_fixable=False,
+            issue_domain=DOMAIN,
+            severity=ir.IssueSeverity.WARNING,
+            translation_key=f"deprecated_yaml_import_issue_{result.get('reason')}",
+            translation_placeholders=dict(result.get("description_placeholders") or {}),
+        )
+        return
+
+    ir.async_create_issue(
+        hass,
+        DOMAIN,
+        "deprecated_yaml",
+        is_fixable=False,
+        issue_domain=DOMAIN,
+        severity=ir.IssueSeverity.WARNING,
+        translation_key="deprecated_yaml",
+    )
 
 
 async def async_setup_entry(

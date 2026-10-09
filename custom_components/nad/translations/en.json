@@ -1,7 +1,8 @@
 {
     "config": {
         "abort": {
-            "already_configured": "Device is already configured"
+            "already_configured": "Device is already configured",
+            "cannot_connect": "Failed to connect"
         },
         "error": {
             "cannot_connect": "Failed to connect",
@@ -388,6 +389,20 @@
         },
         "unknown_source": {
             "message": "Unknown source {source}."
+        }
+    },
+    "issues": {
+        "deprecated_yaml": {
+            "description": "Configuring NAD using YAML is not supported by this custom integration.\n\nYour existing YAML configuration has been imported into the UI automatically.\n\nRemove the `nad` configuration from your configuration.yaml file and restart Home Assistant to fix this issue.",
+            "title": "The NAD YAML configuration is not supported"
+        },
+        "deprecated_yaml_import_issue_cannot_connect": {
+            "description": "Configuring NAD using YAML is not supported by this custom integration. While importing your YAML configuration, the device on {url} could not be reached.\n\nPlease ensure the device is accessible and restart Home Assistant to retry, or remove the `nad` configuration from your configuration.yaml and set up the integration via the UI.",
+            "title": "The NAD YAML configuration is not supported"
+        },
+        "yaml_tcp_not_supported": {
+            "description": "Your NAD YAML configuration uses `type: TCP`, which is not supported by this custom integration. This custom integration replaces the built-in NAD integration, so this device is no longer available.\n\nUninstall the NAD custom integration and restart Home Assistant to use the built-in integration again.",
+            "title": "The NAD TCP protocol is not supported"
         }
     }
 }

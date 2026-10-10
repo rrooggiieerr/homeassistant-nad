@@ -10,5 +10,5 @@
   "issue_tracker": "https://github.com/rrooggiieerr/homeassistant-nad/issues",
   "loggers": ["nad_serial"],
   "requirements": ["nad_serial>=0.0.1rc5"],
-  "version": "0.1.0rc4"
+  "version": "0.1.0"
 }

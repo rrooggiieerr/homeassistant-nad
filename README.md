@@ -16,16 +16,22 @@
 Home Assistant integration to control **[NAD](https://nadelectronics.com/)** amplifiers, tuners and
 receivers over serial (RS-232) or Ethernet (telnet).
 
+⚠️ This custom integration replaces the NAD integration that comes with Home Assistant Core. If your
+NAD device does not follow the v2.x NAD protocol this integration will not work.
+
 ## Features
 
-- Installation/Configuration through Config Flow UI
+- Installation/Configuration through Config Flow UI.
+- Imports YAML configuration as used by Home Assistant Core.
 - Asynchronous, built on [serialx](https://github.com/puddly/serialx).
 - Connects over serial (RS-232) or Ethernet (telnet).
-- Supports Serial to Ethernet/WiFi bridge and [ESPHome Serial Proxy](https://esphome.io/components/serial_proxy/)
+- Supports Serial to Ethernet/WiFi bridge and [ESPHome Serial Proxy](https://esphome.io/components/serial_proxy/).
 - Detects the device model and loads the matching configuration.
-- Detects the device type for models without configuration.
+- Detects the device type (amplifier, tuner, receiver) for models without configuration.
 - Read, set, increment and decrement any supported setting.
 - Reads the source names on supported devices.
+- Supports zones on multi-zone receivers.
+- Change the serial port or URL without removing the device.
 
 ## Supported protocol
 
@@ -33,26 +39,14 @@ If your device follows the second generation NAD protocol (v2.x), it is supporte
 integration. This protocol is used by NAD amplifiers, tuners and receivers with a serial (RS-232)
 or Ethernet port.
 
-The binary protocol that some NAD devices, like the D-series, use on TCP port 50001 is not
+⚠️ The binary protocol that some NAD devices, like the D-series, use on TCP port 50001 is not
 supported.
 
-The serial and Ethernet commands are identical. All communication is plain ASCII text. Every
-command and response has the format:
+Commands for the second generation NAD protocol have the following format:
 
-`<Prefix>.<Variable><Operator><Value>`
+`<Setting><Operator><Value>` like `Main.Volume=-30`
 
-The prefix groups related variables, e.g. `Main`, `Zone2`, `Source1` or `Tuner`. Prefix and
-variable together name a setting, e.g. `Main.Volume`. Every message is terminated by a carriage
-return and/or line feed.
-
-| Operator | Meaning | Example |
-|---|---|---|
-| `?` | Query the value | `Main.Volume?` |
-| `=` | Set the value | `Main.Volume=-30` |
-| `+` | Increment or cycle to the next value | `Main.Volume+` |
-| `-` | Decrement or cycle to the previous value | `Main.Volume-` |
-
-The device responds with the `=` operator and the resulting value, e.g. `Main.Volume=-30`.
+[Read more about the supported protocol.](https://github.com/rrooggiieerr/nad_serial.py#supported-protocol)
 
 ## Supported devices
 
@@ -63,7 +57,7 @@ The following devices are known to work:
 - T755
 - T757
 
-Additionally, the integrations includes untested configuration files for the following devices:
+Additionally, the integration includes untested configuration files for the following devices:
 
 **Receivers:**
 
@@ -89,8 +83,8 @@ Additionally, the integrations includes untested configuration files for the fol
 
 - C427
 
-Other NAD devices that use the [supported protocol](#supported-protocol) should work too, with a
-basic set of settings: power, model, version, volume, mute and source.
+Other NAD devices that use the [supported protocol](https://github.com/rrooggiieerr/nad_serial.py#supported-protocol)
+should work too, with a basic set of settings: power, model, version, volume, mute and source.
 
 ## Installation
 
@@ -109,25 +103,42 @@ Click the following button to open the integration directly on the HACS integrat
 
 ## Adding a new NAD device
 
+### YAML import
+
+Existing YAML configurations as used by the Home Assistant Core NAD integration are imported
+automatically.
+
+`min_volume`, `max_volume`, `volume_step` and `sources` are no longer used; the integration takes
+them from the device or device configuration. TCP type YAML configuration's are not supported,
+uninstall this custom integration and keep using the Home Assistant Core NAD integration for these
+devices.
+
+After a successful import you can remove the YAML configuration.
+
+### Manually
+
 - Browse to your Home Assistant instance.
 - Go to [**Settings > Devices & services**](https://my.home-assistant.io/redirect/integrations).
 - In the bottom right corner, select the [+ Add Integration](https://my.home-assistant.io/redirect/config_flow_start?domain=nad) button.
 - From the list, select **NAD**.
-- Follow the instructions on screen to complete the setup.
+- Select the serial port or provide the URL
 
-When your wiring is right a new NAD integration and device will now be added to your Integrations
-view. If your wiring is not right you will get a *Failed to connect* error message.
+ⓘ To connect to the Ethernet (telnet) interface of your device use socket://<ip address>:23
+
+When your connection is right a new NAD integration and device will now be added to your Integrations
+view. If your connection is not right you will get a *Failed to connect* error message.
 
 ## Contribution and appreciation
 
-Do you enjoy using this Home Assistant integration? You can contribute to this integration,
-or show your appreciation, in the following ways.
+Do you enjoy using this Home Assistant integration? You can contribute to this integration, or show
+your appreciation, in the following ways.
 
 ### Contribute your NAD model
 
-Is your NAD device supported by this Home Assistant integration but not listed under Supported
-devices? Let me know your NAD model so I can improve the overview of supported devices.
- 
+Is your NAD device supported by this Home Assistant integration but not listed under
+[Supported devices](#supported-devices)? Let me know your NAD model so I can improve the overview
+of supported devices.
+
 ### Contribute your language
 
 If you would like to use this Home Assistant integration in your own language you can provide a
@@ -139,8 +150,8 @@ More on translating custom integrations can be found
 
 ### Star this integration
 
-Help other Home Assistant and NAD users find this integration by starring this GitHub
-page. Click **⭐ Star** on the top right of the GitHub page.
+Help other Home Assistant and NAD users find this integration by starring this GitHub page. Click
+**⭐ Star** on the top right of the GitHub page.
 
 ### Support my work
 

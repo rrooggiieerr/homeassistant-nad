@@ -1,0 +1,23 @@
+name: Release Drafter
+
+# yamllint disable-line rule:truthy
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+# Permissions for default token (secrets.GITHUB_TOKEN)
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update_release_draft:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: release-drafter/release-drafter@v7.9.0
+        with:
+          config-name: release-drafter.yml # the default, loads '.github/release-drafter.yml'

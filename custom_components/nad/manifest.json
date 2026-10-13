@@ -4,11 +4,19 @@
   "codeowners": ["@rrooggiieerr"],
   "config_flow": true,
   "dependencies": ["usb"],
+  "dhcp": [
+    {
+      "hostname": "nad[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]*",
+      "macaddress": "905682*"
+    },
+    { "registered_devices": true }
+  ],
   "documentation": "https://github.com/rrooggiieerr/homeassistant-nad",
   "integration_type": "device",
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/rrooggiieerr/homeassistant-nad/issues",
   "loggers": ["nad_serial"],
   "requirements": ["nad_serial>=0.0.1rc5"],
-  "version": "0.1.0"
+  "version": "0.1.0",
+  "zeroconf": [{ "name": "*(nad*", "type": "_telnet._tcp.local." }]
 }

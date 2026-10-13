@@ -7,10 +7,10 @@ import pytest
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.nad.const import CONF_SERIAL_PORT, DOMAIN
-from homeassistant.const import CONF_MODEL
+from homeassistant.const import CONF_MAC, CONF_MODEL
 from homeassistant.core import HomeAssistant
 
-from . import MODEL, SERIAL_NUMBER, SERIAL_PORT
+from . import MAC_ADDRESS, MODEL, SERIAL_NUMBER, SERIAL_PORT, URL
 
 
 @pytest.fixture(autouse=True)
@@ -34,7 +34,7 @@ def mock_setup_entry() -> Generator[AsyncMock]:
 
 
 @pytest.fixture
-def mock_config_entry() -> MockConfigEntry:
+def mock_rs232_config_entry() -> MockConfigEntry:
     """Return an existing NAD config entry."""
     return MockConfigEntry(
         domain=DOMAIN,
@@ -46,13 +46,24 @@ def mock_config_entry() -> MockConfigEntry:
 
 
 @pytest.fixture
+def mock_network_config_entry() -> MockConfigEntry:
+    """Return an existing NAD config entry connected over the network."""
+    return MockConfigEntry(
+        domain=DOMAIN,
+        title=f"NAD {MODEL}",
+        unique_id=SERIAL_NUMBER,
+        data={CONF_SERIAL_PORT: URL, CONF_MODEL: MODEL, CONF_MAC: MAC_ADDRESS},
+        version=2,
+    )
+
+
+@pytest.fixture
 def mock_nad_device() -> MagicMock:
     """Return a mocked NAD device."""
     device = MagicMock()
     device.model = MODEL
     device.name = f"NAD {MODEL}"
     device.serial_number = SERIAL_NUMBER
-    device.async_disconnect = AsyncMock()
     device.firmware_version = "1.0"
     device.async_disconnect = AsyncMock()
     device.async_ping = AsyncMock(return_value=True)

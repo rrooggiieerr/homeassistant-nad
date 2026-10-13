@@ -8,6 +8,7 @@ from nad_serial import NADDevice
 from nad_serial.exceptions import NADBaseError
 
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import CONF_MAC
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
@@ -43,9 +44,11 @@ class NADCoordinator(DataUpdateCoordinator[None]):
 
         self.device = device
         self.unique_id = config_entry.unique_id or config_entry.entry_id
+        mac = config_entry.data.get(CONF_MAC)
 
         self.device_info = DeviceInfo(
             identifiers={(DOMAIN, self.unique_id)},
+            connections={(dr.CONNECTION_NETWORK_MAC, mac)} if mac else set(),
             manufacturer="NAD",
             model=device.model,
             name=device.name,

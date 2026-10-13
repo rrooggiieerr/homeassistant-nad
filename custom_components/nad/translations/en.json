@@ -10,7 +10,12 @@
             "not_same_device": "The device you connected to is not the same NAD device that was previously configured.",
             "unknown": "Unexpected error"
         },
+        "flow_title": "{name}",
         "step": {
+            "discovery_confirm": {
+                "description": "Do you want to set up {name}?",
+                "title": "{name}"
+            },
             "reconfigure": {
                 "data": {
                     "serial_port": "Serial port"

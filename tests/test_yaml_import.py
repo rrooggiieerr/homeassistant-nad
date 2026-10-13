@@ -12,7 +12,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import issue_registry as ir
 from homeassistant.setup import async_setup_component
 
-from . import HOST, SERIAL_NUMBER, SERIAL_PORT
+from . import HOST, SERIAL_NUMBER, SERIAL_PORT, URL
 
 
 async def _setup_yaml(hass: HomeAssistant, platform_config: dict) -> None:
@@ -36,7 +36,7 @@ async def _setup_yaml(hass: HomeAssistant, platform_config: dict) -> None:
         ),
         (
             {"type": "Telnet", "host": HOST, "port": 23, "name": "Living room"},
-            f"socket://{HOST}:23",
+            URL,
             "Living room",
         ),
     ],

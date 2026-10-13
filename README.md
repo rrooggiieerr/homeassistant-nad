@@ -22,6 +22,7 @@ NAD device does not follow the v2.x NAD protocol this integration will not work.
 ## Features
 
 - Installation/Configuration through Config Flow UI.
+- Discovers devices on the network through DHCP and Zeroconf (experimental).
 - Imports YAML configuration as used by Home Assistant Core.
 - Asynchronous, built on [serialx](https://github.com/puddly/serialx).
 - Connects over serial (RS-232) or Ethernet (telnet).
@@ -109,11 +110,17 @@ Existing YAML configurations as used by the Home Assistant Core NAD integration 
 automatically.
 
 `min_volume`, `max_volume`, `volume_step` and `sources` are no longer used; the integration takes
-them from the device or device configuration. TCP type YAML configuration's are not supported,
+them from the device or device configuration. TCP type YAML configurations are not supported;
 uninstall this custom integration and keep using the Home Assistant Core NAD integration for these
 devices.
 
 After a successful import you can remove the YAML configuration.
+
+### Discovery
+
+NAD devices with an Ethernet port are discovered automatically on your network. Go to
+[**Settings > Devices & services**](https://my.home-assistant.io/redirect/integrations) and select
+**Add** on the discovered NAD device.
 
 ### Manually
 
@@ -121,9 +128,9 @@ After a successful import you can remove the YAML configuration.
 - Go to [**Settings > Devices & services**](https://my.home-assistant.io/redirect/integrations).
 - In the bottom right corner, select the [+ Add Integration](https://my.home-assistant.io/redirect/config_flow_start?domain=nad) button.
 - From the list, select **NAD**.
-- Select the serial port or provide the URL
+- Select the serial port or provide the URL.
 
-ⓘ To connect to the Ethernet (telnet) interface of your device use socket://<ip address>:23
+ⓘ To connect to the Ethernet (telnet) interface of your device use `socket://<ip address>:23`
 
 When your connection is right a new NAD integration and device will now be added to your Integrations
 view. If your connection is not right you will get a *Failed to connect* error message.

@@ -14,7 +14,7 @@ from homeassistant.helpers import (
     issue_registry as ir,
 )
 
-from . import HOST, MODEL, SERIAL_NUMBER, SERIAL_PORT
+from . import HOST, MODEL, SERIAL_NUMBER, SERIAL_PORT, URL
 
 
 def _add_v1_config_entry(
@@ -63,7 +63,7 @@ def _add_v1_config_entry(
         (
             {"type": "Telnet", "host": HOST, "port": 23},
             HOST,
-            f"socket://{HOST}:23",
+            URL,
         ),
     ],
 )

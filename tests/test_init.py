@@ -5,8 +5,9 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.nad.const import CONF_SERIAL_PORT, DOMAIN
+from custom_components.nad.const import CONF_BUILD, CONF_SERIAL_PORT, DOMAIN
 from homeassistant.config_entries import ConfigEntryState
+from homeassistant.const import CONF_MODEL
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import (
     device_registry as dr,
@@ -14,7 +15,7 @@ from homeassistant.helpers import (
     issue_registry as ir,
 )
 
-from . import HOST, MODEL, SERIAL_NUMBER, SERIAL_PORT, URL
+from . import BUILD, HOST, MODEL, SERIAL_NUMBER, SERIAL_PORT, URL
 
 
 def _add_v1_config_entry(
@@ -87,7 +88,11 @@ async def test_migrate_v1(
     assert entry.version == 2
     assert entry.minor_version == 1
     assert entry.unique_id == SERIAL_NUMBER
-    assert entry.data == {CONF_SERIAL_PORT: expected_url}
+    assert entry.data == {
+        CONF_SERIAL_PORT: expected_url,
+        CONF_BUILD: BUILD,
+        CONF_MODEL: MODEL,
+    }
     assert entry.options == {}
 
     # Same entity_ids, new unique ids

@@ -7,7 +7,7 @@ from nad_serial.exceptions import NADConnectionError
 import pytest
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.nad.const import CONF_SERIAL_PORT, DOMAIN
+from custom_components.nad.const import CONF_BUILD, CONF_SERIAL_PORT, DOMAIN
 from homeassistant.config_entries import SOURCE_DHCP, SOURCE_ZEROCONF
 from homeassistant.const import CONF_MAC, CONF_MODEL
 from homeassistant.core import HomeAssistant
@@ -15,7 +15,7 @@ from homeassistant.data_entry_flow import FlowResultType
 from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
 from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
-from . import HOST, MAC_ADDRESS, MODEL, SERIAL_NUMBER, SERIAL_PORT, URL
+from . import BUILD, HOST, MAC_ADDRESS, MODEL, SERIAL_NUMBER, SERIAL_PORT, URL
 
 NEW_HOST = "192.0.2.2"
 NEW_URL = f"socket://{NEW_HOST}:23"
@@ -50,6 +50,7 @@ async def test_dhcp(hass: HomeAssistant, mock_connect: AsyncMock) -> None:
     assert result["type"] is FlowResultType.CREATE_ENTRY
     assert result["data"] == {
         CONF_SERIAL_PORT: URL,
+        CONF_BUILD: BUILD,
         CONF_MODEL: MODEL,
         CONF_MAC: MAC_ADDRESS,
     }
@@ -84,7 +85,12 @@ async def test_dhcp_known_mac_serial_entry(
     entry = MockConfigEntry(
         domain=DOMAIN,
         unique_id=SERIAL_NUMBER,
-        data={CONF_SERIAL_PORT: SERIAL_PORT, CONF_MODEL: MODEL, CONF_MAC: MAC_ADDRESS},
+        data={
+            CONF_SERIAL_PORT: SERIAL_PORT,
+            CONF_BUILD: BUILD,
+            CONF_MODEL: MODEL,
+            CONF_MAC: MAC_ADDRESS,
+        },
         version=2,
     )
     entry.add_to_hass(hass)
@@ -103,7 +109,7 @@ async def test_dhcp_unique_id_updates_host(hass: HomeAssistant) -> None:
     entry = MockConfigEntry(
         domain=DOMAIN,
         unique_id=SERIAL_NUMBER,
-        data={CONF_SERIAL_PORT: URL, CONF_MODEL: MODEL},
+        data={CONF_SERIAL_PORT: URL, CONF_BUILD: BUILD, CONF_MODEL: MODEL},
         version=2,
     )
     entry.add_to_hass(hass)
@@ -117,6 +123,7 @@ async def test_dhcp_unique_id_updates_host(hass: HomeAssistant) -> None:
     assert result["reason"] == "already_configured"
     assert entry.data == {
         CONF_SERIAL_PORT: NEW_URL,
+        CONF_BUILD: BUILD,
         CONF_MODEL: MODEL,
         CONF_MAC: MAC_ADDRESS,
     }
@@ -150,7 +157,11 @@ async def test_zeroconf(hass: HomeAssistant, mock_connect: AsyncMock) -> None:
     await hass.async_block_till_done()
     assert result["type"] is FlowResultType.CREATE_ENTRY
     assert result["title"] == f"NAD {MODEL}"
-    assert result["data"] == {CONF_SERIAL_PORT: URL, CONF_MODEL: MODEL}
+    assert result["data"] == {
+        CONF_SERIAL_PORT: URL,
+        CONF_BUILD: BUILD,
+        CONF_MODEL: MODEL,
+    }
     assert result["result"].unique_id == SERIAL_NUMBER
     mock_connect.assert_awaited_once_with(URL)
 
@@ -187,7 +198,11 @@ async def test_reconfigure(
     await hass.async_block_till_done()
     assert result["type"] is FlowResultType.ABORT
     assert result["reason"] == "reconfigure_successful"
-    assert mock_rs232_config_entry.data == {CONF_SERIAL_PORT: URL, CONF_MODEL: MODEL}
+    assert mock_rs232_config_entry.data == {
+        CONF_SERIAL_PORT: URL,
+        CONF_BUILD: BUILD,
+        CONF_MODEL: MODEL,
+    }
     assert mock_rs232_config_entry.title == f"NAD {MODEL}"
     mock_connect.assert_awaited_once_with(URL)
 

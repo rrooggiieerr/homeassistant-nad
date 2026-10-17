@@ -394,9 +394,11 @@
         "cannot_connect": {
             "message": "Unable to connect to NAD device on {url}."
         },
+        "command_failed": { "message": "Failed to send the command: {error}" },
         "communication_error": {
             "message": "Error communicating with NAD {name}."
         },
+        "invalid_command": { "message": "Invalid command: {error}" },
         "not_same_device": {
             "message": "The device you connected to is not the same NAD device that was previously configured."
         },
@@ -426,6 +428,30 @@
         "yaml_tcp_not_supported": {
             "description": "Your NAD YAML configuration uses `type: TCP`, which is not supported by this custom integration. This custom integration replaces the built-in NAD integration, so this device is no longer available.\n\nUninstall the NAD custom integration and restart Home Assistant to use the built-in integration again.",
             "title": "The NAD TCP protocol is not supported"
+        }
+    },
+    "services": {
+        "send_command": {
+            "description": "Sends a command to the NAD device and returns its response.",
+            "fields": {
+                "config_entry_id": {
+                    "description": "The NAD device to send the command to.",
+                    "name": "Device"
+                },
+                "operator": {
+                    "description": "? to query, = to set, + to increment, - to decrement.",
+                    "name": "Operator"
+                },
+                "setting": {
+                    "description": "The setting, like Main.Volume.",
+                    "name": "Setting"
+                },
+                "value": {
+                    "description": "The value, only used with the = operator.",
+                    "name": "Value"
+                }
+            },
+            "name": "Send command"
         }
     }
 }

@@ -1,0 +1,26 @@
+send_command:
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: nad
+    setting:
+      required: true
+      example: Main.Volume
+      selector:
+        text:
+    operator:
+      required: true
+      default: "?"
+      selector:
+        select:
+          options:
+            - "?"
+            - "="
+            - "+"
+            - "-"
+    value:
+      example: "-30"
+      selector:
+        text:

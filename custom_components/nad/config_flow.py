@@ -224,7 +224,6 @@ class NADConfigFlow(ConfigFlow, domain=DOMAIN):
             data={
                 CONF_SERIAL_PORT: url,
                 CONF_MODEL: device.model,
-                CONF_NAME: import_data[CONF_NAME],
             },
         )
 

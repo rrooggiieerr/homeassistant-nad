@@ -6,14 +6,7 @@ from nad_serial import NADDevice
 from nad_serial.exceptions import NADBaseError
 
 from homeassistant.config_entries import SOURCE_IMPORT
-from homeassistant.const import (
-    CONF_HOST,
-    CONF_MODEL,
-    CONF_NAME,
-    CONF_PORT,
-    CONF_TYPE,
-    Platform,
-)
+from homeassistant.const import CONF_HOST, CONF_MODEL, CONF_PORT, CONF_TYPE, Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import ConfigEntryError, ConfigEntryNotReady
 from homeassistant.helpers import (
@@ -119,13 +112,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: NADConfigEntry) -> bool:
 
     entry.runtime_data = NADCoordinator(hass, entry, device)
 
-    if entry.source == SOURCE_IMPORT and (name := entry.data.get(CONF_NAME)):
+    if entry.source == SOURCE_IMPORT:
         er.async_get(hass).async_get_or_create(
             Platform.MEDIA_PLAYER,
             DOMAIN,
             entry.runtime_data.unique_id,
             config_entry=entry,
-            suggested_object_id=slugify(name),
+            suggested_object_id=slugify(entry.title),
         )
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)

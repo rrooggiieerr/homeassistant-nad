@@ -5,14 +5,15 @@ from unittest.mock import AsyncMock
 from nad_serial.exceptions import NADConnectionError
 import pytest
 
-from custom_components.nad.const import CONF_SERIAL_PORT, DOMAIN
+from custom_components.nad.const import CONF_BUILD, CONF_SERIAL_PORT, DOMAIN
 from homeassistant.components.media_player import DOMAIN as MEDIA_PLAYER_DOMAIN
 from homeassistant.config_entries import SOURCE_IMPORT
+from homeassistant.const import CONF_MODEL
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import issue_registry as ir
 from homeassistant.setup import async_setup_component
 
-from . import HOST, SERIAL_NUMBER, SERIAL_PORT, URL
+from . import BUILD, HOST, MODEL, SERIAL_NUMBER, SERIAL_PORT, URL
 
 
 async def _setup_yaml(hass: HomeAssistant, platform_config: dict) -> None:
@@ -59,6 +60,8 @@ async def test_import(
     assert entry.title == expected_title
     assert entry.unique_id == SERIAL_NUMBER
     assert entry.data[CONF_SERIAL_PORT] == expected_url
+    assert entry.data[CONF_BUILD] == BUILD
+    assert entry.data[CONF_MODEL] == MODEL
     mock_connect.assert_awaited_once_with(expected_url)
 
     assert issue_registry.async_get_issue(DOMAIN, "deprecated_yaml")

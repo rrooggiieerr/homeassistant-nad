@@ -16,7 +16,7 @@ from homeassistant.helpers import (
 )
 from homeassistant.util import slugify
 
-from .const import CONF_SERIAL_PORT, DOMAIN
+from .const import CONF_BUILD, CONF_SERIAL_PORT, DOMAIN
 from .coordinator import NADConfigEntry, NADCoordinator
 
 PLATFORMS: list[Platform] = [
@@ -77,10 +77,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: NADConfigEntry) -> bool:
         )
 
     url = entry.data[CONF_SERIAL_PORT]
+    build = entry.data.get(CONF_BUILD)
     model = entry.data.get(CONF_MODEL)
 
     try:
-        device = await NADDevice.async_connect(url, model_hint=model)
+        device = await NADDevice.async_connect(url, build_hint=build or model)
     except NADBaseError as ex:
         raise ConfigEntryNotReady(
             translation_domain=DOMAIN,
@@ -89,10 +90,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: NADConfigEntry) -> bool:
         ) from ex
 
     if (
-        device.serial_number
-        and entry.unique_id
-        and device.serial_number != entry.unique_id
-    ) or (model and device.model != model):
+        (
+            device.serial_number
+            and entry.unique_id
+            and device.serial_number != entry.unique_id
+        )
+        or (build and device.build != build)
+        or (model and device.model != model)
+    ):
         await device.async_disconnect()
         raise ConfigEntryNotReady(
             translation_domain=DOMAIN,
@@ -109,6 +114,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: NADConfigEntry) -> bool:
 
     if entry.unique_id is None and (serial := device.serial_number):
         _async_migrate_to_serial_number(hass, entry, serial)
+
+    if build is None or model is None:
+        hass.config_entries.async_update_entry(
+            entry,
+            data={**entry.data, CONF_BUILD: device.build, CONF_MODEL: device.model},
+        )
 
     entry.runtime_data = NADCoordinator(hass, entry, device)
 

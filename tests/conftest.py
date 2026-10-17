@@ -6,11 +6,11 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.nad.const import CONF_SERIAL_PORT, DOMAIN
+from custom_components.nad.const import CONF_BUILD, CONF_SERIAL_PORT, DOMAIN
 from homeassistant.const import CONF_MAC, CONF_MODEL
 from homeassistant.core import HomeAssistant
 
-from . import MAC_ADDRESS, MODEL, SERIAL_NUMBER, SERIAL_PORT, URL
+from . import BUILD, MAC_ADDRESS, MODEL, SERIAL_NUMBER, SERIAL_PORT, URL
 
 
 @pytest.fixture(autouse=True)
@@ -40,7 +40,7 @@ def mock_rs232_config_entry() -> MockConfigEntry:
         domain=DOMAIN,
         title=f"NAD {MODEL}",
         unique_id=SERIAL_NUMBER,
-        data={CONF_SERIAL_PORT: SERIAL_PORT, CONF_MODEL: MODEL},
+        data={CONF_SERIAL_PORT: SERIAL_PORT, CONF_BUILD: BUILD, CONF_MODEL: MODEL},
         version=2,
     )
 
@@ -52,7 +52,12 @@ def mock_network_config_entry() -> MockConfigEntry:
         domain=DOMAIN,
         title=f"NAD {MODEL}",
         unique_id=SERIAL_NUMBER,
-        data={CONF_SERIAL_PORT: URL, CONF_MODEL: MODEL, CONF_MAC: MAC_ADDRESS},
+        data={
+            CONF_SERIAL_PORT: URL,
+            CONF_BUILD: BUILD,
+            CONF_MODEL: MODEL,
+            CONF_MAC: MAC_ADDRESS,
+        },
         version=2,
     )
 
@@ -61,6 +66,7 @@ def mock_network_config_entry() -> MockConfigEntry:
 def mock_nad_device() -> MagicMock:
     """Return a mocked NAD device."""
     device = MagicMock()
+    device.build = BUILD
     device.model = MODEL
     device.name = f"NAD {MODEL}"
     device.serial_number = SERIAL_NUMBER

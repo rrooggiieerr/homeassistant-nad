@@ -22,7 +22,7 @@ from homeassistant.helpers.selector import SerialPortSelector
 from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
 from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
-from .const import CONF_SERIAL_PORT, DOMAIN
+from .const import CONF_BUILD, CONF_SERIAL_PORT, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -94,6 +94,7 @@ class NADConfigFlow(ConfigFlow, domain=DOMAIN):
             title = self._device.name
             data = {
                 CONF_SERIAL_PORT: f"socket://{self._host}:23",
+                CONF_BUILD: self._device.build,
                 CONF_MODEL: self._device.model,
             }
             if self._mac:
@@ -182,7 +183,11 @@ class NADConfigFlow(ConfigFlow, domain=DOMAIN):
             if device and not errors:
                 return self.async_create_entry(
                     title=device.name,
-                    data={CONF_SERIAL_PORT: url, CONF_MODEL: device.model},
+                    data={
+                        CONF_SERIAL_PORT: url,
+                        CONF_BUILD: device.build,
+                        CONF_MODEL: device.model,
+                    },
                     options={},
                 )
 
@@ -223,6 +228,7 @@ class NADConfigFlow(ConfigFlow, domain=DOMAIN):
             title=import_data[CONF_NAME],
             data={
                 CONF_SERIAL_PORT: url,
+                CONF_BUILD: device.build,
                 CONF_MODEL: device.model,
             },
         )
@@ -242,10 +248,16 @@ class NADConfigFlow(ConfigFlow, domain=DOMAIN):
                 # Test if we can connect to the device
                 device = await NADDevice.async_connect(url)
 
+                build = reconfigure_entry.data.get(CONF_BUILD)
+                model = reconfigure_entry.data.get(CONF_MODEL)
                 if (
-                    reconfigure_entry.unique_id
-                    and device.serial_number
-                    and reconfigure_entry.unique_id != device.serial_number
+                    (
+                        device.serial_number
+                        and reconfigure_entry.unique_id
+                        and device.serial_number != reconfigure_entry.unique_id
+                    )
+                    or (build and device.build != build)
+                    or (model and device.model != model)
                 ):
                     errors["base"] = "not_same_device"
 

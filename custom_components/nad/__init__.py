@@ -126,8 +126,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: NADConfigEntry) -> bool:
 
     entry.runtime_data = NADCoordinator(hass, entry, device)
 
-    # await entry.runtime_data.async_config_entry_first_refresh()
-
     if entry.source == SOURCE_IMPORT:
         er.async_get(hass).async_get_or_create(
             Platform.MEDIA_PLAYER,

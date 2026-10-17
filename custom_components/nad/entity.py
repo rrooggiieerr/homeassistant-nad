@@ -1,6 +1,7 @@
 """NAD Entity."""
 
 from collections.abc import Callable, Coroutine
+import contextlib
 import functools
 import logging
 from typing import Any, Concatenate, override
@@ -115,6 +116,10 @@ class NADEntity(CoordinatorEntity[NADCoordinator]):
         await super().async_added_to_hass()
         self.async_on_remove(self._device.add_callback(self._async_nad_callback))
         self._attr_available = True
+
+        if hasattr(self, "entity_description"):
+            with contextlib.suppress(NADConnectionError):
+                await self._device.async_request_settings([self.entity_description.key])
 
     @callback
     def _async_nad_callback(self, setting: str, value: Any) -> None:

@@ -28,5 +28,8 @@
         "default": "mdi:radio-fm"
       }
     }
+  },
+  "services": {
+    "send_command": { "service": "mdi:console" }
   }
 }

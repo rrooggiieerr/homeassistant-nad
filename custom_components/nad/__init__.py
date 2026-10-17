@@ -10,14 +10,17 @@ from homeassistant.const import CONF_HOST, CONF_MODEL, CONF_PORT, CONF_TYPE, Pla
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import ConfigEntryError, ConfigEntryNotReady
 from homeassistant.helpers import (
+    config_validation as cv,
     device_registry as dr,
     entity_registry as er,
     issue_registry as ir,
 )
+from homeassistant.helpers.typing import ConfigType
 from homeassistant.util import slugify
 
 from .const import CONF_BUILD, CONF_SERIAL_PORT, DOMAIN
 from .coordinator import NADConfigEntry, NADCoordinator
+from .services import async_setup_services
 
 PLATFORMS: list[Platform] = [
     Platform.MEDIA_PLAYER,
@@ -27,6 +30,14 @@ PLATFORMS: list[Platform] = [
     Platform.SENSOR,
     Platform.TEXT,
 ]
+
+CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
+
+
+async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
+    """Set up the NAD integration."""
+    async_setup_services(hass)
+    return True
 
 
 @callback
@@ -104,14 +115,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: NADConfigEntry) -> bool:
             translation_key="not_same_device",
         )
 
-    if not await device.async_ping():
-        await device.async_disconnect()
-        raise ConfigEntryNotReady(
-            translation_domain=DOMAIN,
-            translation_key="cannot_connect",
-            translation_placeholders={"url": url},
-        )
-
     if entry.unique_id is None and (serial := device.serial_number):
         _async_migrate_to_serial_number(hass, entry, serial)
 
@@ -122,6 +125,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: NADConfigEntry) -> bool:
         )
 
     entry.runtime_data = NADCoordinator(hass, entry, device)
+
+    # await entry.runtime_data.async_config_entry_first_refresh()
 
     if entry.source == SOURCE_IMPORT:
         er.async_get(hass).async_get_or_create(

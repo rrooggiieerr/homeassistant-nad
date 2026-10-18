@@ -1,5 +1,25 @@
 {
   "entity": {
+    "binary_sensor": {
+      "main_audio_lock": {
+        "default": "mdi:lock-open",
+        "state": {
+          "on": "mdi:lock"
+        }
+      },
+      "main_video_hdr": {
+        "default": "mdi:hdr-off",
+        "state": {
+          "on": "mdi:hdr"
+        }
+      },
+      "main_video_lock": {
+        "default": "mdi:video-off",
+        "state": {
+          "on": "mdi:video"
+        }
+      }
+    },
     "number": {
       "main_audyssey_offset": {
         "default": "mdi:tune-vertical"

@@ -40,7 +40,7 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
-    "nad_serial>=0.0.1rc5"
+    "nad_serial>=0.0.1rc6"
 ]
 
 [project.urls]

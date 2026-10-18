@@ -363,7 +363,6 @@ testpaths = ["tests"]
 
 [tool.codespell]
 ignore-words-list = "hass"
-ignore-regex = 'EdgeEnhancement\.Treshold'
 
 [tool.ruff]
 # https://docs.astral.sh/ruff/settings/

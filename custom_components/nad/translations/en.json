@@ -170,7 +170,7 @@
             "main_video_edge_enhancement_level": {
                 "name": "Video edge enhancement level"
             },
-            "main_video_edge_enhancement_treshold": {
+            "main_video_edge_enhancement_threshold": {
                 "name": "Video edge enhancement threshold"
             },
             "main_video_noise_reduction": {
@@ -196,17 +196,23 @@
             "main_listening_mode_analog": {
                 "name": "Analog signal listening mode"
             },
-            "main_listening_mode_digital": {
-                "name": "Digital signal listening mode"
+            "main_listening_mode_dolby_stereo": {
+                "name": "Dolby stereo listening mode"
             },
-            "main_listening_mode_dolby_digital": {
-                "name": "Dolby Digital listening mode"
+            "main_listening_mode_dolby_surround": {
+                "name": "Dolby surround listening mode"
             },
-            "main_listening_mode_dolby_digital2ch": {
-                "name": "Dolby Digital 2 channel listening mode"
+            "main_listening_mode_dts_stereo": {
+                "name": "DTS stereo listening mode"
             },
-            "main_listening_mode_dts": {
-                "name": "DTS listening mode"
+            "main_listening_mode_dts_surround": {
+                "name": "DTS surround listening mode"
+            },
+            "main_listening_mode_pcm_stereo": {
+                "name": "PCM stereo listening mode"
+            },
+            "main_listening_mode_pcm_surround": {
+                "name": "PCM surround listening mode"
             },
             "main_speaker_back_config2": {
                 "name": "Speaker size back"
@@ -255,14 +261,29 @@
             },
             "tuner_band": {
                 "name": "Tuner band"
-            },
-            "tuner_digital_mode": {
-                "name": "Tuner digital mode"
             }
         },
         "sensor": {
             "dsp_version": {
                 "name": "DSP version"
+            },
+            "main_audio_channels": {
+                "name": "Audio channels"
+            },
+            "main_audio_codec": {
+                "name": "Audio codec"
+            },
+            "main_audio_rate": {
+                "name": "Audio sample rate"
+            },
+            "main_video_bits": {
+                "name": "Video color depth"
+            },
+            "main_video_color": {
+                "name": "Video color format"
+            },
+            "main_video_resolution": {
+                "name": "Video resolution"
             },
             "tuner_dab_dls": {
                 "name": "DAB DLS"
@@ -394,11 +415,15 @@
         "cannot_connect": {
             "message": "Unable to connect to NAD device on {url}."
         },
-        "command_failed": { "message": "Failed to send the command: {error}" },
+        "command_failed": {
+            "message": "Failed to send the command: {error}"
+        },
         "communication_error": {
             "message": "Error communicating with NAD {name}."
         },
-        "invalid_command": { "message": "Invalid command: {error}" },
+        "invalid_command": {
+            "message": "Invalid command: {error}"
+        },
         "not_same_device": {
             "message": "The device you connected to is not the same NAD device that was previously configured."
         },

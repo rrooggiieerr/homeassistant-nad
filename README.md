@@ -27,12 +27,13 @@ NAD device does not follow the v2.x NAD protocol this integration will not work.
 - Asynchronous, built on [serialx](https://github.com/puddly/serialx).
 - Connects over serial (RS-232) or Ethernet (telnet).
 - Supports Serial to Ethernet/WiFi bridge and [ESPHome Serial Proxy](https://esphome.io/components/serial_proxy/).
-- Detects the device model and loads the matching configuration.
+- Detects the device model and build and loads the matching configuration.
 - Detects the device type (amplifier, tuner, receiver) for models without configuration.
 - Read, set, increment and decrement any supported setting.
 - Reads the source names on supported devices.
-- Supports zones on multi-zone receivers.
+- Supports zones on multi-zone amplifiers and receivers.
 - Change the serial port or URL without removing the device.
+- Send any command to the device with the Send command action.
 
 ## Supported protocol
 
@@ -62,20 +63,25 @@ Additionally, the integration includes untested configuration files for the foll
 
 **Receivers:**
 
+- T758
 - T765
 - T775
 - T777
+- T778
 - T785
 - T787
 
 **Surround preamplifiers:**
 
 - M15HD
+- M17
 - T175
 - T187
 
 **Amplifiers:**
 
+- C328
+- C338
 - C356
 - C368
 - C388
@@ -134,6 +140,33 @@ NAD devices with an Ethernet port are discovered automatically on your network. 
 
 When your connection is right a new NAD integration and device will now be added to your Integrations
 view. If your connection is not right you will get a *Failed to connect* error message.
+
+## Actions
+
+### Send command
+
+The `nad.send_command` action sends any command to the device and returns the response. Use it for
+settings that have no entity.
+
+| Field     | Description                                                   |
+|-----------|---------------------------------------------------------------|
+| Device    | The NAD device to send the command to.                        |
+| Setting   | The setting, like `Main.Volume`.                              |
+| Operator  | `?` to query, `=` to set, `+` to increment, `-` to decrement. |
+| Value     | The value, only used with the `=` operator.                   |
+
+```yaml
+action: nad.send_command
+data:
+  config_entry_id: <your NAD device>
+  setting: Main.Volume
+  operator: "?"
+response_variable: result
+# result.response is -30
+```
+
+For settings in the device configuration, the response is converted, for example a boolean setting
+returns `true` or `false` instead of `On` or `Off`.
 
 ## Contribution and appreciation
 

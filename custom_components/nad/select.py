@@ -29,26 +29,38 @@ _ENTITY_DESCRIPTIONS = [
         entity_registry_enabled_default=False,
     ),
     SelectEntityDescription(
-        key="Main.ListeningMode.Digital",
-        translation_key="main_listening_mode_digital",
+        key="Main.ListeningMode.Dolby.Stereo",
+        translation_key="main_listening_mode_dolby_stereo",
         entity_category=EntityCategory.CONFIG,
         entity_registry_enabled_default=False,
     ),
     SelectEntityDescription(
-        key="Main.ListeningMode.DolbyDigital",
-        translation_key="main_listening_mode_dolby_digital",
+        key="Main.ListeningMode.Dolby.Surround",
+        translation_key="main_listening_mode_dolby_surround",
         entity_category=EntityCategory.CONFIG,
         entity_registry_enabled_default=False,
     ),
     SelectEntityDescription(
-        key="Main.ListeningMode.DolbyDigital2ch",
-        translation_key="main_listening_mode_dolby_digital2ch",
+        key="Main.ListeningMode.DTS.Stereo",
+        translation_key="main_listening_mode_dts_stereo",
         entity_category=EntityCategory.CONFIG,
         entity_registry_enabled_default=False,
     ),
     SelectEntityDescription(
-        key="Main.ListeningMode.DTS",
-        translation_key="main_listening_mode_dts",
+        key="Main.ListeningMode.DTS.Surround",
+        translation_key="main_listening_mode_dts_surround",
+        entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=False,
+    ),
+    SelectEntityDescription(
+        key="Main.ListeningMode.PCM.Stereo",
+        translation_key="main_listening_mode_pcm_stereo",
+        entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=False,
+    ),
+    SelectEntityDescription(
+        key="Main.ListeningMode.PCM.Surround",
+        translation_key="main_listening_mode_pcm_surround",
         entity_category=EntityCategory.CONFIG,
         entity_registry_enabled_default=False,
     ),
@@ -143,12 +155,6 @@ _ENTITY_DESCRIPTIONS = [
         entity_registry_enabled_default=False,
     ),
     SelectEntityDescription(key="Tuner.Band", translation_key="tuner_band"),
-    SelectEntityDescription(
-        key="Tuner.DigitalMode",
-        translation_key="tuner_digital_mode",
-        entity_category=EntityCategory.CONFIG,
-        entity_registry_enabled_default=False,
-    ),
 ]
 
 

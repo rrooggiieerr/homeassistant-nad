@@ -3,9 +3,13 @@
 from datetime import timedelta
 from typing import Any, override
 
-from homeassistant.components.sensor import SensorEntity, SensorEntityDescription
+from homeassistant.components.sensor import (
+    SensorDeviceClass,
+    SensorEntity,
+    SensorEntityDescription,
+)
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import EntityCategory
+from homeassistant.const import EntityCategory, UnitOfFrequency
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
@@ -21,6 +25,32 @@ _ENTITY_DESCRIPTIONS = [
         translation_key="dsp_version",
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
+    ),
+    SensorEntityDescription(
+        key="Main.Audio.Channels",
+        translation_key="main_audio_channels",
+    ),
+    SensorEntityDescription(
+        key="Main.Audio.CODEC",
+        translation_key="main_audio_codec",
+    ),
+    SensorEntityDescription(
+        key="Main.Audio.Rate",
+        translation_key="main_audio_rate",
+        device_class=SensorDeviceClass.FREQUENCY,
+        native_unit_of_measurement=UnitOfFrequency.KILOHERTZ,
+    ),
+    SensorEntityDescription(
+        key="Main.Video.Bits",
+        translation_key="main_video_bits",
+    ),
+    SensorEntityDescription(
+        key="Main.Video.Color",
+        translation_key="main_video_color",
+    ),
+    SensorEntityDescription(
+        key="Main.Video.Resolution",
+        translation_key="main_video_resolution",
     ),
     SensorEntityDescription(
         key="Tuner.DAB.DLS",

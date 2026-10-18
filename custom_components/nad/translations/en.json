@@ -37,6 +37,17 @@
         }
     },
     "entity": {
+        "binary_sensor": {
+            "main_audio_lock": {
+                "name": "Audio lock"
+            },
+            "main_video_hdr": {
+                "name": "Video HDR"
+            },
+            "main_video_lock": {
+                "name": "Video lock"
+            }
+        },
         "number": {
             "main_audyssey_offset": {
                 "name": "Audyssey dynamic EQ offset"

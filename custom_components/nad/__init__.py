@@ -23,6 +23,7 @@ from .coordinator import NADConfigEntry, NADCoordinator
 from .services import async_setup_services
 
 PLATFORMS: list[Platform] = [
+    Platform.BINARY_SENSOR,
     Platform.MEDIA_PLAYER,
     Platform.NUMBER,
     Platform.SWITCH,

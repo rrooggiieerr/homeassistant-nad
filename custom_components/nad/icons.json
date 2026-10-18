@@ -1,6 +1,18 @@
 {
   "entity": {
     "number": {
+      "main_audyssey_offset": {
+        "default": "mdi:tune-vertical"
+      },
+      "main_bass": {
+        "default": "mdi:music-clef-bass"
+      },
+      "main_brightness": {
+        "default": "mdi:brightness-6"
+      },
+      "main_center_dialog": {
+        "default": "mdi:account-voice"
+      },
       "main_dolby_center_width": {
         "default": "mdi:dolby"
       },
@@ -9,27 +21,322 @@
       },
       "main_dolby_drc": {
         "default": "mdi:dolby"
+      },
+      "main_dts_center_gain": {
+        "default": "mdi:surround-sound"
+      },
+      "main_dts_drc": {
+        "default": "mdi:surround-sound"
+      },
+      "main_ir_channel": {
+        "default": "mdi:remote"
+      },
+      "main_level_back_left": {
+        "default": "mdi:tune-vertical"
+      },
+      "main_level_back_right": {
+        "default": "mdi:tune-vertical"
+      },
+      "main_level_center": {
+        "default": "mdi:tune-vertical"
+      },
+      "main_level_left": {
+        "default": "mdi:tune-vertical"
+      },
+      "main_level_right": {
+        "default": "mdi:tune-vertical"
+      },
+      "main_level_sub": {
+        "default": "mdi:tune-vertical"
+      },
+      "main_level_surround_left": {
+        "default": "mdi:tune-vertical"
+      },
+      "main_level_surround_right": {
+        "default": "mdi:tune-vertical"
+      },
+      "main_lip_sync_delay": {
+        "default": "mdi:timer-outline"
+      },
+      "main_speaker_back_config1": {
+        "default": "mdi:speaker"
+      },
+      "main_treble": {
+        "default": "mdi:music-clef-treble"
+      },
+      "main_trigger1_delay": {
+        "default": "mdi:timer-outline"
+      },
+      "main_trigger2_delay": {
+        "default": "mdi:timer-outline"
+      },
+      "main_trigger3_delay": {
+        "default": "mdi:timer-outline"
+      },
+      "main_trim_center": {
+        "default": "mdi:tune-vertical"
+      },
+      "main_trim_sub": {
+        "default": "mdi:tune-vertical"
+      },
+      "main_trim_surround": {
+        "default": "mdi:tune-vertical"
+      },
+      "main_vfd_temp_line": {
+        "default": "mdi:text-short"
+      },
+      "main_video_brightness": {
+        "default": "mdi:brightness-6"
+      },
+      "main_video_contrast": {
+        "default": "mdi:contrast-box"
+      },
+      "main_video_edge_enhancement_level": {
+        "default": "mdi:image-edit"
+      },
+      "main_video_edge_enhancement_threshold": {
+        "default": "mdi:image-edit"
+      },
+      "main_video_noise_reduction": {
+        "default": "mdi:blur"
+      },
+      "tuner_preset": {
+        "default": "mdi:radio"
+      },
+      "tuner_xm_channel": {
+        "default": "mdi:satellite-variant"
+      }
+    },
+    "select": {
+      "main_auto_trigger": {
+        "default": "mdi:import"
+      },
+      "main_listening_mode_analog": {
+        "default": "mdi:surround-sound"
+      },
+      "main_listening_mode_dolby_stereo": {
+        "default": "mdi:surround-sound"
+      },
+      "main_listening_mode_dolby_surround": {
+        "default": "mdi:surround-sound"
+      },
+      "main_listening_mode_dts_stereo": {
+        "default": "mdi:surround-sound"
+      },
+      "main_listening_mode_dts_surround": {
+        "default": "mdi:surround-sound"
+      },
+      "main_listening_mode_pcm_stereo": {
+        "default": "mdi:surround-sound"
+      },
+      "main_listening_mode_pcm_surround": {
+        "default": "mdi:surround-sound"
+      },
+      "main_speaker_back_config2": {
+        "default": "mdi:speaker"
+      },
+      "main_speaker_center_config": {
+        "default": "mdi:speaker"
+      },
+      "main_speaker_front_config": {
+        "default": "mdi:speaker"
+      },
+      "main_speaker_surround_config": {
+        "default": "mdi:speaker"
+      },
+      "main_trigger1_out": {
+        "default": "mdi:export"
+      },
+      "main_trigger2_out": {
+        "default": "mdi:export"
+      },
+      "main_trigger3_out": {
+        "default": "mdi:export"
+      },
+      "main_vfd_display": {
+        "default": "mdi:text-short"
+      },
+      "main_vfd_line1": {
+        "default": "mdi:text-short"
+      },
+      "main_vfd_line2": {
+        "default": "mdi:text-short"
+      },
+      "main_video_aspect_mode": {
+        "default": "mdi:aspect-ratio"
+      },
+      "main_video_aspect_ratio": {
+        "default": "mdi:aspect-ratio"
+      },
+      "main_video_mode": {
+        "default": "mdi:television-classic"
+      },
+      "main_video_rate": {
+        "default": "mdi:video"
+      },
+      "main_video_resolution": {
+        "default": "mdi:monitor"
+      },
+      "tuner_band": {
+        "default": "mdi:radio",
+        "state": {
+          "am": "mdi:radio-am",
+          "fm": "mdi:radio-fm",
+          "xm": "mdi:satellite-variant"
+        }
+      }
+    },
+    "sensor": {
+      "dsp_version": {
+        "default": "mdi:chip"
+      },
+      "main_audio_channels": {
+        "default": "mdi:surround-sound"
+      },
+      "main_audio_codec": {
+        "default": "mdi:waveform"
+      },
+      "main_video_bits": {
+        "default": "mdi:palette"
+      },
+      "main_video_color": {
+        "default": "mdi:palette"
+      },
+      "main_video_resolution": {
+        "default": "mdi:monitor"
+      },
+      "tuner_dab_dls": {
+        "default": "mdi:radio"
+      },
+      "tuner_dab_service": {
+        "default": "mdi:radio"
+      },
+      "tuner_fm_rdsname": {
+        "default": "mdi:radio-fm"
+      },
+      "tuner_fm_rdstext": {
+        "default": "mdi:radio-fm"
+      },
+      "tuner_xm_channel_name": {
+        "default": "mdi:satellite-variant"
+      },
+      "tuner_xm_name": {
+        "default": "mdi:satellite-variant"
+      },
+      "tuner_xm_title": {
+        "default": "mdi:satellite-variant"
+      },
+      "uart_version": {
+        "default": "mdi:chip"
       }
     },
     "switch": {
+      "main_auto_sense": {
+        "default": "mdi:auto-fix"
+      },
+      "main_auto_standby": {
+        "default": "mdi:power-standby"
+      },
+      "main_cec_audio": {
+        "default": "mdi:hdmi-port"
+      },
+      "main_cec_power": {
+        "default": "mdi:hdmi-port"
+      },
+      "main_cec_switch": {
+        "default": "mdi:hdmi-port"
+      },
+      "main_control_standby": {
+        "default": "mdi:power-standby"
+      },
       "main_dimmer": {
         "default": "mdi:text-short"
       },
       "main_dolby_panorama": {
         "default": "mdi:dolby"
       },
+      "main_enhanced_bass": {
+        "default": "mdi:music-clef-bass"
+      },
+      "main_enhanced_stereo_back": {
+        "default": "mdi:surround-sound"
+      },
+      "main_enhanced_stereo_center": {
+        "default": "mdi:surround-sound"
+      },
+      "main_enhanced_stereo_front": {
+        "default": "mdi:surround-sound"
+      },
+      "main_enhanced_stereo_surround": {
+        "default": "mdi:surround-sound"
+      },
+      "main_osd_temp_display": {
+        "default": "mdi:monitor"
+      },
       "main_speaker_a": {
-        "default": "mdi:speaker-multiple"
+        "default": "mdi:speaker-multiple",
+        "state": {
+          "off": "mdi:speaker-off"
+        }
       },
       "main_speaker_b": {
-        "default": "mdi:speaker-multiple"
+        "default": "mdi:speaker-multiple",
+        "state": {
+          "off": "mdi:speaker-off"
+        }
+      },
+      "main_speaker_sub": {
+        "default": "mdi:speaker",
+        "state": {
+          "off": "mdi:speaker-off"
+        }
+      },
+      "main_tape1": {
+        "default": "mdi:cassette"
       },
       "tuner_fm_mute": {
         "default": "mdi:radio-fm"
       }
+    },
+    "text": {
+      "main_bt_name": {
+        "default": "mdi:bluetooth"
+      },
+      "source10_name": {
+        "default": "mdi:import"
+      },
+      "source1_name": {
+        "default": "mdi:import"
+      },
+      "source2_name": {
+        "default": "mdi:import"
+      },
+      "source3_name": {
+        "default": "mdi:import"
+      },
+      "source4_name": {
+        "default": "mdi:import"
+      },
+      "source5_name": {
+        "default": "mdi:import"
+      },
+      "source6_name": {
+        "default": "mdi:import"
+      },
+      "source7_name": {
+        "default": "mdi:import"
+      },
+      "source8_name": {
+        "default": "mdi:import"
+      },
+      "source9_name": {
+        "default": "mdi:import"
+      }
     }
   },
   "services": {
-    "send_command": { "service": "mdi:console" }
+    "send_command": {
+      "service": "mdi:console"
+    }
   }
 }

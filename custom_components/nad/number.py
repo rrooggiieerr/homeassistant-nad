@@ -337,8 +337,8 @@ _ENTITY_DESCRIPTIONS = [
         entity_registry_enabled_default=False,
     ),
     NumberEntityDescription(
-        key="Main.Video.EdgeEnhancement.Treshold",
-        translation_key="main_video_edge_enhancement_treshold",
+        key="Main.Video.EdgeEnhancement.Threshold",
+        translation_key="main_video_edge_enhancement_threshold",
         entity_category=EntityCategory.CONFIG,
         entity_registry_enabled_default=False,
     ),

@@ -8,6 +8,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
+from homeassistant.util import slugify
 
 from .coordinator import NADCoordinator
 from .entity import NADEntity, handle_nad_action_errors
@@ -200,17 +201,21 @@ class NADSelect(NADEntity, SelectEntity):
 
         self.entity_description = entity_description
 
-        self._attr_options = config.get("values", [])
+        # Options are slugified so they can be translated, map them to the values
+        self._values = {slugify(value): value for value in config.get("values", [])}
+        self._attr_options = list(self._values)
 
     @property
     @override
     def current_option(self) -> str | None:
         """Return the selected entity option to represent the entity state."""
         value = self._device.get_setting_value(self.entity_description.key)
-        return str(value) if value else None
+        return slugify(str(value)) if value else None
 
     @override
     @handle_nad_action_errors
     async def async_select_option(self, option: str) -> None:
         """Change the selected option."""
-        await self._device.async_change_setting(self.entity_description.key, option)
+        await self._device.async_change_setting(
+            self.entity_description.key, self._values[option]
+        )

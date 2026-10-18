@@ -191,76 +191,282 @@
         },
         "select": {
             "main_auto_trigger": {
-                "name": "Trigger input"
+                "name": "Trigger input",
+                "state": {
+                    "all": "All",
+                    "main": "Main",
+                    "zone2": "Zone 2",
+                    "zone3": "Zone 3",
+                    "zone4": "Zone 4"
+                }
             },
             "main_listening_mode_analog": {
-                "name": "Analog signal listening mode"
+                "name": "Analog signal listening mode",
+                "state": {
+                    "analogbypass": "Analog bypass",
+                    "ears": "EARS",
+                    "enhancedstereo": "Enhanced stereo",
+                    "neo6cinema": "DTS Neo:6 Cinema",
+                    "neo6music": "DTS Neo:6 Music",
+                    "none": "None",
+                    "pliimovie": "Dolby Pro Logic II Movie",
+                    "pliimusic": "Dolby Pro Logic II Music",
+                    "prologic": "Dolby Pro Logic",
+                    "stereodownmix": "Stereo downmix",
+                    "surroundex": "Dolby Surround EX"
+                }
             },
             "main_listening_mode_dolby_stereo": {
-                "name": "Dolby stereo listening mode"
+                "name": "Dolby stereo listening mode",
+                "state": {
+                    "analogbypass": "Analog bypass",
+                    "ears": "EARS",
+                    "enhancedstereo": "Enhanced stereo",
+                    "neo6cinema": "DTS Neo:6 Cinema",
+                    "neo6music": "DTS Neo:6 Music",
+                    "none": "None",
+                    "pliimovie": "Dolby Pro Logic II Movie",
+                    "pliimusic": "Dolby Pro Logic II Music",
+                    "prologic": "Dolby Pro Logic",
+                    "stereodownmix": "Stereo downmix",
+                    "surroundex": "Dolby Surround EX"
+                }
             },
             "main_listening_mode_dolby_surround": {
-                "name": "Dolby surround listening mode"
+                "name": "Dolby surround listening mode",
+                "state": {
+                    "analogbypass": "Analog bypass",
+                    "ears": "EARS",
+                    "enhancedstereo": "Enhanced stereo",
+                    "neo6cinema": "DTS Neo:6 Cinema",
+                    "neo6music": "DTS Neo:6 Music",
+                    "none": "None",
+                    "pliimovie": "Dolby Pro Logic II Movie",
+                    "pliimusic": "Dolby Pro Logic II Music",
+                    "prologic": "Dolby Pro Logic",
+                    "stereodownmix": "Stereo downmix",
+                    "surroundex": "Dolby Surround EX"
+                }
             },
             "main_listening_mode_dts_stereo": {
-                "name": "DTS stereo listening mode"
+                "name": "DTS stereo listening mode",
+                "state": {
+                    "analogbypass": "Analog bypass",
+                    "ears": "EARS",
+                    "enhancedstereo": "Enhanced stereo",
+                    "neo6cinema": "DTS Neo:6 Cinema",
+                    "neo6music": "DTS Neo:6 Music",
+                    "none": "None",
+                    "pliimovie": "Dolby Pro Logic II Movie",
+                    "pliimusic": "Dolby Pro Logic II Music",
+                    "prologic": "Dolby Pro Logic",
+                    "stereodownmix": "Stereo downmix",
+                    "surroundex": "Dolby Surround EX"
+                }
             },
             "main_listening_mode_dts_surround": {
-                "name": "DTS surround listening mode"
+                "name": "DTS surround listening mode",
+                "state": {
+                    "analogbypass": "Analog bypass",
+                    "ears": "EARS",
+                    "enhancedstereo": "Enhanced stereo",
+                    "neo6cinema": "DTS Neo:6 Cinema",
+                    "neo6music": "DTS Neo:6 Music",
+                    "none": "None",
+                    "pliimovie": "Dolby Pro Logic II Movie",
+                    "pliimusic": "Dolby Pro Logic II Music",
+                    "prologic": "Dolby Pro Logic",
+                    "stereodownmix": "Stereo downmix",
+                    "surroundex": "Dolby Surround EX"
+                }
             },
             "main_listening_mode_pcm_stereo": {
-                "name": "PCM stereo listening mode"
+                "name": "PCM stereo listening mode",
+                "state": {
+                    "analogbypass": "Analog bypass",
+                    "ears": "EARS",
+                    "enhancedstereo": "Enhanced stereo",
+                    "neo6cinema": "DTS Neo:6 Cinema",
+                    "neo6music": "DTS Neo:6 Music",
+                    "none": "None",
+                    "pliimovie": "Dolby Pro Logic II Movie",
+                    "pliimusic": "Dolby Pro Logic II Music",
+                    "prologic": "Dolby Pro Logic",
+                    "stereodownmix": "Stereo downmix",
+                    "surroundex": "Dolby Surround EX"
+                }
             },
             "main_listening_mode_pcm_surround": {
-                "name": "PCM surround listening mode"
+                "name": "PCM surround listening mode",
+                "state": {
+                    "analogbypass": "Analog bypass",
+                    "ears": "EARS",
+                    "enhancedstereo": "Enhanced stereo",
+                    "neo6cinema": "DTS Neo:6 Cinema",
+                    "neo6music": "DTS Neo:6 Music",
+                    "none": "None",
+                    "pliimovie": "Dolby Pro Logic II Movie",
+                    "pliimusic": "Dolby Pro Logic II Music",
+                    "prologic": "Dolby Pro Logic",
+                    "stereodownmix": "Stereo downmix",
+                    "surroundex": "Dolby Surround EX"
+                }
             },
             "main_speaker_back_config2": {
-                "name": "Speaker size back"
+                "name": "Speaker size back",
+                "state": {
+                    "large": "Large",
+                    "off": "Off",
+                    "small": "Small"
+                }
             },
             "main_speaker_center_config": {
-                "name": "Speaker size center"
+                "name": "Speaker size center",
+                "state": {
+                    "large": "Large",
+                    "off": "Off",
+                    "small": "Small"
+                }
             },
             "main_speaker_front_config": {
-                "name": "Speaker size front"
+                "name": "Speaker size front",
+                "state": {
+                    "large": "Large",
+                    "off": "Off",
+                    "small": "Small"
+                }
             },
             "main_speaker_surround_config": {
-                "name": "Speaker size surround"
+                "name": "Speaker size surround",
+                "state": {
+                    "large": "Large",
+                    "off": "Off",
+                    "small": "Small"
+                }
             },
             "main_trigger1_out": {
-                "name": "Trigger 1"
+                "name": "Trigger 1",
+                "state": {
+                    "main": "Main",
+                    "source": "Source",
+                    "zone2": "Zone 2",
+                    "zone234": "Zone 2, 3 and 4",
+                    "zone3": "Zone 3",
+                    "zone4": "Zone 4"
+                }
             },
             "main_trigger2_out": {
-                "name": "Trigger 2"
+                "name": "Trigger 2",
+                "state": {
+                    "main": "Main",
+                    "source": "Source",
+                    "zone2": "Zone 2",
+                    "zone234": "Zone 2, 3 and 4",
+                    "zone3": "Zone 3",
+                    "zone4": "Zone 4"
+                }
             },
             "main_trigger3_out": {
-                "name": "Trigger 3"
+                "name": "Trigger 3",
+                "state": {
+                    "main": "Main",
+                    "source": "Source",
+                    "zone2": "Zone 2",
+                    "zone234": "Zone 2, 3 and 4",
+                    "zone3": "Zone 3",
+                    "zone4": "Zone 4"
+                }
             },
             "main_vfd_display": {
-                "name": "Main VFD display"
+                "name": "Main VFD display",
+                "state": {
+                    "on": "On",
+                    "temp": "Temporary"
+                }
             },
             "main_vfd_line1": {
-                "name": "VFD line 1"
+                "name": "VFD line 1",
+                "state": {
+                    "audiocodec": "Audio codec",
+                    "audiosourceformat": "Audio source format",
+                    "listeningmode": "Listening mode",
+                    "mainsource": "Main source",
+                    "off": "Off",
+                    "volume": "Volume",
+                    "zone2source": "Zone 2 source",
+                    "zone3source": "Zone 3 source",
+                    "zone4source": "Zone 4 source"
+                }
             },
             "main_vfd_line2": {
-                "name": "VFD line 2"
+                "name": "VFD line 2",
+                "state": {
+                    "audiocodec": "Audio codec",
+                    "audiosourceformat": "Audio source format",
+                    "listeningmode": "Listening mode",
+                    "mainsource": "Main source",
+                    "off": "Off",
+                    "volume": "Volume",
+                    "zone2source": "Zone 2 source",
+                    "zone3source": "Zone 3 source",
+                    "zone4source": "Zone 4 source"
+                }
             },
             "main_video_aspect_mode": {
-                "name": "Video aspect mode"
+                "name": "Video aspect mode",
+                "state": {
+                    "letterbox": "Letterbox",
+                    "stretch": "Stretch",
+                    "zoom": "Zoom"
+                }
             },
             "main_video_aspect_ratio": {
-                "name": "Video aspect ratio"
+                "name": "Video aspect ratio",
+                "state": {
+                    "4_3": "4:3",
+                    "16_9": "16:9"
+                }
             },
             "main_video_mode": {
-                "name": "Video mode"
+                "name": "Video mode",
+                "state": {
+                    "ntsc": "NTSC",
+                    "pal": "PAL"
+                }
             },
             "main_video_rate": {
-                "name": "Video frame rate"
+                "name": "Video frame rate",
+                "state": {
+                    "50": "50 Hz",
+                    "60": "60 Hz"
+                }
             },
             "main_video_resolution": {
-                "name": "Video resolution"
+                "name": "Video resolution",
+                "state": {
+                    "480i": "480i",
+                    "480p": "480p",
+                    "576i": "576i",
+                    "576p": "576p",
+                    "720p": "720p",
+                    "720x576i50": "720x576i 50 Hz",
+                    "720x576p50": "720x576p 50 Hz",
+                    "1080i": "1080i",
+                    "1080p": "1080p",
+                    "1280x720p50": "1280x720p 50 Hz",
+                    "1280x720p60": "1280x720p 60 Hz",
+                    "1920x1080i60": "1920x1080i 60 Hz",
+                    "1920x1080p60": "1920x1080p 60 Hz"
+                }
             },
             "tuner_band": {
-                "name": "Tuner band"
+                "name": "Tuner band",
+                "state": {
+                    "am": "AM",
+                    "dab": "DAB",
+                    "fm": "FM",
+                    "xm": "XM"
+                }
             }
         },
         "sensor": {

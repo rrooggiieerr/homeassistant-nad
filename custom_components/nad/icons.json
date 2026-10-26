@@ -357,6 +357,9 @@
   "services": {
     "send_command": {
       "service": "mdi:console"
+    },
+    "send_ir": {
+      "service": "mdi:remote"
     }
   }
 }

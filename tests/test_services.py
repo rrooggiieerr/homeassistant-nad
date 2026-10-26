@@ -7,9 +7,10 @@ import pytest
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.nad.const import DOMAIN
-from homeassistant.const import ATTR_CONFIG_ENTRY_ID
+from homeassistant.const import ATTR_CONFIG_ENTRY_ID, ATTR_DEVICE_ID
 from homeassistant.core import HomeAssistant, ServiceResponse
 from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
+from homeassistant.helpers import device_registry as dr
 
 from . import setup_integration
 
@@ -91,3 +92,142 @@ async def test_send_command_entry_not_loaded(
     with pytest.raises(ServiceValidationError) as exc_info:
         await _send(hass, mock_rs232_config_entry, setting="Main.Volume", operator="?")
     assert exc_info.value.translation_key == "service_config_entry_not_loaded"
+
+
+def _create_device(
+    hass: HomeAssistant, entry: MockConfigEntry, suffix: str = ""
+) -> str:
+    """Create a NAD device in the device registry and return its ID."""
+    device_entry = dr.async_get(hass).async_get_or_create(
+        config_entry_id=entry.entry_id,
+        identifiers={(DOMAIN, f"{entry.unique_id or entry.entry_id}{suffix}")},
+    )
+    return device_entry.id
+
+
+async def _send_ir(hass: HomeAssistant, device_id: str, **data: int) -> None:
+    await hass.services.async_call(
+        DOMAIN,
+        "send_ir",
+        {ATTR_DEVICE_ID: device_id, "code": 148, **data},
+        blocking=True,
+    )
+
+
+@pytest.mark.usefixtures("mock_connect", "mock_no_platforms")
+@pytest.mark.parametrize(
+    ("suffix", "data", "setting"),
+    [
+        ("", {}, "Main.IR"),
+        ("", {"channel": 0}, "Main.IR1"),
+        ("", {"channel": 1}, "Main.IR2"),
+        ("_zone2", {}, "Zone2.IR"),
+        ("_zone3", {"channel": 1}, "Zone3.IR2"),
+    ],
+)
+async def test_send_ir(
+    hass: HomeAssistant,
+    mock_rs232_config_entry: MockConfigEntry,
+    mock_nad_device: MagicMock,
+    suffix: str,
+    data: dict[str, int],
+    setting: str,
+) -> None:
+    """Test sending an IR code to a device or zone."""
+    await setup_integration(hass, mock_rs232_config_entry)
+    device_id = _create_device(hass, mock_rs232_config_entry, suffix)
+    mock_nad_device.supports_setting = MagicMock(return_value=True)
+    mock_nad_device.async_change_setting = AsyncMock()
+
+    await _send_ir(hass, device_id, **data)
+
+    mock_nad_device.supports_setting.assert_called_once_with(setting)
+    mock_nad_device.async_change_setting.assert_awaited_once_with(setting, 148)
+
+
+@pytest.mark.usefixtures("mock_connect", "mock_no_platforms")
+async def test_send_ir_not_supported(
+    hass: HomeAssistant,
+    mock_rs232_config_entry: MockConfigEntry,
+    mock_nad_device: MagicMock,
+) -> None:
+    """Test sending an IR code to a device that doesn't support it."""
+    await setup_integration(hass, mock_rs232_config_entry)
+    device_id = _create_device(hass, mock_rs232_config_entry)
+    mock_nad_device.supports_setting = MagicMock(return_value=False)
+    mock_nad_device.async_change_setting = AsyncMock()
+
+    with pytest.raises(ServiceValidationError) as exc_info:
+        await _send_ir(hass, device_id)
+    assert exc_info.value.translation_key == "ir_not_supported"
+    mock_nad_device.async_change_setting.assert_not_awaited()
+
+
+@pytest.mark.usefixtures("mock_connect", "mock_no_platforms")
+async def test_send_ir_device_not_found(
+    hass: HomeAssistant, mock_rs232_config_entry: MockConfigEntry
+) -> None:
+    """Test sending an IR code to an unknown device."""
+    await setup_integration(hass, mock_rs232_config_entry)
+
+    with pytest.raises(ServiceValidationError) as exc_info:
+        await _send_ir(hass, "unknown")
+    assert exc_info.value.translation_key == "device_not_found"
+
+
+@pytest.mark.usefixtures("mock_connect", "mock_no_platforms")
+async def test_send_ir_other_integration(
+    hass: HomeAssistant, mock_rs232_config_entry: MockConfigEntry
+) -> None:
+    """Test sending an IR code to a device of another integration."""
+    await setup_integration(hass, mock_rs232_config_entry)
+    other_entry = MockConfigEntry(domain="other")
+    other_entry.add_to_hass(hass)
+    device_entry = dr.async_get(hass).async_get_or_create(
+        config_entry_id=other_entry.entry_id, identifiers={("other", "1")}
+    )
+
+    with pytest.raises(ServiceValidationError) as exc_info:
+        await _send_ir(hass, device_entry.id)
+    assert exc_info.value.translation_key == "service_config_entry_wrong_domain"
+
+
+@pytest.mark.usefixtures("mock_connect", "mock_no_platforms")
+async def test_send_ir_entry_not_loaded(
+    hass: HomeAssistant, mock_rs232_config_entry: MockConfigEntry
+) -> None:
+    """Test sending an IR code to a device whose entry isn't loaded."""
+    await setup_integration(hass, mock_rs232_config_entry)
+    device_id = _create_device(hass, mock_rs232_config_entry)
+    await hass.config_entries.async_unload(mock_rs232_config_entry.entry_id)
+
+    with pytest.raises(ServiceValidationError) as exc_info:
+        await _send_ir(hass, device_id)
+    assert exc_info.value.translation_key == "service_config_entry_not_loaded"
+
+
+@pytest.mark.usefixtures("mock_connect", "mock_no_platforms")
+@pytest.mark.parametrize(
+    ("side_effect", "expected", "translation_key"),
+    [
+        (NADCommandError("bad"), ServiceValidationError, "invalid_command"),
+        (NADConnectionError("lost"), HomeAssistantError, "command_failed"),
+    ],
+)
+async def test_send_ir_errors(
+    hass: HomeAssistant,
+    mock_rs232_config_entry: MockConfigEntry,
+    mock_nad_device: MagicMock,
+    side_effect: Exception,
+    expected: type[Exception],
+    translation_key: str,
+) -> None:
+    """Test library errors are translated when sending an IR code."""
+    await setup_integration(hass, mock_rs232_config_entry)
+    device_id = _create_device(hass, mock_rs232_config_entry)
+    mock_nad_device.supports_setting = MagicMock(return_value=True)
+    mock_nad_device.async_change_setting = AsyncMock(side_effect=side_effect)
+
+    with pytest.raises(expected) as exc_info:
+        await _send_ir(hass, device_id)
+    assert exc_info.value.translation_key == translation_key

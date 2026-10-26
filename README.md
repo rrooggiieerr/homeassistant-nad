@@ -34,6 +34,7 @@ NAD device does not follow the v2.x NAD protocol this integration will not work.
 - Supports zones on multi-zone amplifiers and receivers.
 - Change the serial port or URL without removing the device.
 - Send any command to the device with the Send command action.
+- Send IR codes to the device with the Send IR code action.
 
 ## Supported protocol
 
@@ -167,6 +168,27 @@ response_variable: result
 
 For settings in the device configuration, the response is converted, for example a boolean setting
 returns `true` or `false` instead of `On` or `Off`.
+
+### Send IR code
+
+The `nad.send_ir` action sends an IR code to the device or one of its zones through the serial or
+network connection, as if it came from a remote control. It is only available on devices that
+support sending IR codes. The device doesn't respond to IR codes, so the action doesn't confirm
+that the code was handled.
+
+| Field   | Description                                                                         |
+|---------|-------------------------------------------------------------------------------------|
+| Device  | The NAD device or zone to send the IR code to.                                      |
+| Code    | The IR code to send, in decimal (0-255).                                            |
+| Channel | Optional. Channel 0 uses customer code 0x877C, channel 1 uses customer code 0x860F. |
+
+```yaml
+action: nad.send_ir
+data:
+  device_id: <your NAD device or zone>
+  code: 148
+  channel: 0
+```
 
 ## Contribution and appreciation
 

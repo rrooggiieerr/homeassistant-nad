@@ -24,3 +24,25 @@ send_command:
       example: "-30"
       selector:
         text:
+send_ir:
+  fields:
+    device_id:
+      required: true
+      selector:
+        device:
+          integration: nad
+    code:
+      required: true
+      example: 148
+      selector:
+        number:
+          min: 0
+          max: 255
+          mode: box
+    channel:
+      selector:
+        select:
+          translation_key: channel
+          options:
+            - "0"
+            - "1"

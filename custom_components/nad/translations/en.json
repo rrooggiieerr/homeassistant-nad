@@ -638,8 +638,14 @@
         "communication_error": {
             "message": "Error communicating with NAD {name}."
         },
+        "device_not_found": {
+            "message": "Device {device_id} not found."
+        },
         "invalid_command": {
             "message": "Invalid command: {error}"
+        },
+        "ir_not_supported": {
+            "message": "{name} doesn't support sending IR codes with {setting}."
         },
         "not_same_device": {
             "message": "The device you connected to is not the same NAD device that was previously configured."
@@ -672,6 +678,14 @@
             "title": "The NAD TCP protocol is not supported"
         }
     },
+    "selector": {
+        "channel": {
+            "options": {
+                "0": "Channel 0 (customer code 0x877C)",
+                "1": "Channel 1 (customer code 0x860F)"
+            }
+        }
+    },
     "services": {
         "send_command": {
             "description": "Sends a command to the NAD device and returns its response.",
@@ -694,6 +708,24 @@
                 }
             },
             "name": "Send command"
+        },
+        "send_ir": {
+            "description": "Sends an IR code to the NAD device or zone through the serial or network connection.",
+            "fields": {
+                "channel": {
+                    "description": "The IR channel to send the code on. Leave empty to send the code without selecting a channel.",
+                    "name": "Channel"
+                },
+                "code": {
+                    "description": "The IR code to send, in decimal.",
+                    "name": "Code"
+                },
+                "device_id": {
+                    "description": "The NAD device or zone to send the IR code to.",
+                    "name": "Device"
+                }
+            },
+            "name": "Send IR code"
         }
     }
 }

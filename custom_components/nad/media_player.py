@@ -164,24 +164,17 @@ class NADMediaPlayer(NADEntity, MediaPlayerEntity):
     _device: NADAmplifier
     _zone: str
 
-    _min_db: int | None = None
-    _max_db: int | None = None
-
     def __init__(self, coordinator: NADCoordinator, device: NADAmplifier | None = None):
         """Initialize the NAD media player."""
         super().__init__(coordinator, device)
 
-        volume_config = self._device.get_setting_config(f"{self._zone}.Volume")
-        if volume_config:
+        if volume_config := self._device.get_setting_config(f"{self._zone}.Volume"):
             self._attr_supported_features |= MediaPlayerEntityFeature.VOLUME_STEP
-            min_db = volume_config.get("min")
-            max_db = volume_config.get("max")
-            if min_db is not None and max_db is not None:
-                self._min_db = int(min_db)
-                self._max_db = int(max_db)
+            if (
+                volume_config.get("min") is not None
+                and volume_config.get("max") is not None
+            ):
                 self._attr_supported_features |= MediaPlayerEntityFeature.VOLUME_SET
-                step_db = volume_config.get("step", 1)
-                self._attr_volume_step = step_db / abs(self._max_db - self._min_db)
 
         if self._device.supports_setting(f"{self._zone}.Mute"):
             self._attr_supported_features |= MediaPlayerEntityFeature.VOLUME_MUTE
@@ -221,25 +214,50 @@ class NADMediaPlayer(NADEntity, MediaPlayerEntity):
         if self.supported_features & MediaPlayerEntityFeature.SELECT_SOUND_MODE:
             await self._device.async_request_setting(f"{self._zone}.ListeningMode")
 
+    @property
+    def _volume_range(self) -> tuple[int, int, float] | None:
+        """Return the current volume minimum, maximum and step in dB.
+
+        The volume range can change at runtime, so it's read from the setting
+        configuration each time. Returns None if the range is unknown.
+        """
+        volume_config = self._device.get_setting_config(f"{self._zone}.Volume")
+        if not volume_config:
+            return None
+        min_db = volume_config.get("min")
+        max_db = volume_config.get("max")
+        step_db = volume_config.get("step", 1)
+        if (
+            not isinstance(min_db, int | float)
+            or not isinstance(max_db, int | float)
+            or not isinstance(step_db, int | float)
+            or min_db >= max_db
+        ):
+            return None
+        return int(min_db), int(max_db), step_db
+
     def calc_volume(self, decibel: int | None) -> float | None:
         """Calculate the volume given the decibel.
 
         Return the volume (0..1).
         """
-        if decibel is None or self._min_db is None or self._max_db is None:
+        if decibel is None or (volume_range := self._volume_range) is None:
             return None
 
-        level = (decibel - self._min_db) / (self._max_db - self._min_db)
+        min_db, max_db, _ = volume_range
+        level = (decibel - min_db) / (max_db - min_db)
         return max(0.0, min(1.0, level))
 
-    def calc_db(self, volume: float) -> int:
+    def calc_db(self, volume: float) -> int | None:
         """Calculate the decibel given the volume.
 
         Return the dB.
         """
-        assert self._min_db is not None
-        assert self._max_db is not None
-        return self._min_db + round(abs(self._min_db - self._max_db) * volume)
+        if (volume_range := self._volume_range) is None:
+            return None
+
+        min_db, max_db, _ = volume_range
+        return min_db + round((max_db - min_db) * volume)
 
     @property
     @override
@@ -252,6 +270,16 @@ class NADMediaPlayer(NADEntity, MediaPlayerEntity):
     def volume_level(self) -> float | None:
         """Volume level of the media player (0..1)."""
         return self.calc_volume(self._device.volume)
+
+    @property
+    @override
+    def volume_step(self) -> float:
+        """Return the step to be used by the volume_up and volume_down services."""
+        if (volume_range := self._volume_range) is None:
+            return super().volume_step
+
+        min_db, max_db, step_db = volume_range
+        return step_db / (max_db - min_db)
 
     @property
     @override
@@ -300,7 +328,12 @@ class NADMediaPlayer(NADEntity, MediaPlayerEntity):
     @handle_nad_action_errors
     async def async_set_volume_level(self, volume: float) -> None:
         """Set volume level, range 0..1."""
-        await self._device.async_set_volume(self.calc_db(volume))
+        if (decibel := self.calc_db(volume)) is None:
+            raise HomeAssistantError(
+                translation_domain=DOMAIN,
+                translation_key="volume_range_unknown",
+            )
+        await self._device.async_set_volume(decibel)
 
     @override
     @handle_nad_action_errors
@@ -324,7 +357,7 @@ class NADMediaPlayer(NADEntity, MediaPlayerEntity):
     @handle_nad_action_errors
     async def async_volume_up(self) -> None:
         """Turn volume up for media player."""
-        if None in [self._max_db, self._min_db]:
+        if self._volume_range is None:
             await self._device.async_increment(f"{self._zone}.Volume")
         else:
             await super().async_volume_up()
@@ -333,7 +366,7 @@ class NADMediaPlayer(NADEntity, MediaPlayerEntity):
     @handle_nad_action_errors
     async def async_volume_down(self) -> None:
         """Turn volume down for media player."""
-        if None in [self._max_db, self._min_db]:
+        if self._volume_range is None:
             await self._device.async_decrement(f"{self._zone}.Volume")
         else:
             await super().async_volume_down()

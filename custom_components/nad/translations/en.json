@@ -658,6 +658,9 @@
         },
         "unknown_source": {
             "message": "Unknown source {source}."
+        },
+        "volume_range_unknown": {
+            "message": "The volume range of the device is unknown, the volume can't be set."
         }
     },
     "issues": {

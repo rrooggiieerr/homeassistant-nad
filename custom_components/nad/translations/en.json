@@ -13,7 +13,7 @@
         "flow_title": "{name}",
         "step": {
             "discovery_confirm": {
-                "description": "Do you want to set up {name}?",
+                "description": "Do you want to set up {name}?\n\nI’ve put a lot of time and effort into developing and maintaining this integration. If you find it useful, please consider supporting its continued development by [sponsoring me on GitHub]({github_sponsors_url}) or [buying me a coffee ☕️]({buymeacoffee_url}).",
                 "title": "{name}"
             },
             "reconfigure": {
@@ -23,6 +23,7 @@
                 "data_description": {
                     "serial_port": "The serial port the NAD device is connected to, or a URL for the telnet connection or serial to network bridge (e.g. socket://192.0.2.1:23)."
                 },
+                "description": "I’ve put a lot of time and effort into developing and maintaining this integration. If you find it useful, please consider supporting its continued development by [sponsoring me on GitHub]({github_sponsors_url}) or [buying me a coffee ☕️]({buymeacoffee_url}).",
                 "title": "Reconfigure {title}"
             },
             "user": {
@@ -32,6 +33,7 @@
                 "data_description": {
                     "serial_port": "The serial port the NAD device is connected to, or a URL for the telnet connection or serial to network bridge (e.g. socket://192.0.2.1:23)."
                 },
+                "description": "I’ve put a lot of time and effort into developing and maintaining this integration. If you find it useful, please consider supporting its continued development by [sponsoring me on GitHub]({github_sponsors_url}) or [buying me a coffee ☕️]({buymeacoffee_url}).",
                 "title": "Connect to NAD device"
             }
         }

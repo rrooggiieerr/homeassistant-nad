@@ -22,7 +22,7 @@ from homeassistant.helpers.selector import SerialPortSelector
 from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
 from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
-from .const import CONF_BUILD, CONF_SERIAL_PORT, DOMAIN
+from .const import CONF_BUILD, CONF_SERIAL_PORT, DOMAIN, SPONSOR_PLACEHOLDERS
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -149,7 +149,10 @@ class NADConfigFlow(ConfigFlow, domain=DOMAIN):
         self._set_confirm_only()
         return self.async_show_form(
             step_id="discovery_confirm",
-            description_placeholders=self.context["title_placeholders"],
+            description_placeholders={
+                **self.context["title_placeholders"],
+                **SPONSOR_PLACEHOLDERS,
+            },
         )
 
     @override
@@ -194,6 +197,9 @@ class NADConfigFlow(ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="user",
             data_schema=USER_SCHEMA,
+            description_placeholders={
+                **SPONSOR_PLACEHOLDERS,
+            },
             errors=errors,
         )
 
@@ -282,7 +288,10 @@ class NADConfigFlow(ConfigFlow, domain=DOMAIN):
 
         return self.async_show_form(
             step_id="reconfigure",
-            description_placeholders={"title": reconfigure_entry.title},
+            description_placeholders={
+                "title": reconfigure_entry.title,
+                **SPONSOR_PLACEHOLDERS,
+            },
             data_schema=data_schema,
             errors=errors,
         )

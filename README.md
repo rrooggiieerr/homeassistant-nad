@@ -120,7 +120,7 @@ and select the Serial Proxy in the configuration flow.
 
 Example Serial Proxy using a Wemos C3 Mini:
 
-<img src="https://raw.githubusercontent.com/rrooggiieerr/homeassistant-nad.py/main/serial_proxy.png" style="width: 25%;"/>
+<img src="https://raw.githubusercontent.com/rrooggiieerr/homeassistant-nad/main/serial_proxy.png" style="width: 25%;"/>
 
 ⚠️ Unlike this image you need a male connector on the serial to TTL converter
 

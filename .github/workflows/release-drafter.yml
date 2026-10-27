@@ -5,7 +5,6 @@ on:
   push:
     branches:
       - main
-      - master
   pull_request:
     types: [opened, reopened, synchronize]
 
@@ -18,6 +17,29 @@ jobs:
   update_release_draft:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Read version from manifest
+        id: manifest
+        run: |
+          version=$(jq -r .version custom_components/*/manifest.json)
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          if [[ "$version" =~ [a-z] ]]; then
+            echo "prerelease=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "prerelease=false" >> "$GITHUB_OUTPUT"
+          fi
+          if git rev-parse -q --verify "refs/tags/$version" >/dev/null; then
+            echo "released=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "released=false" >> "$GITHUB_OUTPUT"
+          fi
       - uses: release-drafter/release-drafter@v7.10.0
+        if: steps.manifest.outputs.released == 'false'
         with:
           config-name: release-drafter.yml # the default, loads '.github/release-drafter.yml'
+          version: ${{ steps.manifest.outputs.version }}
+          tag: ${{ steps.manifest.outputs.version }}
+          name: ${{ steps.manifest.outputs.version }}
+          prerelease: ${{ steps.manifest.outputs.prerelease }}

@@ -7,9 +7,7 @@
 [![Home Assistant][homeassistant-shield]][homeassistant]
 [![HACS][hacs-shield]][hacs]  
 [![GitHub Sponsors][github-shield]][github]
-[![PayPal][paypal-shield]][paypal]
 [![BuyMeCoffee][buymecoffee-shield]][buymecoffee]
-[![Patreon][patreon-shield]][patreon]
 
 ## Introduction
 
@@ -32,9 +30,9 @@ NAD device does not follow the v2.x NAD protocol this integration will not work.
 - Read, set, increment and decrement any supported setting.
 - Reads the source names on supported devices.
 - Supports zones on multi-zone amplifiers and receivers.
-- Change the serial port or URL without removing the device.
-- Send any command to the device with the Send command action.
-- Send IR codes to the device with the Send IR code action.
+- Reconfigure the serial port or URL without removing the device.
+- Send any command to the device with the *Send command* action.
+- Send IR codes to the device with the *Send IR code* action.
 
 ## Supported protocol
 
@@ -93,6 +91,38 @@ Additionally, the integration includes untested configuration files for the foll
 
 Other NAD devices that use the [supported protocol](https://github.com/rrooggiieerr/nad_serial.py#supported-protocol)
 should work too, with a basic set of settings: power, model, version, volume, mute and source.
+
+## Connecting
+
+### USB to serial adapter
+
+If your device has a serial port, use a USB to serial adapter to connect it. See the documentation
+of your device for the location of the serial port and how to wire it.
+
+### Ethernet
+
+If your device has an Ethernet port use a network cable to connect your device to a router.
+
+Use `socket://<ip address>:23` as the URL if the device is not automatically discovered.
+
+### Serial to Ethernet/WiFi bridge
+
+A serial to Ethernet/WiFi bridge is useful when the device is not close to your Home Assistant
+server. Configure the bridge for 115200 baud, 8N1.
+
+Use `socket://<ip address>:<port>` or `rfc2217://<ip address>:<port>` as the URL, depending on
+which protocol the bridge supports.
+
+### ESPHome Serial Proxy
+
+Build your own ESPHome Serial Proxy using an ESP32 and a serial to TTL converter. Install [ESPHome Serial Proxy](https://esphome.io/components/serial_proxy/)
+and select the Serial Proxy in the configuration flow.
+
+Example Serial Proxy using a Wemos C3 Mini:
+
+<img src="https://raw.githubusercontent.com/rrooggiieerr/homeassistant-nad.py/main/serial_proxy.png" style="width: 25%;"/>
+
+⚠️ Unlike this image you need a male connector on the serial to TTL converter
 
 ## Installation
 
@@ -190,62 +220,68 @@ data:
   channel: 0
 ```
 
-## Contribution and appreciation
+## Contributing and supporting this project
 
-Do you enjoy using this Home Assistant integration? You can contribute to this integration, or show
-your appreciation, in the following ways.
+Are you enjoying this Home Assistant integration? There are several ways you can contribute to the
+project, help other users, or support my work.
 
 ### Contribute your NAD model
 
-Is your NAD device supported by this Home Assistant integration but not listed under
-[Supported devices](#supported-devices)? Let me know your NAD model so I can improve the overview
-of supported devices.
+Is your NAD device supported by this Home Assistant integration but not yet listed under
+[Supported devices](#supported-devices)? Let me know which NAD model you have so I can improve the
+overview of supported devices.
 
-### Contribute your language
+Is your NAD model not fully supported yet? You can help by creating a [configuration file](https://github.com/rrooggiieerr/nad_serial.py/blob/main/nad_serial/configs/README.md)
+for your device and submitting it in a pull request.
 
-If you would like to use this Home Assistant integration in your own language you can provide a
-translation file as found in the `custom_components/nad/translations` directory. Create a pull
-request (preferred) or issue with the file attached.
+### Contribute a translation
 
-More on translating custom integrations can be found
-[here](https://developers.home-assistant.io/docs/internationalization/custom_integration/).
+Would you like to use this integration in your own language? You can help by adding a translation file
+to the `custom_components/nad/translations` directory and submitting it in a pull request.
+
+More information about translating Home Assistant custom integrations can be found
+[here](https://contributors.home-assistant.io/core/integrations/translations/).
 
 ### Star this integration
 
-Help other Home Assistant and NAD users find this integration by starring this GitHub page. Click
-**⭐ Star** on the top right of the GitHub page.
+Help other Home Assistant and NAD users discover this integration by starring the GitHub
+repository. Just click **⭐ Star** at the top right of [this page](https://github.com/rrooggiieerr/homeassistant-nad).
 
 ### Support my work
 
-Please consider supporting my work through one of the following platforms, your contribution is
-greatly appreciated and keeps me motivated:
+I’ve put a lot of time and effort into developing and maintaining this integration. If you find it
+useful, please consider supporting its continued development by [sponsoring me on GitHub][github]
+or [buying me a coffee ☕️][buymecoffee].
+
+Your support is greatly appreciated and helps keep me motivated to continue developing and
+maintaining this integration!
 
 [![GitHub Sponsors][github-shield]][github]
-[![PayPal][paypal-shield]][paypal]
 [![BuyMeCoffee][buymecoffee-shield]][buymecoffee]
-[![Patreon][patreon-shield]][patreon]
 
 ### Home Assistant support
 
-[Let me answer your Home Assistant questions](https://buymeacoffee.com/rrooggiieerr/e/447353). During
-a 1 hour Q&A session I help you solve your Home Assistant related issues.
+Need some hands-on help with Home Assistant? [Book a one-hour Q&A session](https://buymeacoffee.com/rrooggiieerr/e/447353)
+and I'll help you solve your Home Assistant-related questions.
 
-What can be done in one hour:
-- Home Assistant walkthrough, I explain to you what's where in the Home Assistant UI
-- Install and configure a Home Assistant integration
-- Explain and create scenes
-- Explain and create a simple automation
-- Install a ZHA quirk, to make your unsupported Zigbee device work in Home Assistant
+Examples of what we can cover in one hour:
+- Home Assistant walkthrough, I'll explain where to find things in the Home Assistant UI
+- Installing and configuring a Home Assistant integration
+- Explaining and creating scenes
+- Explaining and creating a simple automation
+- Install a ZHA quirk to make an unsupported Zigbee device work with Home Assistant
 
-What takes more time:
-- Depending on the severity I might be able to help you with recovering your crashed Home Assistant
-- Support for Home Assistant Integration developers
+For more complex issues, such as recovering a crashed Home Assistant installation or providing
+support for Home Assistant integration developers, I may be able to help as well. These requests
+can require more than one hour and may need to be arranged separately.
 
 ### Hire me
 
-If you would like to have a Home Assistant integration developed for your product or are in need
-of a freelance Python developer for your project please contact me, you can find my email address
-on [my GitHub profile](https://github.com/rrooggiieerr).
+Would you like a Home Assistant integration developed for your product, or do you need an
+experienced Python developer for your project?
+
+I'm available for freelance development work. You can find my contact details on
+[my GitHub profile](https://github.com/rrooggiieerr).
 
 [python-shield]: https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54
 [releases]: https://github.com/rrooggiieerr/homeassistant-nad/releases
@@ -258,11 +294,7 @@ on [my GitHub profile](https://github.com/rrooggiieerr).
 [homeassistant-shield]: https://img.shields.io/badge/home%20assistant-%2341BDF5.svg?style=for-the-badge&logo=home-assistant&logoColor=white
 [hacs]: https://hacs.xyz/
 [hacs-shield]: https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge
-[paypal]: https://paypal.me/seekingtheedge
-[paypal-shield]: https://img.shields.io/badge/PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white
 [buymecoffee]: https://www.buymeacoffee.com/rrooggiieerr
 [buymecoffee-shield]: https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black
 [github]: https://github.com/sponsors/rrooggiieerr
-[github-shield]: https://img.shields.io/badge/sponsor-30363D?style=for-the-badge&logo=GitHub-Sponsors&logoColor=#EA4AAA
-[patreon]: https://www.patreon.com/seekingtheedge/creators
-[patreon-shield]: https://img.shields.io/badge/Patreon-F96854?style=for-the-badge&logo=patreon&logoColor=white
+[github-shield]: https://img.shields.io/badge/sponsor-30363D?style=for-the-badge&logo=GitHub-Sponsors&logoColor=%23EA4AAA

@@ -1,16 +1,13 @@
 """Creates Switch entities for the NAD Home Assistant integration."""
 
 from datetime import timedelta
-from typing import override
+from typing import Any, override
 
-from homeassistant.components.switch import (
-    SwitchDeviceClass,
-    SwitchEntity,
-    SwitchEntityDescription,
-)
+from homeassistant.components.switch import SwitchEntity, SwitchEntityDescription
+from homeassistant.components.switch.const import SwitchDeviceClass
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from .coordinator import NADCoordinator
@@ -189,12 +186,12 @@ class NADSwitch(NADEntity, SwitchEntity):
 
     @override
     @handle_nad_action_errors
-    async def async_turn_on(self, **kwargs) -> None:
+    async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn the entity on."""
         await self._device.async_change_setting(self.entity_description.key, True)
 
     @override
     @handle_nad_action_errors
-    async def async_turn_off(self, **kwargs) -> None:
+    async def async_turn_off(self, **kwargs: Any) -> None:
         """Turn the entity off."""
         await self._device.async_change_setting(self.entity_description.key, False)

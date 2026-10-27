@@ -4,7 +4,7 @@ from collections.abc import Callable, Coroutine
 import contextlib
 import functools
 import logging
-from typing import Any, Concatenate, override
+from typing import Any, cast, override
 
 from nad_serial import NADDevice
 from nad_serial.exceptions import NADBaseError, NADConnectionError, NADTimeoutError
@@ -19,27 +19,28 @@ from .coordinator import NADCoordinator
 _LOGGER = logging.getLogger(__name__)
 
 
-def handle_nad_action_errors[EntityT: NADEntity, **P](
-    func: Callable[Concatenate[EntityT, P], Coroutine[Any, Any, None]],
-) -> Callable[Concatenate[EntityT, P], Coroutine[Any, Any, None]]:
+def handle_nad_action_errors[**P](
+    func: Callable[P, Coroutine[Any, Any, None]],
+) -> Callable[P, Coroutine[Any, Any, None]]:
     """Handles NAD errors for actions."""
 
     @functools.wraps(func)
-    async def wrapper(self: EntityT, *args: P.args, **kwargs: P.kwargs) -> None:
+    async def wrapper(*args: P.args, **kwargs: P.kwargs) -> None:
+        entity = cast(NADEntity, args[0])
         try:
-            await func(self, *args, **kwargs)
+            await func(*args, **kwargs)
         except NADConnectionError as ex:
-            await self.coordinator.async_request_refresh()
+            await entity.coordinator.async_request_refresh()
             raise HomeAssistantError(
                 translation_domain=DOMAIN,
                 translation_key="communication_error",
-                translation_placeholders={"name": self._device.name},
+                translation_placeholders={"name": entity._device.name},  # ruff: ignore[SLF001]
             ) from ex
         except NADTimeoutError as ex:
             raise HomeAssistantError(
                 translation_domain=DOMAIN,
                 translation_key="timeout_error",
-                translation_placeholders={"name": self._device.name},
+                translation_placeholders={"name": entity._device.name},  # ruff: ignore[SLF001]ss
             ) from ex
         except NADBaseError as ex:
             raise HomeAssistantError(
@@ -47,7 +48,7 @@ def handle_nad_action_errors[EntityT: NADEntity, **P](
                 translation_key="unknown_error",
                 translation_placeholders={"error": str(ex)},
             ) from ex
-        self.async_write_ha_state()
+        entity.async_write_ha_state()
 
     return wrapper
 
@@ -109,10 +110,12 @@ class NADEntity(CoordinatorEntity[NADCoordinator]):
     @property
     @override
     def should_poll(self) -> bool:
+        """Return True if entity has to be polled for state."""
         return not self.coordinator.device.sends_updates
 
     @override
     async def async_added_to_hass(self) -> None:
+        """Run when the entity has been added to hass."""
         await super().async_added_to_hass()
         self.async_on_remove(self._device.add_callback(self._async_nad_callback))
         self._attr_available = True

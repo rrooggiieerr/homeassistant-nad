@@ -9,8 +9,9 @@ from nad_serial.exceptions import NADBaseError
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_MAC
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry as dr
-from homeassistant.helpers.entity import DeviceInfo
+from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .const import DOMAIN
@@ -31,7 +32,9 @@ class NADCoordinator(DataUpdateCoordinator[None]):
     unique_id: str
     device_info: Final[DeviceInfo]
 
-    def __init__(self, hass, config_entry: NADConfigEntry, device: NADDevice):
+    def __init__(
+        self, hass: HomeAssistant, config_entry: NADConfigEntry, device: NADDevice
+    ) -> None:
         """Initialize NAD Data Update Coordinator."""
         super().__init__(
             hass,

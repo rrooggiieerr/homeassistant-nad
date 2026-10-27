@@ -38,6 +38,7 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import device_registry as dr, entity_registry as er
+from homeassistant.setup import async_setup_component
 
 from . import SERIAL_NUMBER, setup_integration
 
@@ -71,8 +72,16 @@ def setting_configs() -> dict[str, dict[str, Any]]:
     }
 
 
+@pytest.fixture
+def setting_values() -> dict[str, Any]:
+    """Return the setting values of the mocked device, by lowercase name."""
+    return {"main.listeningmode": "Stereo"}
+
+
 def _configure_amplifier(
-    device: MagicMock, setting_configs: dict[str, dict[str, Any]]
+    device: MagicMock,
+    setting_configs: dict[str, dict[str, Any]],
+    setting_values: dict[str, Any],
 ) -> None:
     """Configure a mocked NAD amplifier or zone."""
     device.get_setting_config.side_effect = lambda setting: setting_configs.get(
@@ -81,7 +90,9 @@ def _configure_amplifier(
     device.supports_setting.side_effect = lambda setting: (
         setting.lower() in setting_configs
     )
-    device.get_setting_value.return_value = "Stereo"
+    device.get_setting_value.side_effect = lambda setting: setting_values.get(
+        setting.lower()
+    )
     device.sends_updates = True
     device.is_on = True
     device.volume = -30
@@ -93,6 +104,12 @@ def _configure_amplifier(
         "async_decrement",
         "async_increment",
         "async_mute",
+        "async_request_is_on",
+        "async_request_mute",
+        "async_request_setting",
+        "async_request_settings",
+        "async_request_source_name",
+        "async_request_volume",
         "async_set_source",
         "async_set_volume",
         "async_turn_off",
@@ -104,11 +121,13 @@ def _configure_amplifier(
 
 @pytest.fixture
 def mock_amplifier(
-    mock_nad_device: MagicMock, setting_configs: dict[str, dict[str, Any]]
+    mock_nad_device: MagicMock,
+    setting_configs: dict[str, dict[str, Any]],
+    setting_values: dict[str, Any],
 ) -> MagicMock:
     """Return a mocked NAD amplifier."""
     mock_nad_device.__class__ = NADAmplifier
-    _configure_amplifier(mock_nad_device, setting_configs)
+    _configure_amplifier(mock_nad_device, setting_configs, setting_values)
     return mock_nad_device
 
 
@@ -334,9 +353,10 @@ async def test_zone_device_disabled_by_default(
             setting.replace("main.", "zone2."): config
             for setting, config in setting_configs.items()
         },
+        {},
     )
     mock_nad_device.__class__ = NADMultiZoneAmplifier
-    _configure_amplifier(mock_nad_device, setting_configs)
+    _configure_amplifier(mock_nad_device, setting_configs, {})
     mock_nad_device.zones = [zone]
 
     await setup_integration(hass, mock_rs232_config_entry)
@@ -351,3 +371,92 @@ async def test_zone_device_disabled_by_default(
         MEDIA_PLAYER_DOMAIN, DOMAIN, f"{SERIAL_NUMBER}_zone2"
     )
     assert entity_id is None or hass.states.get(entity_id) is None
+
+
+VOLUME_FEATURES = (
+    MediaPlayerEntityFeature.VOLUME_STEP | MediaPlayerEntityFeature.VOLUME_SET
+)
+
+
+async def test_volume_control_fixed(
+    hass: HomeAssistant,
+    mock_connect: AsyncMock,
+    mock_amplifier: MagicMock,
+    mock_rs232_config_entry: MockConfigEntry,
+    setting_configs: dict[str, dict[str, Any]],
+    setting_values: dict[str, Any],
+) -> None:
+    """Test volume control is disabled while the volume is fixed."""
+    setting_configs["main.volumecontrol"] = {
+        "operators": "=+-?",
+        "type": "enum",
+        "values": ["Variable", "Fixed"],
+    }
+    setting_values["main.volumecontrol"] = "Fixed"
+    await setup_integration(hass, mock_rs232_config_entry)
+    entity_id = er.async_get(hass).async_get_entity_id(
+        MEDIA_PLAYER_DOMAIN, DOMAIN, SERIAL_NUMBER
+    )
+    assert entity_id
+
+    state = hass.states.get(entity_id)
+    assert state is not None
+    features = state.attributes[ATTR_SUPPORTED_FEATURES]
+    assert not features & VOLUME_FEATURES
+    assert features & MediaPlayerEntityFeature.VOLUME_MUTE
+
+    with pytest.raises(HomeAssistantError):
+        await _call(hass, SERVICE_VOLUME_SET, entity_id, volume_level=0.5)
+    with pytest.raises(HomeAssistantError):
+        await _call(hass, SERVICE_VOLUME_UP, entity_id)
+    mock_amplifier.async_set_volume.assert_not_awaited()
+    mock_amplifier.async_increment.assert_not_awaited()
+
+    # The volume control is switched to variable on the device
+    setting_values["main.volumecontrol"] = "Variable"
+    await _push_update(hass, mock_amplifier, "Main.VolumeControl", "Variable")
+
+    state = hass.states.get(entity_id)
+    assert state is not None
+    assert state.attributes[ATTR_SUPPORTED_FEATURES] & VOLUME_FEATURES == (
+        VOLUME_FEATURES
+    )
+
+    await _call(hass, SERVICE_VOLUME_SET, entity_id, volume_level=0.5)
+    mock_amplifier.async_set_volume.assert_awaited_once_with(-40)
+
+
+async def test_volume_control_requested_when_added(
+    hass: HomeAssistant, entity_id: str, mock_amplifier: MagicMock
+) -> None:
+    """Test the volume control is requested when the entity is added."""
+    mock_amplifier.async_request_settings.assert_any_await(["Main.VolumeControl"])
+
+
+async def test_update_requests_volume_settings(
+    hass: HomeAssistant,
+    mock_connect: AsyncMock,
+    mock_amplifier: MagicMock,
+    mock_rs232_config_entry: MockConfigEntry,
+) -> None:
+    """Test polling requests the volume control and volume range."""
+    mock_amplifier.sends_updates = False
+    await setup_integration(hass, mock_rs232_config_entry)
+    assert await async_setup_component(hass, "homeassistant", {})
+    entity_id = er.async_get(hass).async_get_entity_id(
+        MEDIA_PLAYER_DOMAIN, DOMAIN, SERIAL_NUMBER
+    )
+    assert entity_id
+    mock_amplifier.async_request_settings.reset_mock()
+
+    await hass.services.async_call(
+        "homeassistant",
+        "update_entity",
+        {ATTR_ENTITY_ID: entity_id},
+        blocking=True,
+    )
+
+    mock_amplifier.async_request_settings.assert_awaited_once_with(
+        ["Main.VolumeControl", "Main.Volume.Min", "Main.Volume.Max"]
+    )
+    mock_amplifier.async_request_volume.assert_awaited_once()

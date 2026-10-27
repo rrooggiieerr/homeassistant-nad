@@ -1,10 +1,12 @@
 """Creates Media Player entities for the NAD Home Assistant integration."""
 
+import contextlib
 from datetime import timedelta
 import logging
 from typing import Any, override
 
 from nad_serial import NADAmplifier, NADMultiZoneAmplifier, NADZone
+from nad_serial.exceptions import NADConnectionError
 import probatio
 
 from homeassistant.components.media_player import (
@@ -168,19 +170,18 @@ class NADMediaPlayer(NADEntity, MediaPlayerEntity):
         """Initialize the NAD media player."""
         super().__init__(coordinator, device)
 
-        if volume_config := self._device.get_setting_config(f"{self._zone}.Volume"):
-            self._attr_supported_features |= MediaPlayerEntityFeature.VOLUME_STEP
-            if (
-                volume_config.get("min") is not None
-                and volume_config.get("max") is not None
-            ):
-                self._attr_supported_features |= MediaPlayerEntityFeature.VOLUME_SET
-
         if self._device.supports_setting(f"{self._zone}.Mute"):
             self._attr_supported_features |= MediaPlayerEntityFeature.VOLUME_MUTE
 
         if self._device.source_names:
             self._attr_supported_features |= MediaPlayerEntityFeature.SELECT_SOURCE
+
+    @override
+    async def async_added_to_hass(self) -> None:
+        """Run when the entity has been added to hass."""
+        await super().async_added_to_hass()
+        with contextlib.suppress(NADConnectionError):
+            await self._device.async_request_settings([f"{self._zone}.VolumeControl"])
 
     @override
     @callback
@@ -201,6 +202,14 @@ class NADMediaPlayer(NADEntity, MediaPlayerEntity):
             await self._device.async_request_is_on()
         if not self._device.is_on:
             return
+
+        await self._device.async_request_settings(
+            [
+                f"{self._zone}.VolumeControl",
+                f"{self._zone}.Volume.Min",
+                f"{self._zone}.Volume.Max",
+            ]
+        )
 
         if self.supported_features & MediaPlayerEntityFeature.VOLUME_SET:
             await self._device.async_request_volume()
@@ -302,6 +311,22 @@ class NADMediaPlayer(NADEntity, MediaPlayerEntity):
             if self._device.source_names
             else None
         )
+
+    @property
+    @override
+    def supported_features(self) -> MediaPlayerEntityFeature:
+        """Flag media player features that are supported."""
+        features = self._attr_supported_features
+
+        if self._device.get_setting_value(f"{self._zone}.VolumeControl") == "Fixed":
+            return features
+
+        if self._device.get_setting_config(f"{self._zone}.Volume"):
+            features |= MediaPlayerEntityFeature.VOLUME_STEP
+            if self._volume_range:
+                features |= MediaPlayerEntityFeature.VOLUME_SET
+
+        return features
 
     @override
     @handle_nad_action_errors

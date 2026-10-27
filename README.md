@@ -62,6 +62,8 @@ Additionally, the integration includes untested configuration files for the foll
 
 **Receivers:**
 
+- T175
+- T187
 - T758
 - T765
 - T775
@@ -74,6 +76,7 @@ Additionally, the integration includes untested configuration files for the foll
 
 - M15HD
 - M17
+- M51
 - T175
 - T187
 

@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling>=1.29", "hatch-vcs"]
+requires = ["hatchling>=1.32.4", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 [tool.hatch.version]
@@ -352,6 +352,7 @@ max-line-length-suggestions = 72
 [tool.mypy]
 python_version = "3.14"
 packages = ["custom_components.nad"]
+strict = true
 explicit_package_bases = true
 
 [tool.pytest.ini_options]

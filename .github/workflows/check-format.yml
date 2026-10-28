@@ -1,7 +1,9 @@
 name: Check Python code format
 
 # yamllint disable-line rule:truthy
-on: [push]
+on:
+  push:
+  pull_request:
 
 jobs:
   pre-commit:

@@ -1,7 +1,9 @@
 name: Run Python tests
 
 # yamllint disable-line rule:truthy
-on: [push]
+on:
+  push:
+  pull_request:
 
 jobs:
   build:

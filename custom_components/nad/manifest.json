@@ -18,7 +18,7 @@
   "issue_tracker": "https://github.com/rrooggiieerr/homeassistant-nad/issues",
   "loggers": ["nad_serial"],
   "requirements": [
-    "nad_serial@git+https://github.com/rrooggiieerr/nad_serial.py@722e1f6"
+    "nad_serial@git+https://github.com/rrooggiieerr/nad_serial.py@19363e6"
   ],
   "version": "0.1.2",
   "zeroconf": [{ "name": "*(nad*", "type": "_telnet._tcp.local." }]

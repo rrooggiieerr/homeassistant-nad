@@ -7,6 +7,12 @@
           "on": "mdi:lock"
         }
       },
+      "main_headphone": {
+        "default": "mdi:headphones-off",
+        "state": {
+          "on": "mdi:headphones"
+        }
+      },
       "main_video_hdr": {
         "default": "mdi:hdr-off",
         "state": {
@@ -32,6 +38,12 @@
       },
       "main_center_dialog": {
         "default": "mdi:account-voice"
+      },
+      "main_crossover": {
+        "default": "mdi:sine-wave"
+      },
+      "main_dirac": {
+        "default": "mdi:tune-vertical"
       },
       "main_dolby_center_width": {
         "default": "mdi:dolby"
@@ -81,6 +93,9 @@
       "main_speaker_back_config1": {
         "default": "mdi:speaker"
       },
+      "main_subwoofer": {
+        "default": "mdi:speaker"
+      },
       "main_treble": {
         "default": "mdi:music-clef-treble"
       },
@@ -120,6 +135,12 @@
       "main_video_noise_reduction": {
         "default": "mdi:blur"
       },
+      "source_analog_gain": {
+        "default": "mdi:volume-plus"
+      },
+      "source_volume_fixed": {
+        "default": "mdi:volume-lock"
+      },
       "tuner_preset": {
         "default": "mdi:radio"
       },
@@ -130,6 +151,12 @@
     "select": {
       "main_auto_trigger": {
         "default": "mdi:import"
+      },
+      "main_balance": {
+        "default": "mdi:scale-balance"
+      },
+      "main_display": {
+        "default": "mdi:monitor"
       },
       "main_listening_mode_analog": {
         "default": "mdi:surround-sound"
@@ -197,6 +224,12 @@
       "main_video_resolution": {
         "default": "mdi:monitor"
       },
+      "main_volume_display_mode": {
+        "default": "mdi:numeric"
+      },
+      "source_volume_control": {
+        "default": "mdi:volume-lock"
+      },
       "tuner_band": {
         "default": "mdi:radio",
         "state": {
@@ -210,11 +243,32 @@
       "dsp_version": {
         "default": "mdi:chip"
       },
+      "fpga_version": {
+        "default": "mdi:chip"
+      },
       "main_audio_channels": {
         "default": "mdi:surround-sound"
       },
       "main_audio_codec": {
         "default": "mdi:waveform"
+      },
+      "main_bt_codec": {
+        "default": "mdi:bluetooth-audio"
+      },
+      "main_bt_device": {
+        "default": "mdi:bluetooth-connect"
+      },
+      "main_bt_sink_device": {
+        "default": "mdi:bluetooth-connect"
+      },
+      "main_bt_status": {
+        "default": "mdi:bluetooth"
+      },
+      "main_bt_version": {
+        "default": "mdi:bluetooth-settings"
+      },
+      "main_bt_work_mode": {
+        "default": "mdi:bluetooth-settings"
       },
       "main_video_bits": {
         "default": "mdi:palette"
@@ -247,6 +301,21 @@
         "default": "mdi:satellite-variant"
       },
       "uart_version": {
+        "default": "mdi:chip"
+      },
+      "ui_ip": {
+        "default": "mdi:ip-network"
+      },
+      "ui_lcd_version": {
+        "default": "mdi:chip"
+      },
+      "ui_mac_eth0": {
+        "default": "mdi:ethernet"
+      },
+      "ui_mac_wlan0": {
+        "default": "mdi:wifi"
+      },
+      "ui_version": {
         "default": "mdi:chip"
       }
     },
@@ -290,8 +359,20 @@
       "main_enhanced_stereo_surround": {
         "default": "mdi:surround-sound"
       },
+      "main_lcd_display": {
+        "default": "mdi:monitor-off",
+        "state": {
+          "on": "mdi:monitor"
+        }
+      },
       "main_osd_temp_display": {
         "default": "mdi:monitor"
+      },
+      "main_speaker": {
+        "default": "mdi:speaker-off",
+        "state": {
+          "on": "mdi:speaker"
+        }
       },
       "main_speaker_a": {
         "default": "mdi:speaker-multiple",
@@ -313,6 +394,15 @@
       },
       "main_tape1": {
         "default": "mdi:cassette"
+      },
+      "source_analog_bypass": {
+        "default": "mdi:transit-skip"
+      },
+      "source_auto_sense": {
+        "default": "mdi:auto-fix"
+      },
+      "source_enabled": {
+        "default": "mdi:import"
       },
       "tuner_fm_mute": {
         "default": "mdi:radio-fm"

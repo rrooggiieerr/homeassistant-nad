@@ -156,6 +156,34 @@ _ENTITY_DESCRIPTIONS = [
         entity_registry_enabled_default=False,
     ),
     SelectEntityDescription(key="Tuner.Band", translation_key="tuner_band"),
+    SelectEntityDescription(
+        key="Main.Balance",
+        translation_key="main_balance",
+        entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=False,
+    ),
+    SelectEntityDescription(
+        key="Main.Display",
+        translation_key="main_display",
+        entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=False,
+    ),
+    SelectEntityDescription(
+        key="Main.VolumeDisplayMode",
+        translation_key="main_volume_display_mode",
+        entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=False,
+    ),
+    *(
+        SelectEntityDescription(
+            key=f"Source{i}.VolumeControl",
+            translation_key="source_volume_control",
+            translation_placeholders={"source": str(i)},
+            entity_category=EntityCategory.CONFIG,
+            entity_registry_enabled_default=False,
+        )
+        for i in range(1, 11)
+    ),
 ]
 
 

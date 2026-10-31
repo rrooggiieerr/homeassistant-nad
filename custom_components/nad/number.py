@@ -372,6 +372,48 @@ _ENTITY_DESCRIPTIONS = [
         translation_key="tuner_xm_channel",
         entity_registry_enabled_default=False,
     ),
+    NumberEntityDescription(
+        key="Main.CrossOver",
+        translation_key="main_crossover",
+        entity_category=EntityCategory.CONFIG,
+        device_class=NumberDeviceClass.FREQUENCY,
+        native_unit_of_measurement=UnitOfFrequency.HERTZ,
+        entity_registry_enabled_default=False,
+    ),
+    NumberEntityDescription(
+        key="Main.Dirac",
+        translation_key="main_dirac",
+        entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=False,
+    ),
+    NumberEntityDescription(
+        key="Main.Subwoofer",
+        translation_key="main_subwoofer",
+        entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=False,
+    ),
+    *(
+        NumberEntityDescription(
+            key=f"Source{i}.AnalogGain",
+            translation_key="source_analog_gain",
+            translation_placeholders={"source": str(i)},
+            entity_category=EntityCategory.CONFIG,
+            native_unit_of_measurement=UnitOfSoundPressure.DECIBEL,
+            entity_registry_enabled_default=False,
+        )
+        for i in range(1, 11)
+    ),
+    *(
+        NumberEntityDescription(
+            key=f"Source{i}.VolumeFixed",
+            translation_key="source_volume_fixed",
+            translation_placeholders={"source": str(i)},
+            entity_category=EntityCategory.CONFIG,
+            native_unit_of_measurement=UnitOfSoundPressure.DECIBEL,
+            entity_registry_enabled_default=False,
+        )
+        for i in range(1, 11)
+    ),
 ]
 
 
@@ -424,7 +466,7 @@ class NADNumber(NADEntity, NumberEntity):
     def native_value(self) -> float | None:
         """Return the value reported by the number."""
         value = self._device.get_setting_value(self.entity_description.key)
-        return float(value) if value is not None else None
+        return float(value) if isinstance(value, int | float) else None
 
     @override
     @handle_nad_action_errors

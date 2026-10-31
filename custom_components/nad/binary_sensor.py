@@ -7,7 +7,9 @@ from homeassistant.components.binary_sensor import (
     BinarySensorEntity,
     BinarySensorEntityDescription,
 )
+from homeassistant.components.binary_sensor.const import BinarySensorDeviceClass
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
@@ -32,6 +34,102 @@ _ENTITY_DESCRIPTIONS = [
         key="Main.Video.Lock",
         translation_key="main_video_lock",
         entity_registry_enabled_default=False,
+    ),
+    BinarySensorEntityDescription(
+        key="Main.Error.Amp",
+        translation_key="main_error_amp",
+        device_class=BinarySensorDeviceClass.PROBLEM,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+    ),
+    BinarySensorEntityDescription(
+        key="Main.Error.MiscLeft",
+        translation_key="main_error_misc_left",
+        device_class=BinarySensorDeviceClass.PROBLEM,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+    ),
+    BinarySensorEntityDescription(
+        key="Main.Error.MiscRight",
+        translation_key="main_error_misc_right",
+        device_class=BinarySensorDeviceClass.PROBLEM,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+    ),
+    BinarySensorEntityDescription(
+        key="Main.Error.OverloadLeft",
+        translation_key="main_error_overload_left",
+        device_class=BinarySensorDeviceClass.PROBLEM,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+    ),
+    BinarySensorEntityDescription(
+        key="Main.Error.OverloadRight",
+        translation_key="main_error_overload_right",
+        device_class=BinarySensorDeviceClass.PROBLEM,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+    ),
+    BinarySensorEntityDescription(
+        key="Main.Error.TempLeft",
+        translation_key="main_error_temp_left",
+        device_class=BinarySensorDeviceClass.PROBLEM,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+    ),
+    BinarySensorEntityDescription(
+        key="Main.Error.TempRight",
+        translation_key="main_error_temp_right",
+        device_class=BinarySensorDeviceClass.PROBLEM,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+    ),
+    BinarySensorEntityDescription(
+        key="Main.Error.Voltage",
+        translation_key="main_error_voltage",
+        device_class=BinarySensorDeviceClass.PROBLEM,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+    ),
+    BinarySensorEntityDescription(
+        key="Main.Fatal.ACDetect",
+        translation_key="main_fatal_ac_detect",
+        device_class=BinarySensorDeviceClass.PROBLEM,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+    ),
+    BinarySensorEntityDescription(
+        key="Main.Fatal.AmpProtectLeft",
+        translation_key="main_fatal_amp_protect_left",
+        device_class=BinarySensorDeviceClass.PROBLEM,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+    ),
+    BinarySensorEntityDescription(
+        key="Main.Fatal.AmpProtectRight",
+        translation_key="main_fatal_amp_protect_right",
+        device_class=BinarySensorDeviceClass.PROBLEM,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+    ),
+    BinarySensorEntityDescription(
+        key="Main.Fatal.PowerSupplyBad",
+        translation_key="main_fatal_power_supply_bad",
+        device_class=BinarySensorDeviceClass.PROBLEM,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+    ),
+    BinarySensorEntityDescription(
+        key="Main.Headphone",
+        translation_key="main_headphone",
+        device_class=BinarySensorDeviceClass.PLUG,
+        entity_registry_enabled_default=False,
+    ),
+    BinarySensorEntityDescription(
+        key="UI.UpgradeAvailable",
+        translation_key="ui_upgrade_available",
+        device_class=BinarySensorDeviceClass.UPDATE,
+        entity_category=EntityCategory.DIAGNOSTIC,
     ),
 ]
 

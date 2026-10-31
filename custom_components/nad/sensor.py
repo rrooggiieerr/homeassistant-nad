@@ -7,9 +7,10 @@ from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorEntity,
     SensorEntityDescription,
+    SensorStateClass,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import EntityCategory, UnitOfFrequency
+from homeassistant.const import EntityCategory, UnitOfFrequency, UnitOfTemperature
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
@@ -39,6 +40,7 @@ _ENTITY_DESCRIPTIONS = [
         translation_key="main_audio_rate",
         device_class=SensorDeviceClass.FREQUENCY,
         native_unit_of_measurement=UnitOfFrequency.KILOHERTZ,
+        suggested_display_precision=0,
     ),
     SensorEntityDescription(
         key="Main.Video.Bits",
@@ -90,6 +92,94 @@ _ENTITY_DESCRIPTIONS = [
     SensorEntityDescription(
         key="UART.Version",
         translation_key="uart_version",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+    ),
+    SensorEntityDescription(
+        key="FPGA.Version",
+        translation_key="fpga_version",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+    ),
+    SensorEntityDescription(
+        key="Main.BT.Codec",
+        translation_key="main_bt_codec",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+    ),
+    SensorEntityDescription(
+        key="Main.BT.Device",
+        translation_key="main_bt_device",
+        entity_registry_enabled_default=False,
+    ),
+    SensorEntityDescription(
+        key="Main.BT.SinkDevice",
+        translation_key="main_bt_sink_device",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+    ),
+    SensorEntityDescription(
+        key="Main.BT.Status",
+        translation_key="main_bt_status",
+        entity_registry_enabled_default=False,
+    ),
+    SensorEntityDescription(
+        key="Main.BT.Version",
+        translation_key="main_bt_version",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+    ),
+    SensorEntityDescription(
+        key="Main.BT.WorkMode",
+        translation_key="main_bt_work_mode",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+    ),
+    SensorEntityDescription(
+        key="Main.Temp.Amp.Left",
+        translation_key="main_temp_amp_left",
+        device_class=SensorDeviceClass.TEMPERATURE,
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+    ),
+    SensorEntityDescription(
+        key="Main.Temp.Amp.Right",
+        translation_key="main_temp_amp_right",
+        device_class=SensorDeviceClass.TEMPERATURE,
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+    ),
+    SensorEntityDescription(
+        key="UI.IP",
+        translation_key="ui_ip",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+    ),
+    SensorEntityDescription(
+        key="UI.LCDVersion",
+        translation_key="ui_lcd_version",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+    ),
+    SensorEntityDescription(
+        key="UI.MAC.eth0",
+        translation_key="ui_mac_eth0",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+    ),
+    SensorEntityDescription(
+        key="UI.MAC.wlan0",
+        translation_key="ui_mac_wlan0",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+    ),
+    SensorEntityDescription(
+        key="UI.VERSION",
+        translation_key="ui_version",
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
     ),

@@ -132,6 +132,48 @@ _ENTITY_DESCRIPTIONS = [
         translation_key="tuner_fm_mute",
         entity_registry_enabled_default=False,
     ),
+    SwitchEntityDescription(
+        key="Main.LCD.Display",
+        translation_key="main_lcd_display",
+        entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=False,
+    ),
+    SwitchEntityDescription(
+        key="Main.Speaker",
+        translation_key="main_speaker",
+        entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=False,
+    ),
+    *(
+        SwitchEntityDescription(
+            key=f"Source{i}.AnalogBypass",
+            translation_key="source_analog_bypass",
+            translation_placeholders={"source": str(i)},
+            entity_category=EntityCategory.CONFIG,
+            entity_registry_enabled_default=False,
+        )
+        for i in range(1, 11)
+    ),
+    *(
+        SwitchEntityDescription(
+            key=f"Source{i}.AutoSense",
+            translation_key="source_auto_sense",
+            translation_placeholders={"source": str(i)},
+            entity_category=EntityCategory.CONFIG,
+            entity_registry_enabled_default=False,
+        )
+        for i in range(1, 11)
+    ),
+    *(
+        SwitchEntityDescription(
+            key=f"Source{i}.Enabled",
+            translation_key="source_enabled",
+            translation_placeholders={"source": str(i)},
+            entity_category=EntityCategory.CONFIG,
+            entity_registry_enabled_default=False,
+        )
+        for i in range(1, 11)
+    ),
 ]
 
 

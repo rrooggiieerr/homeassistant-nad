@@ -43,11 +43,53 @@
             "main_audio_lock": {
                 "name": "Audio lock"
             },
+            "main_error_amp": {
+                "name": "Amplifier error"
+            },
+            "main_error_misc_left": {
+                "name": "Left channel error"
+            },
+            "main_error_misc_right": {
+                "name": "Right channel error"
+            },
+            "main_error_overload_left": {
+                "name": "Left channel overload"
+            },
+            "main_error_overload_right": {
+                "name": "Right channel overload"
+            },
+            "main_error_temp_left": {
+                "name": "Left channel temperature"
+            },
+            "main_error_temp_right": {
+                "name": "Right channel temperature"
+            },
+            "main_error_voltage": {
+                "name": "Voltage error"
+            },
+            "main_fatal_ac_detect": {
+                "name": "AC detection failure"
+            },
+            "main_fatal_amp_protect_left": {
+                "name": "Left amplifier protection"
+            },
+            "main_fatal_amp_protect_right": {
+                "name": "Right amplifier protection"
+            },
+            "main_fatal_power_supply_bad": {
+                "name": "Power supply failure"
+            },
+            "main_headphone": {
+                "name": "Headphones"
+            },
             "main_video_hdr": {
                 "name": "Video HDR"
             },
             "main_video_lock": {
                 "name": "Video lock"
+            },
+            "ui_upgrade_available": {
+                "name": "Firmware upgrade available"
             }
         },
         "number": {
@@ -62,6 +104,12 @@
             },
             "main_center_dialog": {
                 "name": "Center dialog"
+            },
+            "main_crossover": {
+                "name": "Subwoofer crossover"
+            },
+            "main_dirac": {
+                "name": "Dirac filter"
             },
             "main_distance_back_left": {
                 "name": "Distance back left"
@@ -150,6 +198,9 @@
             "main_speaker_surround_frequency": {
                 "name": "Speaker crossover surround"
             },
+            "main_subwoofer": {
+                "name": "Number of subwoofers"
+            },
             "main_treble": {
                 "name": "Treble tone control"
             },
@@ -189,6 +240,12 @@
             "main_video_noise_reduction": {
                 "name": "Video noise reduction"
             },
+            "source_analog_gain": {
+                "name": "Source {source} analog gain"
+            },
+            "source_volume_fixed": {
+                "name": "Source {source} fixed volume"
+            },
             "tuner_am_frequency": {
                 "name": "Tuner AM frequency"
             },
@@ -211,6 +268,33 @@
                     "zone2": "Zone 2",
                     "zone3": "Zone 3",
                     "zone4": "Zone 4"
+                }
+            },
+            "main_balance": {
+                "name": "Balance",
+                "state": {
+                    "0": "Center",
+                    "1l": "Left −1 dB",
+                    "1r": "Right −1 dB",
+                    "2l": "Left −2 dB",
+                    "2r": "Right −2 dB",
+                    "3l": "Left −3 dB",
+                    "3r": "Right −3 dB",
+                    "4l": "Left −4 dB",
+                    "4r": "Right −4 dB",
+                    "5l": "Left −5 dB",
+                    "5r": "Right −5 dB",
+                    "6l": "Left −6 dB",
+                    "6r": "Right −6 dB",
+                    "7l": "Left −7 dB",
+                    "7r": "Right −7 dB"
+                }
+            },
+            "main_display": {
+                "name": "Display",
+                "state": {
+                    "on": "Always on",
+                    "temp": "Temporary"
                 }
             },
             "main_listening_mode_analog": {
@@ -472,6 +556,20 @@
                     "1920x1080p60": "1920x1080p 60 Hz"
                 }
             },
+            "main_volume_display_mode": {
+                "name": "Volume display mode",
+                "state": {
+                    "decibel": "Decibel",
+                    "percent": "Percent"
+                }
+            },
+            "source_volume_control": {
+                "name": "Source {source} volume control",
+                "state": {
+                    "fixed": "Fixed",
+                    "variable": "Variable"
+                }
+            },
             "tuner_band": {
                 "name": "Tuner band",
                 "state": {
@@ -486,6 +584,9 @@
             "dsp_version": {
                 "name": "DSP version"
             },
+            "fpga_version": {
+                "name": "FPGA version"
+            },
             "main_audio_channels": {
                 "name": "Audio channels"
             },
@@ -494,6 +595,30 @@
             },
             "main_audio_rate": {
                 "name": "Audio sample rate"
+            },
+            "main_bt_codec": {
+                "name": "Bluetooth codec"
+            },
+            "main_bt_device": {
+                "name": "Bluetooth device"
+            },
+            "main_bt_sink_device": {
+                "name": "Bluetooth sink device"
+            },
+            "main_bt_status": {
+                "name": "Bluetooth status"
+            },
+            "main_bt_version": {
+                "name": "Bluetooth version"
+            },
+            "main_bt_work_mode": {
+                "name": "Bluetooth work mode"
+            },
+            "main_temp_amp_left": {
+                "name": "Left amplifier temperature"
+            },
+            "main_temp_amp_right": {
+                "name": "Right amplifier temperature"
             },
             "main_video_bits": {
                 "name": "Video color depth"
@@ -527,6 +652,21 @@
             },
             "uart_version": {
                 "name": "UART version"
+            },
+            "ui_ip": {
+                "name": "IP address"
+            },
+            "ui_lcd_version": {
+                "name": "LCD version"
+            },
+            "ui_mac_eth0": {
+                "name": "Ethernet MAC address"
+            },
+            "ui_mac_wlan0": {
+                "name": "Wi-Fi MAC address"
+            },
+            "ui_version": {
+                "name": "UI version"
             }
         },
         "switch": {
@@ -569,8 +709,14 @@
             "main_enhanced_stereo_surround": {
                 "name": "Enhanced stereo surround"
             },
+            "main_lcd_display": {
+                "name": "LCD display"
+            },
             "main_osd_temp_display": {
                 "name": "OSD temp display"
+            },
+            "main_speaker": {
+                "name": "Speaker output"
             },
             "main_speaker_a": {
                 "name": "Speakers A"
@@ -586,6 +732,15 @@
             },
             "main_tone_defeat": {
                 "name": "Tone defeat"
+            },
+            "source_analog_bypass": {
+                "name": "Source {source} analog bypass"
+            },
+            "source_auto_sense": {
+                "name": "Source {source} auto sense"
+            },
+            "source_enabled": {
+                "name": "Source {source} enabled"
             },
             "tuner_fm_mute": {
                 "name": "Tuner FM mute"

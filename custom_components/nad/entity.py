@@ -40,7 +40,7 @@ def handle_nad_action_errors[**P](
             raise HomeAssistantError(
                 translation_domain=DOMAIN,
                 translation_key="timeout_error",
-                translation_placeholders={"name": entity._device.name},  # ruff: ignore[SLF001]ss
+                translation_placeholders={"name": entity._device.name},  # ruff: ignore[SLF001]
             ) from ex
         except NADBaseError as ex:
             raise HomeAssistantError(

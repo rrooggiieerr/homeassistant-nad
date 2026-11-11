@@ -5,7 +5,7 @@
 [![Licence][license-shield]][license]
 [![Maintainer][maintainer-shield]][maintainer]
 [![Home Assistant][homeassistant-shield]][homeassistant]
-[![HACS][hacs-shield]][hacs]  
+[![Marketplace][marketplace-shield]][marketplace]  
 [![GitHub Sponsors][github-shield]][github]
 [![BuyMeCoffee][buymecoffee-shield]][buymecoffee]
 
@@ -129,12 +129,26 @@ Example Serial Proxy using a Wemos C3 Mini:
 
 ## Installation
 
-### HACS
+### Marketplace
 
-The recommended way to install this Home Assistant integration is by using [HACS][hacs].
-Click the following button to open the integration directly on the HACS integration page.
+The recommended way to install this Home Assistant integration is by using [Marketplace][marketplace].
+Click the following button to open the integration directly on the Marketplace page.
 
-[![Install NAD from HACS.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=rrooggiieerr&repository=homeassistant-nad&category=integration)
+[![Install NAD from Marketplace.](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=rrooggiieerr&repository=homeassistant-nad&category=integration)
+
+Or follow these instructions:
+
+- Go to **Settings > Marketplace** in Home Assistant
+- Select **Add from link** in the upper-right corner
+- Enter this repository URL under **GitHub link** and select **Add**
+- Open the *NAD* repository page and select **Install**
+- Confirm the installation
+- Restart Home Assistant
+
+Home Assistant Core also has a NAD integration that uses the same `nad` domain. That's why this
+integration can't be found by searching in Marketplace. When you install it, Marketplace warns that
+it replaces the built-in NAD integration and asks for an extra confirmation. After the restart this
+integration is used instead of the built-in one.
 
 ### Manually
 
@@ -295,8 +309,8 @@ I'm available for freelance development work. You can find my contact details on
 [maintainer-shield]: https://img.shields.io/badge/MAINTAINER-%40rrooggiieerr-41BDF5?style=for-the-badge
 [homeassistant]: https://www.home-assistant.io/
 [homeassistant-shield]: https://img.shields.io/badge/home%20assistant-%2341BDF5.svg?style=for-the-badge&logo=home-assistant&logoColor=white
-[hacs]: https://hacs.xyz/
-[hacs-shield]: https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge
+[marketplace]: https://www.home-assistant.io/integrations/marketplace/
+[marketplace-shield]: https://img.shields.io/badge/Marketplace-Custom-41BDF5.svg?style=for-the-badge
 [buymecoffee]: https://www.buymeacoffee.com/rrooggiieerr
 [buymecoffee-shield]: https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black
 [github]: https://github.com/sponsors/rrooggiieerr
